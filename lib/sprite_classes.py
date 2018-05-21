@@ -205,7 +205,7 @@ class FighterSprite(MaskedSprite):
     
 
 class PlayerSprite(FighterSprite):
-        
+    '''Class used for player fighter.'''
         
     def get_pilot_commands(self):
         '''See parent class 'FighterSprite' method doc.'''
@@ -246,6 +246,80 @@ class PlayerSprite(FighterSprite):
             fire_cannon = False
             
         return  fire_cannon
+    
+    
+class EnemySprite(FighterSprite):
+    '''Class used for enemy fighters.'''
+    
+    piloting_cone_sine = 0.1
+    gunning_cone_sine = 0.05
+    
+    def __init__(self,screen,image_path,laser_beams_group,player,*groups,**initial_values):
+        
+        FighterSprite.__init__(self,screen,image_path,laser_beams_group,*groups,**initial_values)
+        
+        # attach group containing player sprite
+        self.player = player
+        
+        
+    def use_radar(self):
+        '''Util method used by piloting and gunning methods. Yields player position
+        relative to the enemy sprite by calculating the projection of the 
+        enemy -> player connecting line on the vector orthogonal to the enemy's
+        current direction of flight. This allows the enemy to see whether to turn
+        left or right to get closer to the player.'''
+        
+        # get own directional unit vector
+        angle_degrees = self._angle * pi / 180
+        direction = np.array([cos(angle_degrees ),-sin(angle_degrees )])
+        clockwise_ortnorm = np.array([direction[1],-direction[0]])
+        
+        # get clockwise rotated orthogonal to unit vector pointing towards player position
+        rel_player_position = (self.player._center - self._center)
+        rel_player_position /= np.linalg.norm(rel_player_position)
+        
+        # turn towards player, whichever way is more aligned with current direction of movement
+        projection_on_ortnorm = np.dot(clockwise_ortnorm,rel_player_position)
+        
+        return projection_on_ortnorm
+    
+    def get_pilot_commands(self):
+        '''See parent FighterSprite class doc for this method.'''
+        
+        # have a look at the radar to see where player sprite is
+        projection_on_ortnorm = self.use_radar()
+
+        # turn towards player, whichever way is more aligned with current direction of movement        
+        if projection_on_ortnorm > self.__class__.piloting_cone_sine:
+            # turn left
+            d_angle = self.__class__.d_angle
+        elif projection_on_ortnorm < -self.__class__.piloting_cone_sine:
+            # turn right
+            d_angle = - self.__class__.d_angle
+        else:
+            # continue straight on
+            d_angle = 0
+            
+        d_speed = 0
+        
+        return d_angle, d_speed
+        
+    def get_gunner_commands(self):
+        '''See parent FighterSprite class doc for this method.'''
+        
+        # have a look at the radar to see where player sprite is
+        projection_on_ortnorm = self.use_radar()
+        
+        # if player within 'cone of reasonable accuracy', shoot
+        if - self.__class__.gunning_cone_sine < projection_on_ortnorm < self.__class__.gunning_cone_sine:
+            # make decision to fire
+            fire_cannon = True
+        else:
+            fire_cannon = False
+        
+        return fire_cannon
+
+    
             
 class LaserSprite(MaskedSprite):
     
@@ -289,8 +363,16 @@ screen = pg.display.set_mode(size)
 
 player_sprite = Group()
 player_lasers = Group()
+enemy_sprite = Group()
+enemy_lasers = Group()
 
-player = PlayerSprite(screen,'.\\graphics\\ship_2.bmp',player_lasers,player_sprite,angle=-45)
+player = PlayerSprite(screen,'.\\graphics\\ship_2.bmp',player_lasers,
+                      player_sprite,
+                      angle=-45)
+
+enemy_1 = EnemySprite(screen,'.\\graphics\\ship_3.bmp',enemy_lasers,player,
+                      enemy_sprite,
+                      angle=-45,center=[200,400],speed=5)
                
 while 1:
     # check for exit events
@@ -299,16 +381,22 @@ while 1:
             pg.quit()
             sys.exit()
     
-    # update player
+    # update sprites
     player_sprite.update()
+    enemy_sprite.update()
     
-    # update player lasers
+    # update lasers
     player_lasers.update()
+    enemy_lasers.update()
 
     # draw new game state    
     screen.fill(white) # paint over old game state
+    
     player_sprite.draw(screen) # draw all player sprite
     player_lasers.draw(screen) # draw all player laser sprites
+    
+    enemy_sprite.draw(screen) # draw all enemy sprite
+    enemy_lasers.draw(screen) # draw all enemy laser sprite
                
     # flip canvas
     pg.display.flip()
