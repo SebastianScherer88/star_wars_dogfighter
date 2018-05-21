@@ -17,7 +17,7 @@ import numpy as np
 
 class MaskedSprite(Sprite):
     
-    def __init__(self,screen,image_path,laser_beams_group,*groups,**initial_values):
+    def __init__(self,screen,image_path,*groups,**initial_values):
         '''image: path to sprite image
         *groups: optional (unnamed) list of groups the sprite will be added to
                           when created
@@ -30,9 +30,6 @@ class MaskedSprite(Sprite):
         # attach screen
         self.screen = screen
         
-        # attach laser beam 'basket' group
-        self.laser_beams = laser_beams_group
-
         # get and attach image as pygame surface; initialize rotated image storage
         self._original_image = pg.image.load(image_path)
         
@@ -121,9 +118,12 @@ class MaskedSprite(Sprite):
         
         # update speed attribute
         self._speed = speed
-                
-class PlayerSprite(MaskedSprite):
         
+class FighterSprite(MaskedSprite):
+    '''Parent class for PlayerSprite and EnemySprite. Allows for a slim MaskedSprite
+    class that has doesnt lead to 'appendix syndrome' for the LaserSprite class.'''
+    
+    # set up some class attributes; maybe make these ship specific or similar
     d_angle = 1 # rotation rate for this sprite type (in degrees)
     d_speed = 0.5 # acceleration rate for this sprite type
     max_speed = 20 # max speed for this sprite type
@@ -132,16 +132,84 @@ class PlayerSprite(MaskedSprite):
     weapon_cool_down = 50 # number of frames between shots
     
     def __init__(self,screen,image_path,laser_beams_group,*groups,**initial_values):
-        '''Repeat original init to add some attributes'''
         
-        MaskedSprite.__init__(self,screen,image_path,laser_beams_group,*groups,**initial_values)
+        # call parent class __init__
+        MaskedSprite.__init__(self,screen,image_path,*groups,**initial_values)
         
+        # attach laser beam 'basket' group
+        self.laser_beams = laser_beams_group
+        
+        # set the weapon cool down counter
         self.weapon_cooling = 0
         
-    def get_player_controls(self):
-        '''Gets player control input and converts into angle and speed
-        differentials d_angle and d_speed, as well as fire command.'''
+    def get_pilot_commands(self):
+        '''Controls the sprites steering process. Either player or 'AI' controlled.
+        Returns:
+            - d_angle: float that indicates angle w.r.t current direction, i.e.
+                        '0' to go straight on. Positive values lead to left turns,
+                        negative value to right turns
+            - d_speed: float that indicates acceleration on a per frame basis.
+                        Probably only relevant for player controlled sprite. Positive
+                        acceleration means speeding up, negative means slowing down.'''
+                        
+    def get_gunner_commands(self):
+        ''' Controls the sprites weapon firing process. Either player or 'AI' controlled.
+        Returns:
+            - fire_cannon: Bool. 'True' to fire laser, 'False' to not.'''
             
+    def use_cannon(self,fire_cannon):
+        '''Fires the cannon if firing flag 'fire_cannon' is True by creating a
+        LaserSprite object with appropriate initial values near sprite's cannon
+        guns' tips. Reset weapon cool down counter when necessary.'''
+        
+        if fire_cannon and not self.weapon_cooling:
+            # fire laser beam: set arguments for laser __init__
+            laser_screen = self.screen
+            laser_lifetime = self.__class__.laser_lifetime
+            laser_speed = self._speed + self.__class__.laser_speed
+            laser_angle = self._angle
+            laser_center = self._center
+            
+            # fire laser beam: create laserSprite instance
+            LaserSprite(laser_screen,'.\\graphics\\laser.bmp',laser_lifetime,
+                        self.laser_beams,
+                        speed=laser_speed,
+                        angle=laser_angle,
+                        center=laser_center)
+            
+            # set cool down counter to maximum after weapon use
+            self.weapon_cooling = self.__class__.weapon_cool_down
+            
+    def update(self):
+        '''Updates the sprites position based on player control input. Also fires
+        cannon when necessary.'''
+        
+        # handle pilot controls
+        d_angle, d_speed = self.get_pilot_commands()
+        
+        # handle gunner controls
+        fire_cannon = self.get_gunner_commands()
+            
+        # rotate sprite if necessary
+        self.rotate_ip(d_angle)
+        
+        # move player sprite
+        self.move_ip(d_speed)
+            
+        # fire cannon if necessary
+        self.use_cannon(fire_cannon)
+        
+        # update weapon cooling counter but keep at minimum 0
+        if self.weapon_cooling > 0:
+            self.weapon_cooling -= 1
+    
+
+class PlayerSprite(FighterSprite):
+        
+        
+    def get_pilot_commands(self):
+        '''See parent class 'FighterSprite' method doc.'''
+        
         # get all keys currently down
         pressed_keys = pg.key.get_pressed()
             
@@ -163,66 +231,27 @@ class PlayerSprite(MaskedSprite):
         else:
             d_speed = 0
             
+        return d_angle, d_speed
+    
+    def get_gunner_commands(self):
+        '''See parent class 'FighterSprite' method doc.'''
+        
+        # get all keys currently down
+        pressed_keys = pg.key.get_pressed()
+        
         # get fire command
         if pressed_keys[pg.K_SPACE]:
             fire_cannon = True
         else:
             fire_cannon = False
             
-        return d_angle, d_speed, fire_cannon
-    
-    def use_cannon(self,fire_cannon):
-        '''Fires the cannon if firing flag 'fire_cannon' is True by creating a
-        LaserSprite object with appropriate initial values near sprite's cannon
-        guns' tips. When fleshing out the full game, every laser should be added
-        to a player_laser group or similar that keeps track of alive player laser,
-        and similarly for enemy lasers. This means the MaskedSprite needs additional
-        __init__ arguments to pass groups.
-        Returns remaining weapon cool down time.'''
-        
-        if fire_cannon and not self.weapon_cooling:
-            # fire laser beam: set arguments for laser __init__
-            laser_screen = self.screen
-            laser_lifetime = self.__class__.laser_lifetime
-            laser_speed = self._speed + self.__class__.laser_speed
-            laser_angle = self._angle
-            laser_center = self._center
-            
-            # fire laser beam: create laserSprite instance
-            LaserSprite(laser_screen,'.\\graphics\\laser.bmp',laser_lifetime,
-                        self.laser_beams,
-                        speed=laser_speed,
-                        angle=laser_angle,
-                        center=laser_center)
-            
-            # set cool down counter to maximum after weapon use
-            self.weapon_cooling = self.__class__.weapon_cool_down
-    
-    def update(self):
-        '''Updates the sprites position based on player control input. Also fires
-        cannon when necessary.'''
-        
-        # handle player controls
-        d_angle, d_speed, fire_cannon = self.get_player_controls()
-            
-        # rotate sprite if necessary
-        self.rotate_ip(d_angle)
-        
-        # move player sprite
-        self.move_ip(d_speed)
-            
-        # fire cannon if necessary
-        self.use_cannon(fire_cannon)
-        
-        # update weapon cooling counter but keep at minimum 0
-        if self.weapon_cooling > 0:
-            self.weapon_cooling -= 1
+        return  fire_cannon
             
 class LaserSprite(MaskedSprite):
     
     def __init__(self,screen,image_path,time_left,*groups,**initial_values):
         
-        MaskedSprite.__init__(self,screen,image_path,None,*groups,**initial_values)
+        MaskedSprite.__init__(self,screen,image_path,*groups,**initial_values)
         
         self.time_left = time_left
     
