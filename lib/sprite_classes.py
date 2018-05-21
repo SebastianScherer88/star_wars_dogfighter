@@ -35,7 +35,12 @@ class MaskedSprite(Sprite):
 
         # get and attach image as pygame surface; initialize rotated image storage
         self._original_image = pg.image.load(image_path)
-        self.image = pg.image.load(image_path)
+        
+        # make original image's white parts transparent
+        self._original_image.set_colorkey((255,255,255))
+        
+        # get temporary image
+        self.image = pg.transform.rotate(self._original_image,0)
         
         # get and attach positional rectangle
         self.rect = self.image.get_rect()
