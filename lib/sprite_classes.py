@@ -9,7 +9,7 @@ Created on Sat May 19 22:36:56 2018
 It contains the \'MaskedSprite\' class which functions as a functional base class
 for the more refined custom classes \'PlayerSprite\', \'EnemySprite\' and \'LaserSprite\'.'''
 
-from pygame.sprite import Sprite, Group
+from pygame.sprite import Sprite, Group, collide_mask, spritecollide, groupcollide
 from math import cos, sin, pi
 
 import pygame as pg
@@ -127,7 +127,7 @@ class FighterSprite(MaskedSprite):
     d_angle = 1 # rotation rate for this sprite type (in degrees)
     d_speed = 0.5 # acceleration rate for this sprite type
     max_speed = 20 # max speed for this sprite type
-    laser_speed = 15 # speed of fired laser beams relative to sprite
+    laser_speed = 10 # speed of fired laser beams relative to sprite
     laser_lifetime = 50 # number of frames a laser beam lasts before 'dissolving'
     weapon_cool_down = 50 # number of frames between shots
     
@@ -251,8 +251,8 @@ class PlayerSprite(FighterSprite):
 class EnemySprite(FighterSprite):
     '''Class used for enemy fighters.'''
     
-    piloting_cone_sine = 0.1
-    gunning_cone_sine = 0.05
+    piloting_cone_sine = 0.05
+    gunning_cone_sine = 0.1
     
     def __init__(self,screen,image_path,laser_beams_group,player,*groups,**initial_values):
         
@@ -356,6 +356,7 @@ clock = pg.time.Clock()
 
 white = 255, 255, 255
 fps = 40
+enemy_down_time = 5 # pause between enemy death and spawning of new enemy in seconds
 
 # initialize main screen
 size = width, height = 620, 540 # screen size
@@ -373,8 +374,10 @@ player = PlayerSprite(screen,'.\\graphics\\ship_2.bmp',player_lasers,
 enemy_1 = EnemySprite(screen,'.\\graphics\\ship_3.bmp',enemy_lasers,player,
                       enemy_sprite,
                       angle=-45,center=[200,400],speed=5)
-               
-while 1:
+
+kill_confirmed= False
+
+while True:
     # check for exit events
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -388,7 +391,7 @@ while 1:
     # update lasers
     player_lasers.update()
     enemy_lasers.update()
-
+    
     # draw new game state    
     screen.fill(white) # paint over old game state
     
@@ -400,6 +403,44 @@ while 1:
                
     # flip canvas
     pg.display.flip()
+    
+    # check for collisions
+    if spritecollide(player,enemy_sprite,True,collided=collide_mask) or \
+                    spritecollide(player,enemy_lasers,True,collided=collide_mask):
+        # if player collides with enemy or is shot down, end game
+        pg.quit()
+        sys.exit()
+        
+    elif groupcollide(enemy_sprite,player_lasers,True,True,collided=collide_mask):    
+        # mark down time of kill shot
+        kill_confirmed = True
+        kill_time = pygame.time.get_ticks()
+        
+    # spawn new enemy if necessary
+    if kill_confirmed:
+        # check if enough time has passed since kill
+        now_time = pygame.time.get_ticks()
+        if (now_time - kill_time) / 1000 > enemy_down_time:
+            # reset confirmed kill flag
+            kill_confirmed = False
+            
+            # start spawning procedure
+            too_close = True
+            
+            while too_close:
+                # break loop when done
+                too_close = False
+                
+                # spawn enemy at random location
+                enemy_center = np.random.uniform(0,1,2) * np.array([width,height]).astype('float')
+                
+                # if enemy has safety distance from player, proceed with spawning
+                if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
+                    # spawn enemy
+                    new_enemy = EnemySprite(screen,'.\\graphics\\ship_3.bmp',enemy_lasers,player,
+                      enemy_sprite,
+                      angle=-45,center=enemy_center,speed=5)
+
     
     # control pace
     clock.tick(fps)
