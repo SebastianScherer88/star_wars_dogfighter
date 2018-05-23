@@ -128,7 +128,7 @@ class FighterSprite(MaskedSprite):
     d_speed = 0.5 # acceleration rate for this sprite type
     max_speed = 20 # max speed for this sprite type
     laser_speed = 10 # speed of fired laser beams relative to sprite
-    laser_lifetime = 50 # number of frames a laser beam lasts before 'dissolving'
+    laser_lifetime = 40 # number of frames a laser beam lasts before 'dissolving'
     weapon_cool_down = 50 # number of frames between shots
     
     def __init__(self,screen,image_path,laser_beams_group,*groups,**initial_values):
@@ -359,7 +359,7 @@ fps = 40
 enemy_down_time = 5 # pause between enemy death and spawning of new enemy in seconds
 
 # initialize main screen
-size = width, height = 620, 540 # screen size
+size = width, height = 1040, 740 # screen size
 screen = pg.display.set_mode(size)
 
 player_sprite = Group()
