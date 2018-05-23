@@ -367,11 +367,11 @@ player_lasers = Group()
 enemy_sprite = Group()
 enemy_lasers = Group()
 
-player = PlayerSprite(screen,'.\\graphics\\ship_2.bmp',player_lasers,
+player = PlayerSprite(screen,'.\\graphics\\f35.bmp',player_lasers,
                       player_sprite,
                       angle=-45)
 
-enemy_1 = EnemySprite(screen,'.\\graphics\\ship_3.bmp',enemy_lasers,player,
+enemy_1 = EnemySprite(screen,'.\\graphics\\hornet.bmp',enemy_lasers,player,
                       enemy_sprite,
                       angle=-45,center=[200,400],speed=5)
 
@@ -437,7 +437,7 @@ while True:
                 # if enemy has safety distance from player, proceed with spawning
                 if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
                     # spawn enemy
-                    new_enemy = EnemySprite(screen,'.\\graphics\\ship_3.bmp',enemy_lasers,player,
+                    new_enemy = EnemySprite(screen,'.\\graphics\\hornet.bmp',enemy_lasers,player,
                       enemy_sprite,
                       angle=-45,center=enemy_center,speed=5)
 
