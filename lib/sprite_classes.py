@@ -428,8 +428,6 @@ while True:
             too_close = True
             
             while too_close:
-                # break loop when done
-                too_close = False
                 
                 # spawn enemy at random location
                 enemy_center = np.random.uniform(0,1,2) * np.array([width,height]).astype('float')
@@ -440,6 +438,9 @@ while True:
                     new_enemy = EnemySprite(screen,'.\\graphics\\tiefighter.bmp',enemy_lasers,player,
                       enemy_sprite,
                       angle=-45,center=enemy_center,speed=5)
+                    
+                    # break loop when done
+                    too_close = False
 
     
     # control pace
