@@ -124,7 +124,7 @@ class FighterSprite(MaskedSprite):
     class that has doesnt lead to 'appendix syndrome' for the LaserSprite class.'''
     
     # set up some class attributes; maybe make these ship specific or similar
-    d_angle = 1.2 # rotation rate for this sprite type (in degrees)
+    d_angle = 1.5 # rotation rate for this sprite type (in degrees)
     d_speed = 0.5 # acceleration rate for this sprite type
     max_speed = 20 # max speed for this sprite type
     laser_speed = 10 # speed of fired laser beams relative to sprite
@@ -367,7 +367,7 @@ player_lasers = Group()
 enemy_sprite = Group()
 enemy_lasers = Group()
 
-player = PlayerSprite(screen,'.\\graphics\\xwing.bmp',player_lasers,
+player = PlayerSprite(screen,'.\\graphics\\awing.bmp',player_lasers,
                       player_sprite,
                       angle=-45)
 
@@ -428,8 +428,6 @@ while True:
             too_close = True
             
             while too_close:
-                # break loop when done
-                too_close = False
                 
                 # spawn enemy at random location
                 enemy_center = np.random.uniform(0,1,2) * np.array([width,height]).astype('float')
@@ -440,6 +438,9 @@ while True:
                     new_enemy = EnemySprite(screen,'.\\graphics\\tiefighter.bmp',enemy_lasers,player,
                       enemy_sprite,
                       angle=-45,center=enemy_center,speed=5)
+                    
+                    # break loop when done
+                    too_close = False
 
     
     # control pace
