@@ -347,7 +347,7 @@ class LaserSprite(MaskedSprite):
 # demo gam states here
 import sys, pygame, os
 
-#os.chdir('C:\\Users\\bettmensch\\GitReps\\star_wars_dogfighter')
+os.chdir('..//')
 
 pygame.init()
 
