@@ -27,7 +27,7 @@ class Game(object):
         
         white = 255, 255, 255
         fps = 40
-        enemy_down_time = 5 # pause between enemy death and spawning of new enemy in seconds
+        enemy_down_time = 500 # pause between enemy death and spawning of new enemy in seconds
         
         # initialize main screen
         size = width, height = 1040, 740 # screen size
@@ -39,12 +39,12 @@ class Game(object):
         enemy_lasers = Group()
         
         # create player sprite
-        player = PlayerSprite(screen,'..\\graphics\\awing.bmp',player_lasers,
+        player = PlayerSprite(screen,'x_wing',player_lasers,
                               player_sprite,
                               angle=-45)
         
         # create first enemy sprite
-        EnemySprite(screen,'..\\graphics\\tiefighter.bmp',enemy_lasers,player,
+        EnemySprite(screen,'tie_fighter',enemy_lasers,player,
                     enemy_sprite,
                     angle=-45,center=[200,400],speed=5)
         
@@ -108,7 +108,7 @@ class Game(object):
                         # if enemy has safety distance from player, proceed with spawning
                         if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
                             # spawn enemy
-                            EnemySprite(screen,'..\\graphics\\tiefighter.bmp',enemy_lasers,player,
+                            EnemySprite(screen,'tie_fighter',enemy_lasers,player,
                                         enemy_sprite,
                                         angle=-45,center=enemy_center,speed=5)
                             

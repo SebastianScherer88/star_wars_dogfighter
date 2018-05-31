@@ -17,10 +17,11 @@ from math import cos, sin, pi
 
 import pygame as pg
 import numpy as np
+import yaml
 
 class MaskedSprite(Sprite):
     
-    def __init__(self,screen,image_path,*groups,**initial_values):
+    def __init__(self,screen,sprite_name,*groups,**initial_values):
         '''image: path to sprite image
         *groups: optional (unnamed) list of groups the sprite will be added to
                           when created
@@ -33,7 +34,12 @@ class MaskedSprite(Sprite):
         # attach screen
         self.screen = screen
         
+        # retrieve sprite meta data via ship type argument
+        with open('../meta/sprite_meta_data.yaml','r') as meta_file:
+            self.meta_data = yaml.load(meta_file)[sprite_name]
+        
         # get and attach image as pygame surface; initialize rotated image storage
+        image_path = "../graphics/" + self.meta_data['image_name']
         self._original_image = pg.image.load(image_path)
         
         # make original image's white parts transparent
@@ -61,6 +67,7 @@ class MaskedSprite(Sprite):
         if 'center' in initial_values.keys():
             self._center = np.array(initial_values['center']).astype('float')
             self.rect.center = self._center
+            
         
     def rotate_ip(self,d_angle):
         '''Rotates the sprite in place based on differential angle d_angle. Updates
@@ -96,10 +103,10 @@ class MaskedSprite(Sprite):
         speed = self._speed + d_speed
         
         # convert self._angle attribute to radian for cos & sin functions
-        angle_degrees = self._angle * pi / 180
+        angle_radian = self._angle * pi / 180
             
         # get velocity vector
-        velocity = np.array([cos(angle_degrees),-sin(angle_degrees)]) * speed
+        velocity = np.array([cos(angle_radian),-sin(angle_radian)]) * speed
         
         # move sprite by moving sprite's _center attribute and updating rect
         # (necessary bc floats smaller than 1 get rounded)
@@ -122,6 +129,7 @@ class MaskedSprite(Sprite):
         # update speed attribute
         self._speed = speed
         
+        
 class FighterSprite(MaskedSprite):
     '''Parent class for PlayerSprite and EnemySprite. Allows for a slim MaskedSprite
     class that has doesnt lead to 'appendix syndrome' for the LaserSprite class.'''
@@ -134,10 +142,19 @@ class FighterSprite(MaskedSprite):
     laser_lifetime = 40 # number of frames a laser beam lasts before 'dissolving'
     weapon_cool_down = 50 # number of frames between shots
     
-    def __init__(self,screen,image_path,laser_beams_group,*groups,**initial_values):
+    def __init__(self,screen,sprite_name,laser_beams_group,*groups,**initial_values):
         
         # call parent class __init__
-        MaskedSprite.__init__(self,screen,image_path,*groups,**initial_values)
+        MaskedSprite.__init__(self,screen,sprite_name,*groups,**initial_values)
+        
+        # set meta attibutes dependent on chosen fighter type
+        self._d_angle = self.meta_data['rotation_speed'] # rotation rate for this ship type (in degrees)
+        self._d_speed = self.meta_data['acceleration'] # acceleration rate for this ship type
+        self._max_speed = self.meta_data['max_speed'] # max speed for this ship type
+        self._laser_speed = self.meta_data['laser_speed'] # laser speed is constant across all shiptypes
+        self._laser_lifetime = self.meta_data['laser_lifetime'] # laser lifetime is constant across all ship types
+        self._weapon_cool_down = self.meta_data['weapon_cool_down'] # number of frames between shots
+        self._rel_cannon_tip_positions = self.meta_data['cannon_tip_positions'] # pixel coordinates of gun tips relative to image center
         
         # attach laser beam 'basket' group
         self.laser_beams = laser_beams_group
@@ -167,20 +184,39 @@ class FighterSprite(MaskedSprite):
         
         # fire laser beam: set arguments for laser __init__
         laser_screen = self.screen
-        laser_lifetime = self.__class__.laser_lifetime
-        laser_speed = self._speed + self.__class__.laser_speed
+        laser_lifetime = self._laser_lifetime
+        laser_speed = self._speed + self._laser_speed
         laser_angle = self._angle
-        laser_center = self._center
+        
+        # get the left_center rect attribute for laser __init__
+        
+        # construct rotational matrix to apply to gun tips positional array
+        laser_angle_radian = self._angle * pi / 180
+        
+        rotation_matrix = np.array([[cos(laser_angle_radian), sin(laser_angle_radian)],
+                                   [- sin(laser_angle_radian), cos(laser_angle_radian)]])
+        
+        # rotate relative gun tip positions around center of image
+        rotated_rel_cannon_tip_positions = np.dot(rotation_matrix,
+                                                  self._rel_cannon_tip_positions.T).T
+
+        # if more than one gun on ship, pick first gun (TO DO: change this later)
+        if rotated_rel_cannon_tip_positions.shape[0] > 1:
+            rotated_rel_cannon_tip_positions = rotated_rel_cannon_tip_positions[0]
+        
+        # add sprite center coordinates to relative gun tip coordinates to get laser spawn position
+        laser_left_center = self._center + rotated_rel_cannon_tip_positions
         
         # fire laser beam: create laserSprite instance
-        LaserSprite(laser_screen,'..\\graphics\\laser.bmp',laser_lifetime,
+        LaserSprite(laser_screen,'red_laser',laser_lifetime,
                     self.laser_beams,
                     speed=laser_speed,
                     angle=laser_angle,
-                    center=laser_center)
+                    center=laser_left_center)
         
         # set cool down counter to maximum after weapon use
         self.weapon_cooling = self.__class__.weapon_cool_down
+        
             
     def update(self):
         '''Updates the sprites position based on player control input. Also fires
@@ -195,7 +231,7 @@ class FighterSprite(MaskedSprite):
         # rotate sprite if necessary
         self.rotate_ip(d_angle)
         
-        # move player sprite
+        # move sprite
         self.move_ip(d_speed)
             
         # fire cannon if necessary
@@ -218,19 +254,19 @@ class PlayerSprite(FighterSprite):
             
         # get angle differential
         if pressed_keys[pg.K_LEFT] and not pressed_keys[pg.K_RIGHT]:
-            d_angle = self.__class__.d_angle
+            d_angle = self._d_angle
         elif pressed_keys[pg.K_RIGHT] and not pressed_keys[pg.K_LEFT]:
-            d_angle = -self.__class__.d_angle
+            d_angle = -self._d_angle
         else:
             d_angle = 0
             
         # get speed differential
         if pressed_keys[pg.K_UP] and not pressed_keys[pg.K_DOWN]:
             # dont accelerate above sprite's max speed
-            d_speed = min(self.__class__.d_speed,self.__class__.max_speed - self._speed)
+            d_speed = min(self._d_speed,self._max_speed - self._speed)
         elif pressed_keys[pg.K_DOWN] and not pressed_keys[pg.K_UP]:
             # dont decelarate to going backwards
-            d_speed = -min(self.__class__.d_speed,self._speed)
+            d_speed = -min(self._d_speed,self._speed)
         else:
             d_speed = 0
             
@@ -257,9 +293,9 @@ class EnemySprite(FighterSprite):
     piloting_cone_sine = 0.05
     gunning_cone_sine = 0.1
     
-    def __init__(self,screen,image_path,laser_beams_group,player,*groups,**initial_values):
+    def __init__(self,screen,sprite_name,laser_beams_group,player,*groups,**initial_values):
         
-        FighterSprite.__init__(self,screen,image_path,laser_beams_group,*groups,**initial_values)
+        FighterSprite.__init__(self,screen,sprite_name,laser_beams_group,*groups,**initial_values)
         
         # attach group containing player sprite
         self.player = player
@@ -326,9 +362,9 @@ class EnemySprite(FighterSprite):
             
 class LaserSprite(MaskedSprite):
     
-    def __init__(self,screen,image_path,time_left,*groups,**initial_values):
+    def __init__(self,screen,laser_name,time_left,*groups,**initial_values):
         
-        MaskedSprite.__init__(self,screen,image_path,*groups,**initial_values)
+        MaskedSprite.__init__(self,screen,laser_name,*groups,**initial_values)
         
         self.time_left = time_left
     
