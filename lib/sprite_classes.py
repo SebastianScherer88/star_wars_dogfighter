@@ -160,28 +160,27 @@ class FighterSprite(MaskedSprite):
         Returns:
             - fire_cannon: Bool. 'True' to fire laser, 'False' to not.'''
             
-    def use_cannon(self,fire_cannon):
+    def fire_cannon(self):
         '''Fires the cannon if firing flag 'fire_cannon' is True by creating a
         LaserSprite object with appropriate initial values near sprite's cannon
         guns' tips. Reset weapon cool down counter when necessary.'''
         
-        if fire_cannon and not self.weapon_cooling:
-            # fire laser beam: set arguments for laser __init__
-            laser_screen = self.screen
-            laser_lifetime = self.__class__.laser_lifetime
-            laser_speed = self._speed + self.__class__.laser_speed
-            laser_angle = self._angle
-            laser_center = self._center
-            
-            # fire laser beam: create laserSprite instance
-            LaserSprite(laser_screen,'.\\graphics\\laser.bmp',laser_lifetime,
-                        self.laser_beams,
-                        speed=laser_speed,
-                        angle=laser_angle,
-                        center=laser_center)
-            
-            # set cool down counter to maximum after weapon use
-            self.weapon_cooling = self.__class__.weapon_cool_down
+        # fire laser beam: set arguments for laser __init__
+        laser_screen = self.screen
+        laser_lifetime = self.__class__.laser_lifetime
+        laser_speed = self._speed + self.__class__.laser_speed
+        laser_angle = self._angle
+        laser_center = self._center
+        
+        # fire laser beam: create laserSprite instance
+        LaserSprite(laser_screen,'..\\graphics\\laser.bmp',laser_lifetime,
+                    self.laser_beams,
+                    speed=laser_speed,
+                    angle=laser_angle,
+                    center=laser_center)
+        
+        # set cool down counter to maximum after weapon use
+        self.weapon_cooling = self.__class__.weapon_cool_down
             
     def update(self):
         '''Updates the sprites position based on player control input. Also fires
@@ -200,7 +199,8 @@ class FighterSprite(MaskedSprite):
         self.move_ip(d_speed)
             
         # fire cannon if necessary
-        self.use_cannon(fire_cannon)
+        if fire_cannon and not self.weapon_cooling:
+            self.fire_cannon()
         
         # update weapon cooling counter but keep at minimum 0
         if self.weapon_cooling > 0:

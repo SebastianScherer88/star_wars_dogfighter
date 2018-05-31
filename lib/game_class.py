@@ -17,7 +17,7 @@ from sprite_classes import PlayerSprite, EnemySprite
 
 class Game(object):
     
-    def __init__(self,screen_width,screen_height):
+    def __init__(self,screen_width=800,screen_height=500):
         '''Initializes the game object and also the game'''
         
         pg.init()
@@ -39,12 +39,12 @@ class Game(object):
         enemy_lasers = Group()
         
         # create player sprite
-        player = PlayerSprite(screen,'.\\graphics\\awing.bmp',player_lasers,
+        player = PlayerSprite(screen,'..\\graphics\\awing.bmp',player_lasers,
                               player_sprite,
                               angle=-45)
         
         # create first enemy sprite
-        EnemySprite(screen,'.\\graphics\\tiefighter.bmp',enemy_lasers,player,
+        EnemySprite(screen,'..\\graphics\\tiefighter.bmp',enemy_lasers,player,
                     enemy_sprite,
                     angle=-45,center=[200,400],speed=5)
         
@@ -108,7 +108,7 @@ class Game(object):
                         # if enemy has safety distance from player, proceed with spawning
                         if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
                             # spawn enemy
-                            EnemySprite(screen,'.\\graphics\\tiefighter.bmp',enemy_lasers,player,
+                            EnemySprite(screen,'..\\graphics\\tiefighter.bmp',enemy_lasers,player,
                                         enemy_sprite,
                                         angle=-45,center=enemy_center,speed=5)
                             
@@ -118,3 +118,10 @@ class Game(object):
             
             # control pace
             clock.tick(fps)
+            
+def main():
+    # create new game
+    Game()
+    
+if __name__=='__main__':
+    main()
