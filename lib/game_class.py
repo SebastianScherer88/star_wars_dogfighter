@@ -26,7 +26,7 @@ class Game(object):
         clock = pg.time.Clock()
         
         white = 255, 255, 255
-        fps = 40
+        fps = 60
         enemy_down_time = 500 # pause between enemy death and spawning of new enemy in seconds
         
         # initialize main screen
@@ -44,7 +44,7 @@ class Game(object):
                               angle=-45)
         
         # create first enemy sprite
-        EnemySprite(screen,'tie_fighter',enemy_lasers,player,
+        EnemySprite(screen,'a_wing',enemy_lasers,player,
                     enemy_sprite,
                     angle=-45,center=[200,400],speed=5)
         
@@ -70,9 +70,12 @@ class Game(object):
             
             player_sprite.draw(screen) # draw all player sprite
             player_lasers.draw(screen) # draw all player laser sprites
+            #player.draw_guntips()
             
             enemy_sprite.draw(screen) # draw all enemy sprite
             enemy_lasers.draw(screen) # draw all enemy laser sprite
+            #for enemy in enemy_sprite:
+            #    enemy.draw_guntips()
                        
             # flip canvas
             pg.display.flip()

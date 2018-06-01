@@ -177,6 +177,37 @@ class FighterSprite(MaskedSprite):
         Returns:
             - fire_cannon: Bool. 'True' to fire laser, 'False' to not.'''
             
+    def _get_guntips_positions(self):
+        '''Calculates pixel tuple specifiying the location of the current sprite's
+        gun tips.'''
+        
+        # construct rotational matrix to apply to gun tips positional array
+        laser_angle_radian = self._angle * pi / 180
+        
+        rotation_matrix = np.array([[cos(laser_angle_radian), sin(laser_angle_radian)],
+                                   [- sin(laser_angle_radian), cos(laser_angle_radian)]])
+        
+        # rotate relative gun tip positions around center of image
+        rotated_rel_cannon_tip_positions = np.dot(rotation_matrix,
+                                                  self._rel_cannon_tip_positions.T).T
+        
+        # add sprite center coordinates to relative gun tip coordinates to get laser spawn position
+        gun_tip_positions = self._center + rotated_rel_cannon_tip_positions
+        
+        return gun_tip_positions
+        
+            
+    def draw_guntips(self):
+        '''temporary drawing function to help evaluate current gun tip location
+        calculation approach implemented in the "get_guntips_positions()" method.'''
+        
+        for guntip_position in self._get_guntips_positions():
+            pg.draw.circle(self.screen,
+                               (255,0,0), # yellow?
+                               guntip_position.astype('int'), # pygame drawing functions only accept integer pixel positions
+                               2)
+        
+            
     def fire_cannon(self):
         '''Fires the cannon if firing flag 'fire_cannon' is True by creating a
         LaserSprite object with appropriate initial values near sprite's cannon
@@ -188,32 +219,14 @@ class FighterSprite(MaskedSprite):
         laser_speed = self._speed + self._laser_speed
         laser_angle = self._angle
         
-        # get the left_center rect attribute for laser __init__
-        
-        # construct rotational matrix to apply to gun tips positional array
-        laser_angle_radian = self._angle * pi / 180
-        
-        rotation_matrix = np.array([[cos(laser_angle_radian), sin(laser_angle_radian)],
-                                   [- sin(laser_angle_radian), cos(laser_angle_radian)]])
-        
-        # rotate relative gun tip positions around center of image
-        rotated_rel_cannon_tip_positions = np.dot(rotation_matrix,
-                                                  self._rel_cannon_tip_positions.T).T
-
-        # if more than one gun on ship, pick first gun (TO DO: change this later)
-        if rotated_rel_cannon_tip_positions.shape[0] > 1:
-            rotated_rel_cannon_tip_positions = rotated_rel_cannon_tip_positions[0]
-        
-        # add sprite center coordinates to relative gun tip coordinates to get laser spawn position
-        laser_left_center = self._center + rotated_rel_cannon_tip_positions
-        
         # fire laser beam: create laserSprite instance
-        LaserSprite(laser_screen,'red_laser',laser_lifetime,
-                    self.laser_beams,
-                    speed=laser_speed,
-                    angle=laser_angle,
-                    center=laser_left_center)
-        
+        for guntip_position in self._get_guntips_positions():
+            LaserSprite(laser_screen,'red_laser',laser_lifetime,
+                        self.laser_beams,
+                        speed=laser_speed,
+                        angle=laser_angle,
+                        center=tuple(guntip_position))
+            
         # set cool down counter to maximum after weapon use
         self.weapon_cooling = self.__class__.weapon_cool_down
         
@@ -366,6 +379,15 @@ class LaserSprite(MaskedSprite):
         
         MaskedSprite.__init__(self,screen,laser_name,*groups,**initial_values)
         
+        # adjust position of laser to align with gun tips of firing sprite
+        angle_degrees = self._angle * pi / 180 # convert degree angle attribute to radian
+        half_laser_beam_length = self._original_image.get_width() # get half of the length of laser beam image
+        angled_offset = np.array([cos(angle_degrees ),
+                                  -sin(angle_degrees )]) * half_laser_beam_length / 2 # calculate angled offset w.r.t gun tip position
+        self._center += angled_offset # add angled offset to gun tip position to align laser beam with gun tip
+        self.rect.center = self._center # update positional rect position
+
+        # set life time attribute
         self.time_left = time_left
     
     def update(self):
