@@ -177,7 +177,7 @@ class FighterSprite(MaskedSprite):
         Returns:
             - fire_cannon: Bool. 'True' to fire laser, 'False' to not.'''
             
-    def _get_guntips_positions(self):
+    def _get_gun_muzzle_positions(self):
         '''Calculates pixel tuple specifiying the location of the current sprite's
         gun tips.'''
         
@@ -197,15 +197,14 @@ class FighterSprite(MaskedSprite):
         return gun_tip_positions
         
             
-    def draw_guntips(self):
+    def draw_gun_muzzle_flash(self,gun_muzzle_position):
         '''temporary drawing function to help evaluate current gun tip location
         calculation approach implemented in the "get_guntips_positions()" method.'''
         
-        for guntip_position in self._get_guntips_positions():
-            pg.draw.circle(self.screen,
-                               (255,0,0), # yellow?
-                               guntip_position.astype('int'), # pygame drawing functions only accept integer pixel positions
-                               2)
+        pg.draw.circle(self.screen,
+                       (255,0,0), # yellow?
+                       gun_muzzle_position.astype('int'), # pygame drawing functions only accept integer pixel positions
+                       2)
         
             
     def fire_cannon(self):
@@ -220,15 +219,19 @@ class FighterSprite(MaskedSprite):
         laser_angle = self._angle
         
         # fire laser beam: create laserSprite instance
-        for guntip_position in self._get_guntips_positions():
+        for gun_muzzle_position in self._get_gun_muzzle_positions():
+            # draw gun nuzzle light
+            self.draw_gun_muzzle_flash(gun_muzzle_position)
+            
+            # spawn laser at gun tip
             LaserSprite(laser_screen,'red_laser',laser_lifetime,
                         self.laser_beams,
                         speed=laser_speed,
                         angle=laser_angle,
-                        center=tuple(guntip_position))
+                        center=tuple(gun_muzzle_position))
             
         # set cool down counter to maximum after weapon use
-        self.weapon_cooling = self.__class__.weapon_cool_down
+        self.weapon_cooling = self._weapon_cool_down
         
             
     def update(self):
@@ -347,7 +350,7 @@ class EnemySprite(FighterSprite):
             d_angle = self.__class__.d_angle
         elif projection_on_ortnorm < -self.__class__.piloting_cone_sine:
             # turn right
-            d_angle = - self.__class__.d_angle
+            d_angle = - self._d_angle
         else:
             # continue straight on
             d_angle = 0
@@ -378,14 +381,6 @@ class LaserSprite(MaskedSprite):
     def __init__(self,screen,laser_name,time_left,*groups,**initial_values):
         
         MaskedSprite.__init__(self,screen,laser_name,*groups,**initial_values)
-        
-        # adjust position of laser to align with gun tips of firing sprite
-        angle_degrees = self._angle * pi / 180 # convert degree angle attribute to radian
-        half_laser_beam_length = self._original_image.get_width() # get half of the length of laser beam image
-        angled_offset = np.array([cos(angle_degrees ),
-                                  -sin(angle_degrees )]) * half_laser_beam_length / 2 # calculate angled offset w.r.t gun tip position
-        self._center += angled_offset # add angled offset to gun tip position to align laser beam with gun tip
-        self.rect.center = self._center # update positional rect position
 
         # set life time attribute
         self.time_left = time_left
