@@ -134,13 +134,7 @@ class FighterSprite(MaskedSprite):
     '''Parent class for PlayerSprite and EnemySprite. Allows for a slim MaskedSprite
     class that has doesnt lead to 'appendix syndrome' for the LaserSprite class.'''
     
-    # set up some class attributes; maybe make these ship specific or similar
-    d_angle = 1.5 # rotation rate for this sprite type (in degrees)
-    d_speed = 0.5 # acceleration rate for this sprite type
-    max_speed = 20 # max speed for this sprite type
-    laser_speed = 10 # speed of fired laser beams relative to sprite
-    laser_lifetime = 40 # number of frames a laser beam lasts before 'dissolving'
-    weapon_cool_down = 50 # number of frames between shots
+    gun_muzzle_flash_frames = 10 # number of frames the gun muzzle flare should be visible after firing
     
     def __init__(self,screen,sprite_name,laser_beams_group,*groups,**initial_values):
         
@@ -162,6 +156,9 @@ class FighterSprite(MaskedSprite):
         # set the weapon cool down counter
         self.weapon_cooling = 0
         
+        # set the muzzle flare counter
+        self.muzzle_flash_counter = 0
+        
     def get_pilot_commands(self):
         '''Controls the sprites steering process. Either player or 'AI' controlled.
         Returns:
@@ -177,7 +174,7 @@ class FighterSprite(MaskedSprite):
         Returns:
             - fire_cannon: Bool. 'True' to fire laser, 'False' to not.'''
             
-    def _get_gun_muzzle_positions(self):
+    def _get_gun_muzzle_positions(self,relative_positions=False):
         '''Calculates pixel tuple specifiying the location of the current sprite's
         gun tips.'''
         
@@ -188,23 +185,33 @@ class FighterSprite(MaskedSprite):
                                    [- sin(laser_angle_radian), cos(laser_angle_radian)]])
         
         # rotate relative gun tip positions around center of image
-        rotated_rel_cannon_tip_positions = np.dot(rotation_matrix,
+        rotated_rel_gun_muzzle_positions = np.dot(rotation_matrix,
                                                   self._rel_cannon_tip_positions.T).T
         
-        # add sprite center coordinates to relative gun tip coordinates to get laser spawn position
-        gun_tip_positions = self._center + rotated_rel_cannon_tip_positions
+        # make sure to get correct kind of position, i.e. absolute or relative
+        if relative_positions:
+            # take the positions of gun muzzles w.r.t. to the center of the sprite positional rect
+            gun_muzzle_positions = rotated_rel_gun_muzzle_positions
+        if not relative_positions:
+            # add sprite center coordinates to relative gun tip coordinates absolute gun muzzle positions
+            gun_muzzle_positions = self._center + rotated_rel_gun_muzzle_positions
         
-        return gun_tip_positions
+        #return gun_tip_positions
+        
+        return gun_muzzle_positions
         
             
-    def draw_gun_muzzle_flash(self,gun_muzzle_position):
+    def draw_gun_muzzle_flash(self):
         '''temporary drawing function to help evaluate current gun tip location
         calculation approach implemented in the "get_guntips_positions()" method.'''
         
-        pg.draw.circle(self.screen,
-                       (255,0,0), # yellow?
-                       gun_muzzle_position.astype('int'), # pygame drawing functions only accept integer pixel positions
-                       2)
+        # iterate through sprites gun muzzle positions 
+        for gun_muzzle_position in self._get_gun_muzzle_positions(relative_positions=True):
+            # draw a flash for each gun muzzle onto sprite surface
+            pg.draw.circle(self.image,
+                           (255,0,0), # red
+                           gun_muzzle_position.astype('int'), # pygame drawing functions only accept integer pixel positions
+                           2)
         
             
     def fire_cannon(self):
@@ -215,13 +222,14 @@ class FighterSprite(MaskedSprite):
         # fire laser beam: set arguments for laser __init__
         laser_screen = self.screen
         laser_lifetime = self._laser_lifetime
-        laser_speed = self._speed + self._laser_speed
+        #laser_speed = self._speed + self._laser_speed
+        laser_speed = 0
         laser_angle = self._angle
         
         # fire laser beam: create laserSprite instance
         for gun_muzzle_position in self._get_gun_muzzle_positions():
-            # draw gun nuzzle light
-            self.draw_gun_muzzle_flash(gun_muzzle_position)
+            # set gun muzzle countdown to maximum so that sprite's draw method will draw the flares
+            self.muzzle_flash_counter = self.__class__.gun_muzzle_flash_frames
             
             # spawn laser at gun tip
             LaserSprite(laser_screen,'red_laser',laser_lifetime,
@@ -253,6 +261,15 @@ class FighterSprite(MaskedSprite):
         # fire cannon if necessary
         if fire_cannon and not self.weapon_cooling:
             self.fire_cannon()
+            
+        # update the gun muzzle flash counter and draw flashes if necessary
+        if self.muzzle_flash_counter > 0:
+            self.draw_gun_muzzle_flash() # draw the flashes
+            self.muzzle_flash_counter -= 1 # update the flash countdown
+        elif self.muzzle_flash_counter == 0:
+            # refresh sprite surface, wiping off any remaining gun flashes
+            self.image = pg.transform.rotate(self._original_image,
+                                 self._angle)
         
         # update weapon cooling counter but keep at minimum 0
         if self.weapon_cooling > 0:
@@ -347,7 +364,7 @@ class EnemySprite(FighterSprite):
         # turn towards player, whichever way is more aligned with current direction of movement        
         if projection_on_ortnorm > self.__class__.piloting_cone_sine:
             # turn left
-            d_angle = self.__class__.d_angle
+            d_angle = self._d_angle
         elif projection_on_ortnorm < -self.__class__.piloting_cone_sine:
             # turn right
             d_angle = - self._d_angle

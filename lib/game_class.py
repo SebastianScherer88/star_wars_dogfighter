@@ -69,13 +69,9 @@ class Game(object):
             screen.fill(white) # paint over old game state
             
             player_sprite.draw(screen) # draw all player sprite
-            player_lasers.draw(screen) # draw all player laser sprites
-            #player.draw_guntips()
-            
+            player_lasers.draw(screen) # draw all player laser sprites            
             enemy_sprite.draw(screen) # draw all enemy sprite
             enemy_lasers.draw(screen) # draw all enemy laser sprite
-            #for enemy in enemy_sprite:
-            #    enemy.draw_guntips()
                        
             # flip canvas
             pg.display.flip()
