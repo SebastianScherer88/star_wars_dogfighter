@@ -35,7 +35,7 @@ class BasicAnimation(Sprite):
         
         for i in range(9):
             index = i + 1
-            image_path = './graphics/explosion' + str(index) + '.bmp'
+            image_path = '../graphics/explosion' + str(index) + '.bmp'
             image = pg.image.load(image_path)
             image.set_colorkey((255,255,255)) # make image transparent
             original_images.append(image)
@@ -68,7 +68,7 @@ class BasicAnimation(Sprite):
         self.counter += 1
         
         # Check if image needs to be updated / animation has ended
-        if self.counter % self.frames_per_image == 0:
+        if self.counter % int(self.frames_per_image) == 0:
             # if end of animation is NOT reached, continue animation
             if self.image_index < self.last_image_index:
                 self.image_index += 1 # update image index
@@ -89,7 +89,7 @@ def main():
     
     white = 255, 255, 255
     fps = 60 # frames per second for pygame
-    spi = 0.1 # seconds per image for animation
+    spi = 0.08 # seconds per image for animation
     #frames_between_animation = 500 # pause between enemy death and spawning of new enemy in seconds
     
     # initialize main screen
