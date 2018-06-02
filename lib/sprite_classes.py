@@ -20,7 +20,13 @@ import numpy as np
 
 class MaskedSprite(Sprite):
     
-    def __init__(self,screen,sprite_meta_data,*groups,**initial_values):
+    def __init__(self,
+                 screen,
+                 sprite_meta_data,
+                 *groups,
+                 angle=0,
+                 speed=0,
+                 center=np.array([0,0]).astype('float')):
         '''image: path to sprite image
         *groups: optional (unnamed) list of groups the sprite will be added to
                           when created
@@ -33,73 +39,54 @@ class MaskedSprite(Sprite):
         # attach screen
         self.screen = screen
         
-        # for debugging only
-        #print(meta_data)
-        #print(sprite_name)
-        
         # retrieve sprite meta data
         self.meta_data = sprite_meta_data
         
-        # get and attach image as pygame surface; initialize rotated image storage
-        image_paths = self.meta_data['image_paths']
-        self._original_images = [pg.image.load(image_path) for image_path in image_paths]
+        # load and attach the animation sequence's images
+        self._original_images = []
         
-        # make original image's white parts transparent
-        for original_image in self._original_images:
-            original_image.set_colorkey((255,255,255))
+        for image_path in sprite_meta_data['image_paths']:
+            image = pg.image.load(image_path)
+            image.set_colorkey((255,255,255))
+            self._original_images.append(image)     
+        
+        # set default initial values where necessary
+        self._speed = speed # needed to keep track of speed
+        self._angle = angle # needed to kepp track of angle
+        self._center = center # needed to recenter image after rotation
             
         # initialize image _index
         self.image_index = 0
-        
+            
         # get temporary image
         self.image = pg.transform.rotate(self._original_images[self.image_index],
-                                         0)
-        
-        # get and attach positional rectangle
-        self.rect = self.image.get_rect()
+                                         self._angle)
         
         # get and attach mask
         self.mask = pg.mask.from_surface(self.image)
         
-        # set default initial values where necessary
-        self._speed = 0 # needed to keep track of speed
-        self._angle = 0 # needed to kepp track of angle
-        self._center = np.array([0,0]).astype('float') # needed to recenter image after rotation
-        
-        # work through initial values if sensible
-        if 'angle' in initial_values.keys():
-            self.rotate_ip(initial_values['angle'])
-        if 'speed' in initial_values.keys():
-            self._speed = initial_values['speed']
-        if 'center' in initial_values.keys():
-            self._center = np.array(initial_values['center']).astype('float')
-            self.rect.center = self._center
+        # get and attach positional rectangle
+        self.rect = self.image.get_rect()
+        self.rect.center = self._center
             
         
     def rotate_ip(self,d_angle):
         '''Rotates the sprite in place based on differential angle d_angle. Updates
         the image, rect and angle attribute accordingly.'''
         
-        if d_angle == 0:
-            # do nothing
-            pass
-        else:
-            # get new angle
-            angle = self._angle + d_angle
-            
-            # rotate sprite image by angle
-            self.image = pg.transform.rotate(self._original_images[self.image_index],
-                                             angle)
-            
-            # update the positional rect
-            self.rect = self.image.get_rect()
-            self.rect.center = self._center
-            
-            # update mask
-            self.mask = pg.mask.from_surface(self.image)
-            
-            # update angle attribute
-            self._angle = angle
+        # get new angle
+        self._angle += d_angle
+        
+        # rotate sprite image by angle
+        self.image = pg.transform.rotate(self._original_images[self.image_index],
+                                         self._angle)
+        
+        # update the positional rect
+        self.rect = self.image.get_rect()
+        self.rect.center = self._center
+        
+        # update mask
+        self.mask = pg.mask.from_surface(self.image)
             
     def move_ip(self,d_speed):
         '''Moves the sprite in place. Takes a differential speed d_speed and calculates
@@ -107,13 +94,13 @@ class MaskedSprite(Sprite):
         on current angle nad moves the sprite accordingly.'''
         
         # get new speed (might be old speed if d_speed = 0)
-        speed = self._speed + d_speed
+        self._speed += d_speed
         
         # convert self._angle attribute to radian for cos & sin functions
         angle_radian = self._angle * pi / 180
             
         # get velocity vector
-        velocity = np.array([cos(angle_radian),-sin(angle_radian)]) * speed
+        velocity = np.array([cos(angle_radian),-sin(angle_radian)]) * self._speed
         
         # move sprite by moving sprite's _center attribute and updating rect
         # (necessary bc floats smaller than 1 get rounded)
@@ -132,10 +119,7 @@ class MaskedSprite(Sprite):
             self._center[1] = screen_height + self.rect.height / 2
         elif self.rect.top > screen_height:
             self._center[1] = 0 - self.rect.height / 2
-        
-        # update speed attribute
-        self._speed = speed
-        
+                        
         
 class FighterSprite(MaskedSprite):
     '''Parent class for PlayerSprite and EnemySprite. Allows for a slim MaskedSprite
@@ -241,6 +225,8 @@ class FighterSprite(MaskedSprite):
             # set gun muzzle countdown to maximum so that sprite's draw method will draw the flares
             self.muzzle_flash_counter = self.__class__.gun_muzzle_flash_frames
             
+            print('fire!')
+            
             # spawn laser at gun tip
             LaserSprite(laser_screen,
                         self.laser_meta_data,
@@ -265,7 +251,8 @@ class FighterSprite(MaskedSprite):
         fire_cannon = self.get_gunner_commands()
             
         # rotate sprite if necessary
-        self.rotate_ip(d_angle)
+        if d_angle != 0:
+            self.rotate_ip(d_angle)
         
         # move sprite
         self.move_ip(d_speed)
@@ -407,9 +394,22 @@ class EnemySprite(FighterSprite):
             
 class LaserSprite(MaskedSprite):
     
-    def __init__(self,screen,laser_meta_data,time_left,*groups,**initial_values):
+    def __init__(self,
+                 screen,
+                 laser_meta_data,
+                 time_left,
+                 *groups,
+                 angle=0,
+                 speed=0,
+                 center=0):
         
-        MaskedSprite.__init__(self,screen,laser_meta_data,*groups,**initial_values)
+        MaskedSprite.__init__(self,
+                              screen,
+                              laser_meta_data,
+                              *groups,
+                              angle=angle,
+                              speed=speed,
+                              center=center)
 
         # set life time attribute
         self.time_left = time_left

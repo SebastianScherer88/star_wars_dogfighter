@@ -13,48 +13,36 @@ Created on Sat Jun  2 14:00:12 2018
  sprites movement and stay attached to it, i.e. have a constant position relative to that
  sprite through time (like gun flashes, missile propulsion, engine fire etc.)'''
  
-from pygame.sprite import Sprite, Group
+#from pygame.sprite import Sprite, Group
+from sprite_classes import MaskedSprite
+from pygame.sprite import Group
  
 import pygame as pg
+import numpy as np
 
 import sys
  
-class BasicAnimation(Sprite):
+class BasicAnimation(MaskedSprite):
     
     def __init__(self,
-                 x,
-                 y,
-                 seconds_per_image,
+                 screen,
+                 animation_meta_data,
                  frames_per_second,
-                 *groups):
+                 *groups,
+                 angle=0,
+                 speed=0,
+                 center=np.array([0,0]).astype('float')):
         
-        pg.sprite.Sprite.__init__(self,*groups)
-        
-        # load and attach the explosion images
-        original_images = []
-        
-        for i in range(9):
-            index = i + 1
-            image_path = '../graphics/explosion' + str(index) + '.bmp'
-            image = pg.image.load(image_path)
-            image.set_colorkey((255,255,255)) # make image transparent
-            original_images.append(image)
-        
-        self._original_images = original_images
-
-        # make first image of sequence the sprite surface  
-        self.image_index = 0
-        self.image = self._original_images[self.image_index]
-        
-        # create, position and attach positional rect based on passed x&y image dimensions
-        rect_size = self.image.get_size()
-        self.rect = pg.Rect((x, y), rect_size)
-        
-        # attach sequence length (in images)
-        self.last_image_index = len(self._original_images) - 1
+        MaskedSprite.__init__(self,
+                             screen,
+                             animation_meta_data,
+                             *groups,
+                             angle=angle,
+                             speed=speed,
+                             center=center)
         
         # get frames per image ratio
-        self.frames_per_image = frames_per_second * seconds_per_image
+        self.frames_per_image = frames_per_second * animation_meta_data['seconds_per_image']
         
         # start counter
         self.counter = 1

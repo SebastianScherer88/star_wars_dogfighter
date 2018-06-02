@@ -15,6 +15,7 @@ import yaml
 
 from pygame.sprite import Group, collide_mask, spritecollide, groupcollide
 from sprite_classes import PlayerSprite, EnemySprite
+from animation_classes import BasicAnimation
 
 class Game(object):
     
@@ -37,17 +38,19 @@ class Game(object):
         screen = pg.display.set_mode(size)
         
         # initialize empty sprite groups
+        all_sprites = Group()
         player_sprite = Group()
         player_lasers = Group()
         enemy_sprite = Group()
         enemy_lasers = Group()
+        explosions = Group()
         
         # create player sprite and add to relevant groups / provide with relevant groups
         player = PlayerSprite(screen,
                               all_sprite_meta_data['x_wing'],
                               all_sprite_meta_data['red_laser'],
                               player_lasers,
-                              player_sprite,
+                              (player_sprite,all_sprites),
                               angle=-45)
         
         # create first enemy sprite and add to relevant groups / provide with relevant groups
@@ -56,7 +59,7 @@ class Game(object):
                     all_sprite_meta_data['green_laser'],
                     enemy_lasers,
                     player,
-                    enemy_sprite,
+                    (enemy_sprite,all_sprites),
                     angle=-45,
                     center=[200,400],
                     speed=5)
@@ -71,36 +74,56 @@ class Game(object):
                     pg.quit()
                     sys.exit()
             
-            # update sprites
-            player_sprite.update()
-            enemy_sprite.update()
-            
-            # update lasers
-            player_lasers.update()
-            enemy_lasers.update()
+            # update all sprites
+            all_sprites.update()
             
             # draw new game state    
             screen.fill(white) # paint over old game state
             
-            player_sprite.draw(screen) # draw all player sprite
-            player_lasers.draw(screen) # draw all player laser sprites            
-            enemy_sprite.draw(screen) # draw all enemy sprite
-            enemy_lasers.draw(screen) # draw all enemy laser sprite
+            all_sprites.draw(screen) # draw all sprites
                        
             # flip canvas
             pg.display.flip()
             
-            # check for collisions
-            if spritecollide(player,enemy_sprite,True,collided=collide_mask) or \
-                            spritecollide(player,enemy_lasers,True,collided=collide_mask):
-                # if player collides with enemy or is shot down, end game
-                pg.quit()
-                sys.exit()
+            # check for player collisions with enemy sprites and enemy lasers
+            collided_enemy_sprites = spritecollide(player,enemy_sprite,True,collided=collide_mask)
+            collided_enemy_lasers = spritecollide(player,enemy_lasers,True,collided=collide_mask)
+            
+            if collided_enemy_sprites or collided_enemy_lasers:
+                # if player collides with either laser or enemy sprite, create explosion at player position
+                BasicAnimation(screen,
+                               all_animation_meta_data['explosion'],
+                                fps,
+                                explosions,
+                                center=player._center)
+                # if player collides with enemy sprite in particular, create explosion at enemy position
+                for collided_enemy_sprite in collided_enemy_sprites:
+                    BasicAnimation(screen,
+                                   all_animation_meta_data['explosion'],
+                                    fps,
+                                    explosions,
+                                    center=collided_enemy_sprite._center)
                 
-            elif groupcollide(enemy_sprite,player_lasers,True,True,collided=collide_mask):    
+                
+                # if player collides with enemy or is shot down, end game
+                #pg.quit()
+                #sys.exit()
+            
+            # check for enemy collisions with player lasers
+            collided_enemy_sprites = groupcollide(enemy_sprite,player_lasers,True,True,collided=collide_mask)
+            
+            if collided_enemy_sprites:
                 # mark down time of kill shot
                 kill_confirmed = True
                 kill_time = pg.time.get_ticks()
+                
+                # create explosion at location of killed enemy sprites
+                for collided_enemy_sprite in collided_enemy_sprites:
+                    BasicAnimation(screen,
+                                   all_animation_meta_data['explosion'],
+                                    fps,
+                                    explosions,
+                                    center=collided_enemy_sprite._center)
                 
             # spawn new enemy if necessary
             if kill_confirmed:
@@ -126,7 +149,7 @@ class Game(object):
                                         all_sprite_meta_data['green_laser'],
                                         enemy_lasers,
                                         player,
-                                        enemy_sprite,
+                                        (enemy_sprite,all_sprites),
                                         angle=-45,
                                         center=[200,400],
                                         speed=5)
@@ -147,9 +170,12 @@ def main():
         sprite_meta_data = yaml.load(sprite_meta_data_file)
         
     # get game meta dat for animations
+    with open('./meta/animation_meta_data.yaml','r') as animation_meta_data_file:
+        animation_meta_data = yaml.load(animation_meta_data_file)
     
     # create new game with all the meta data
-    Game(all_sprite_meta_data=sprite_meta_data)
+    Game(all_sprite_meta_data=sprite_meta_data,
+         all_animation_meta_data=animation_meta_data)
     
 if __name__=='__main__':
     main()
