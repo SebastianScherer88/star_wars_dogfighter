@@ -15,7 +15,7 @@ a_wing:
     - false
     - !!binary |
       CAAAAPH///8IAAAADgAAAA==
-  image_path: ./graphics/awing.bmp
+  image_paths: [./graphics/awing.bmp]
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 30
@@ -37,13 +37,15 @@ f35:
     - false
     - !!binary |
       DAAAAP3///8MAAAAAgAAAA==
-  image_path: ./graphics/f35.bmp
+  image_paths: [./graphics/f35.bmp]
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 25
   rotation_speed: 1.4
   ship_type: f35
   weapon_cool_down: 40
+green_laser:
+  image_paths: [./graphics/greenlaser.bmp]
 hornet:
   acceleration: 0.25
   cannon_tip_positions: !!python/object/apply:numpy.core.multiarray._reconstruct
@@ -59,13 +61,15 @@ hornet:
     - false
     - !!binary |
       BgAAAPj///8GAAAABwAAAA==
-  image_path: ./graphics/hornet.bmp
+  image_paths: [./graphics/hornet.bmp]
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 22
   rotation_speed: 1.2
   ship_type: hornet
   weapon_cool_down: 30
+red_laser:
+  image_paths: [./graphics/redlaser.bmp]
 tie_fighter:
   acceleration: 0.4
   cannon_tip_positions: !!python/object/apply:numpy.core.multiarray._reconstruct
@@ -81,7 +85,7 @@ tie_fighter:
     - false
     - !!binary |
       CAAAAP3///8IAAAAAgAAAA==
-  image_path: ./graphics/tiefighter.bmp
+  image_paths: [./graphics/tiefighter.bmp]
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 25
@@ -103,12 +107,10 @@ x_wing:
     - false
     - !!binary |
       CgAAAO7///8KAAAAEQAAAAsAAADw////CwAAAA8AAAA=
-  image_path: ./graphics/xwing.bmp
+  image_paths: [./graphics/xwing.bmp]
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 20
   rotation_speed: 1.2
   ship_type: x_wing
   weapon_cool_down: 20
-red_laser: {image_path: ./graphics/redlaser.bmp}
-green_laser: {image_path: ./graphics/greenlaser.bmp}

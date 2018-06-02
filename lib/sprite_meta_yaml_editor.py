@@ -9,29 +9,20 @@ import yaml
 import numpy
 import os
 
-os.getcwd()
+os.chdir('C:/Users/bettmensch/GitReps/star_wars_dogfighter/meta')
 
-with open('../meta/sprite_meta_data.yaml','r') as meta_file:
+with open('sprite_meta_data.yaml','r') as meta_file:
     meta_data = yaml.load(meta_file)
 
-old_array = meta_data['x_wing']['cannon_tip_positions']
-
-new_array = old_array.copy()
-new_array[0,1] +=1
-new_array[1,1] -=1
-new_array[2,1] +=1
-new_array[3,1] -=1
-         
-meta_data['x_wing']['cannon_tip_positions'] = new_array
-
-cannon_tips_rel_to_centers = {}
+all_image_paths = {}
 
 for ship_type in meta_data.keys():
-    cannon_tips = meta_data[ship_type]['cannon_tip_positions']
-    cannon_tips_rel_to_centers[ship_type] = cannon_tips - numpy.array([20,20])
+    image_paths = [meta_data[ship_type]['image_path'],]
+    del meta_data[ship_type]['image_path']
+    all_image_paths[ship_type] = image_paths
     
-for ship_type in cannon_tips_rel_to_centers.keys():
-    meta_data[ship_type]['cannon_tip_positions'] = cannon_tips_rel_to_centers[ship_type]
+for ship_type in all_image_paths.keys():
+    meta_data[ship_type]['image_paths'] = all_image_paths[ship_type]
     
 with open('sprite_meta_data.yaml','w') as meta_file:
     yaml.dump(meta_data,meta_file)

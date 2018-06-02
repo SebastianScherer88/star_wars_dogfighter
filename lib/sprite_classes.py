@@ -41,14 +41,19 @@ class MaskedSprite(Sprite):
         self.meta_data = sprite_meta_data
         
         # get and attach image as pygame surface; initialize rotated image storage
-        image_path = self.meta_data['image_path']
-        self._original_image = pg.image.load(image_path)
+        image_paths = self.meta_data['image_paths']
+        self._original_images = [pg.image.load(image_path) for image_path in image_paths]
         
         # make original image's white parts transparent
-        self._original_image.set_colorkey((255,255,255))
+        for original_image in self._original_images:
+            original_image.set_colorkey((255,255,255))
+            
+        # initialize image _index
+        self.image_index = 0
         
         # get temporary image
-        self.image = pg.transform.rotate(self._original_image,0)
+        self.image = pg.transform.rotate(self._original_images[self.image_index],
+                                         0)
         
         # get and attach positional rectangle
         self.rect = self.image.get_rect()
@@ -83,7 +88,7 @@ class MaskedSprite(Sprite):
             angle = self._angle + d_angle
             
             # rotate sprite image by angle
-            self.image = pg.transform.rotate(self._original_image,
+            self.image = pg.transform.rotate(self._original_images[self.image_index],
                                              angle)
             
             # update the positional rect
@@ -136,7 +141,7 @@ class FighterSprite(MaskedSprite):
     '''Parent class for PlayerSprite and EnemySprite. Allows for a slim MaskedSprite
     class that has doesnt lead to 'appendix syndrome' for the LaserSprite class.'''
     
-    gun_muzzle_flash_frames = 30 # number of frames the gun muzzle flare should be visible after firing
+    gun_muzzle_flash_frames = 10 # number of frames the gun muzzle flare should be visible after firing
     
     def __init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,*groups,**initial_values):
         
@@ -275,8 +280,8 @@ class FighterSprite(MaskedSprite):
             self.muzzle_flash_counter -= 1 # update the flash countdown
         elif self.muzzle_flash_counter == 0:
             # refresh sprite surface, wiping off any remaining gun flashes
-            self.image = pg.transform.rotate(self._original_image,
-                                 self._angle)
+            self.image = pg.transform.rotate(self._original_images[self.image_index],
+                                             self._angle)
         
         # update weapon cooling counter but keep at minimum 0
         if self.weapon_cooling > 0:

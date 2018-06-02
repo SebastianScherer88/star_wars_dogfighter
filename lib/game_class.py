@@ -18,7 +18,7 @@ from sprite_classes import PlayerSprite, EnemySprite
 
 class Game(object):
     
-    def __init__(self,screen_width=800,screen_height=500,
+    def __init__(self,screen_width=1200,screen_height=600,
                  all_sprite_meta_data=None,
                  all_animation_meta_data=None):
         '''Initializes the game object and also the game'''
@@ -30,7 +30,7 @@ class Game(object):
         
         white = 255, 255, 255
         fps = 60
-        enemy_down_time = 500 # pause between enemy death and spawning of new enemy in seconds
+        enemy_down_time = 2 # pause between enemy death and spawning of new enemy in seconds
         
         # initialize main screen
         size = width, height = 1040, 740 # screen size
@@ -119,7 +119,7 @@ class Game(object):
                         enemy_center = np.random.uniform(0,1,2) * np.array([width,height]).astype('float')
                         
                         # if enemy has safety distance from player, proceed with spawning
-                        if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
+                        if np.linalg.norm(player._center-enemy_center,ord=1) > min(3*width/4,3*height/4):
                             # spawn enemy
                             EnemySprite(screen,
                                         all_sprite_meta_data['tie_fighter'],
