@@ -76,11 +76,19 @@ class Game(object):
             
             # update all sprites
             all_sprites.update()
+            player_lasers.update()
+            enemy_lasers.update()
+            
+            # update explosions
+            explosions.update()
             
             # draw new game state    
             screen.fill(white) # paint over old game state
             
             all_sprites.draw(screen) # draw all sprites
+            player_lasers.draw(screen) # draw player lasers
+            enemy_lasers.draw(screen) # draw enemy lasers
+            explosions.draw(screen) # draw explosion animation
                        
             # flip canvas
             pg.display.flip()
@@ -142,7 +150,7 @@ class Game(object):
                         enemy_center = np.random.uniform(0,1,2) * np.array([width,height]).astype('float')
                         
                         # if enemy has safety distance from player, proceed with spawning
-                        if np.linalg.norm(player._center-enemy_center,ord=1) > min(3*width/4,3*height/4):
+                        if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
                             # spawn enemy
                             EnemySprite(screen,
                                         all_sprite_meta_data['tie_fighter'],

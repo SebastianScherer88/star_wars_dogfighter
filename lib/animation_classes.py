@@ -41,6 +41,9 @@ class BasicAnimation(MaskedSprite):
                              speed=speed,
                              center=center)
         
+        # set last image index
+        self.last_image_index = len(self._original_images) - 1
+        
         # get frames per image ratio
         self.frames_per_image = frames_per_second * animation_meta_data['seconds_per_image']
         
