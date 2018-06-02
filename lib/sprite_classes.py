@@ -174,7 +174,7 @@ class FighterSprite(MaskedSprite):
         Returns:
             - fire_cannon: Bool. 'True' to fire laser, 'False' to not.'''
             
-    def _get_gun_muzzle_positions(self,relative_positions=False):
+    def _get_gun_muzzle_positions(self,sprite_surface=False):
         '''Calculates pixel tuple specifiying the location of the current sprite's
         gun tips.'''
         
@@ -189,10 +189,11 @@ class FighterSprite(MaskedSprite):
                                                   self._rel_cannon_tip_positions.T).T
         
         # make sure to get correct kind of position, i.e. absolute or relative
-        if relative_positions:
+        if sprite_surface:
             # take the positions of gun muzzles w.r.t. to the center of the sprite positional rect
-            gun_muzzle_positions = rotated_rel_gun_muzzle_positions
-        if not relative_positions:
+            sprite_surface_center = np.array(self.image.get_size()).reshape((1,-1))
+            gun_muzzle_positions = sprite_surface_center / 2 + rotated_rel_gun_muzzle_positions
+        if not sprite_surface:
             # add sprite center coordinates to relative gun tip coordinates absolute gun muzzle positions
             gun_muzzle_positions = self._center + rotated_rel_gun_muzzle_positions
         
@@ -206,7 +207,7 @@ class FighterSprite(MaskedSprite):
         calculation approach implemented in the "get_guntips_positions()" method.'''
         
         # iterate through sprites gun muzzle positions 
-        for gun_muzzle_position in self._get_gun_muzzle_positions(relative_positions=True):
+        for gun_muzzle_position in self._get_gun_muzzle_positions(sprite_surface=True):
             # draw a flash for each gun muzzle onto sprite surface
             pg.draw.circle(self.image,
                            (255,0,0), # red
@@ -222,8 +223,7 @@ class FighterSprite(MaskedSprite):
         # fire laser beam: set arguments for laser __init__
         laser_screen = self.screen
         laser_lifetime = self._laser_lifetime
-        #laser_speed = self._speed + self._laser_speed
-        laser_speed = 0
+        laser_speed = self._speed + self._laser_speed
         laser_angle = self._angle
         
         # fire laser beam: create laserSprite instance
