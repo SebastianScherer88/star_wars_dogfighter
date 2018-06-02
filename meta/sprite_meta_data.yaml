@@ -15,7 +15,7 @@ a_wing:
     - false
     - !!binary |
       CAAAAPH///8IAAAADgAAAA==
-  image_name: awing.bmp
+  image_path: ./graphics/awing.bmp
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 30
@@ -37,7 +37,7 @@ f35:
     - false
     - !!binary |
       DAAAAP3///8MAAAAAgAAAA==
-  image_name: f35.bmp
+  image_path: ./graphics/f35.bmp
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 25
@@ -59,7 +59,7 @@ hornet:
     - false
     - !!binary |
       BgAAAPj///8GAAAABwAAAA==
-  image_name: hornet.bmp
+  image_path: ./graphics/hornet.bmp
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 22
@@ -81,7 +81,7 @@ tie_fighter:
     - false
     - !!binary |
       CAAAAP3///8IAAAAAgAAAA==
-  image_name: tiefighter.bmp
+  image_path: ./graphics/tiefighter.bmp
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 25
@@ -102,13 +102,13 @@ x_wing:
     - *id002
     - false
     - !!binary |
-      CgAAAO3///8KAAAAEgAAAAsAAADv////CwAAABAAAAA=
-  image_name: xwing.bmp
+      CgAAAO7///8KAAAAEQAAAAsAAADw////CwAAAA8AAAA=
+  image_path: ./graphics/xwing.bmp
   laser_lifetime: 40
   laser_speed: 10
   max_speed: 20
   rotation_speed: 1.2
   ship_type: x_wing
   weapon_cool_down: 20
-red_laser:
-  image_name: redlaser.bmp
+red_laser: {image_path: ./graphics/redlaser.bmp}
+green_laser: {image_path: ./graphics/greenlaser.bmp}

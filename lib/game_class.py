@@ -7,17 +7,20 @@ Created on Sun May 27 22:09:47 2018
 
 # demo gam states here
 import sys
+import os
 
 import pygame as pg
-
 import numpy as np
+import yaml
 
 from pygame.sprite import Group, collide_mask, spritecollide, groupcollide
 from sprite_classes import PlayerSprite, EnemySprite
 
 class Game(object):
     
-    def __init__(self,screen_width=800,screen_height=500):
+    def __init__(self,screen_width=800,screen_height=500,
+                 all_sprite_meta_data=None,
+                 all_animation_meta_data=None):
         '''Initializes the game object and also the game'''
         
         pg.init()
@@ -33,23 +36,34 @@ class Game(object):
         size = width, height = 1040, 740 # screen size
         screen = pg.display.set_mode(size)
         
+        # initialize empty sprite groups
         player_sprite = Group()
         player_lasers = Group()
         enemy_sprite = Group()
         enemy_lasers = Group()
         
-        # create player sprite
-        player = PlayerSprite(screen,'x_wing',player_lasers,
+        # create player sprite and add to relevant groups / provide with relevant groups
+        player = PlayerSprite(screen,
+                              all_sprite_meta_data['x_wing'],
+                              all_sprite_meta_data['red_laser'],
+                              player_lasers,
                               player_sprite,
                               angle=-45)
         
-        # create first enemy sprite
-        EnemySprite(screen,'a_wing',enemy_lasers,player,
+        # create first enemy sprite and add to relevant groups / provide with relevant groups
+        EnemySprite(screen,
+                    all_sprite_meta_data['tie_fighter'],
+                    all_sprite_meta_data['green_laser'],
+                    enemy_lasers,
+                    player,
                     enemy_sprite,
-                    angle=-45,center=[200,400],speed=5)
+                    angle=-45,
+                    center=[200,400],
+                    speed=5)
         
         kill_confirmed= False
         
+        # start main game loop
         while True:
             # check for exit events
             for event in pg.event.get():
@@ -107,9 +121,15 @@ class Game(object):
                         # if enemy has safety distance from player, proceed with spawning
                         if np.linalg.norm(player._center-enemy_center,ord=1) > min(width/2,height/2):
                             # spawn enemy
-                            EnemySprite(screen,'tie_fighter',enemy_lasers,player,
+                            EnemySprite(screen,
+                                        all_sprite_meta_data['tie_fighter'],
+                                        all_sprite_meta_data['green_laser'],
+                                        enemy_lasers,
+                                        player,
                                         enemy_sprite,
-                                        angle=-45,center=enemy_center,speed=5)
+                                        angle=-45,
+                                        center=[200,400],
+                                        speed=5)
                             
                             # break loop when done
                             too_close = False
@@ -119,8 +139,17 @@ class Game(object):
             clock.tick(fps)
             
 def main():
-    # create new game
-    Game()
+    # make sure directory is repo head
+    os.chdir('C:/Users/bettmensch/GitReps/star_wars_dogfighter')
+    
+    # get game meta data for sprites
+    with open('./meta/sprite_meta_data.yaml','r') as sprite_meta_data_file:
+        sprite_meta_data = yaml.load(sprite_meta_data_file)
+        
+    # get game meta dat for animations
+    
+    # create new game with all the meta data
+    Game(all_sprite_meta_data=sprite_meta_data)
     
 if __name__=='__main__':
     main()

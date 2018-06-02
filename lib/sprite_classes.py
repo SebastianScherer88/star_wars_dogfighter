@@ -17,11 +17,10 @@ from math import cos, sin, pi
 
 import pygame as pg
 import numpy as np
-import yaml
 
 class MaskedSprite(Sprite):
     
-    def __init__(self,screen,sprite_name,*groups,**initial_values):
+    def __init__(self,screen,sprite_meta_data,*groups,**initial_values):
         '''image: path to sprite image
         *groups: optional (unnamed) list of groups the sprite will be added to
                           when created
@@ -34,12 +33,15 @@ class MaskedSprite(Sprite):
         # attach screen
         self.screen = screen
         
-        # retrieve sprite meta data via ship type argument
-        with open('../meta/sprite_meta_data.yaml','r') as meta_file:
-            self.meta_data = yaml.load(meta_file)[sprite_name]
+        # for debugging only
+        #print(meta_data)
+        #print(sprite_name)
+        
+        # retrieve sprite meta data
+        self.meta_data = sprite_meta_data
         
         # get and attach image as pygame surface; initialize rotated image storage
-        image_path = "../graphics/" + self.meta_data['image_name']
+        image_path = self.meta_data['image_path']
         self._original_image = pg.image.load(image_path)
         
         # make original image's white parts transparent
@@ -134,12 +136,12 @@ class FighterSprite(MaskedSprite):
     '''Parent class for PlayerSprite and EnemySprite. Allows for a slim MaskedSprite
     class that has doesnt lead to 'appendix syndrome' for the LaserSprite class.'''
     
-    gun_muzzle_flash_frames = 10 # number of frames the gun muzzle flare should be visible after firing
+    gun_muzzle_flash_frames = 30 # number of frames the gun muzzle flare should be visible after firing
     
-    def __init__(self,screen,sprite_name,laser_beams_group,*groups,**initial_values):
+    def __init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,*groups,**initial_values):
         
         # call parent class __init__
-        MaskedSprite.__init__(self,screen,sprite_name,*groups,**initial_values)
+        MaskedSprite.__init__(self,screen,sprite_meta_data,*groups,**initial_values)
         
         # set meta attibutes dependent on chosen fighter type
         self._d_angle = self.meta_data['rotation_speed'] # rotation rate for this ship type (in degrees)
@@ -150,6 +152,9 @@ class FighterSprite(MaskedSprite):
         self._weapon_cool_down = self.meta_data['weapon_cool_down'] # number of frames between shots
         self._rel_cannon_tip_positions = self.meta_data['cannon_tip_positions'] # pixel coordinates of gun tips relative to image center
         
+        # attach laser beam meta data
+        self.laser_meta_data = laser_meta_data
+                                                       
         # attach laser beam 'basket' group
         self.laser_beams = laser_beams_group
         
@@ -232,7 +237,9 @@ class FighterSprite(MaskedSprite):
             self.muzzle_flash_counter = self.__class__.gun_muzzle_flash_frames
             
             # spawn laser at gun tip
-            LaserSprite(laser_screen,'red_laser',laser_lifetime,
+            LaserSprite(laser_screen,
+                        self.laser_meta_data,
+                        laser_lifetime,
                         self.laser_beams,
                         speed=laser_speed,
                         angle=laser_angle,
@@ -325,10 +332,10 @@ class EnemySprite(FighterSprite):
     
     piloting_cone_sine = 0.05
     gunning_cone_sine = 0.1
-    
-    def __init__(self,screen,sprite_name,laser_beams_group,player,*groups,**initial_values):
+    #screen,meta_data,sprite_name,*groups,**initial_values
+    def __init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,player,*groups,**initial_values):
         
-        FighterSprite.__init__(self,screen,sprite_name,laser_beams_group,*groups,**initial_values)
+        FighterSprite.__init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,*groups,**initial_values)
         
         # attach group containing player sprite
         self.player = player
@@ -395,9 +402,9 @@ class EnemySprite(FighterSprite):
             
 class LaserSprite(MaskedSprite):
     
-    def __init__(self,screen,laser_name,time_left,*groups,**initial_values):
+    def __init__(self,screen,laser_meta_data,time_left,*groups,**initial_values):
         
-        MaskedSprite.__init__(self,screen,laser_name,*groups,**initial_values)
+        MaskedSprite.__init__(self,screen,laser_meta_data,*groups,**initial_values)
 
         # set life time attribute
         self.time_left = time_left
