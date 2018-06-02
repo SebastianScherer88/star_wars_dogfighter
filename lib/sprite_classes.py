@@ -222,10 +222,9 @@ class FighterSprite(MaskedSprite):
         
         # fire laser beam: create laserSprite instance
         for gun_muzzle_position in self._get_gun_muzzle_positions():
+            
             # set gun muzzle countdown to maximum so that sprite's draw method will draw the flares
             self.muzzle_flash_counter = self.__class__.gun_muzzle_flash_frames
-            
-            print('fire!')
             
             # spawn laser at gun tip
             LaserSprite(laser_screen,
@@ -263,9 +262,13 @@ class FighterSprite(MaskedSprite):
             
         # update the gun muzzle flash counter and draw flashes if necessary
         if self.muzzle_flash_counter > 0:
+            
             self.draw_gun_muzzle_flash() # draw the flashes
+            
             self.muzzle_flash_counter -= 1 # update the flash countdown
+            
         elif self.muzzle_flash_counter == 0:
+            
             # refresh sprite surface, wiping off any remaining gun flashes
             self.image = pg.transform.rotate(self._original_images[self.image_index],
                                              self._angle)
@@ -286,20 +289,30 @@ class PlayerSprite(FighterSprite):
             
         # get angle differential
         if pressed_keys[pg.K_LEFT] and not pressed_keys[pg.K_RIGHT]:
+            
             d_angle = self._d_angle
+            
         elif pressed_keys[pg.K_RIGHT] and not pressed_keys[pg.K_LEFT]:
+            
             d_angle = -self._d_angle
+            
         else:
+            
             d_angle = 0
             
         # get speed differential
         if pressed_keys[pg.K_UP] and not pressed_keys[pg.K_DOWN]:
+            
             # dont accelerate above sprite's max speed
             d_speed = min(self._d_speed,self._max_speed - self._speed)
+            
         elif pressed_keys[pg.K_DOWN] and not pressed_keys[pg.K_UP]:
+            
             # dont decelarate to going backwards
             d_speed = -min(self._d_speed,self._speed)
+            
         else:
+            
             d_speed = 0
             
         return d_angle, d_speed
@@ -312,8 +325,11 @@ class PlayerSprite(FighterSprite):
         
         # get fire command
         if pressed_keys[pg.K_SPACE]:
+            
             fire_cannon = True
+            
         else:
+            
             fire_cannon = False
             
         return  fire_cannon

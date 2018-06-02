@@ -13,7 +13,7 @@ import pygame as pg
 import numpy as np
 import yaml
 
-from pygame.sprite import Group, collide_mask, spritecollide, groupcollide
+from pygame.sprite import Group, collide_mask, groupcollide
 from sprite_classes import PlayerSprite, EnemySprite
 from animation_classes import BasicAnimation
 
@@ -94,16 +94,25 @@ class Game(object):
             pg.display.flip()
             
             # check for player collisions with enemy sprites and enemy lasers
-            collided_enemy_sprites = spritecollide(player,enemy_sprite,True,collided=collide_mask)
-            collided_enemy_lasers = spritecollide(player,enemy_lasers,True,collided=collide_mask)
+            collided_enemy_sprites = groupcollide(player_sprite,
+                                                   enemy_sprite,
+                                                   True,
+                                                   True,
+                                                   collided=collide_mask)
+            collided_enemy_lasers = groupcollide(player_sprite,
+                                                 enemy_lasers,
+                                                 True,
+                                                 True,
+                                                 collided=collide_mask)
             
+            # if player collides with either laser or enemy sprite, create explosion at player position
             if collided_enemy_sprites or collided_enemy_lasers:
-                # if player collides with either laser or enemy sprite, create explosion at player position
                 BasicAnimation(screen,
                                all_animation_meta_data['explosion'],
                                 fps,
                                 explosions,
                                 center=player._center)
+                
                 # if player collides with enemy sprite in particular, create explosion at enemy position
                 for collided_enemy_sprite in collided_enemy_sprites:
                     BasicAnimation(screen,
@@ -111,27 +120,22 @@ class Game(object):
                                     fps,
                                     explosions,
                                     center=collided_enemy_sprite._center)
-                
-                
-                # if player collides with enemy or is shot down, end game
-                #pg.quit()
-                #sys.exit()
             
             # check for enemy collisions with player lasers
-            collided_enemy_sprites = groupcollide(enemy_sprite,player_lasers,True,True,collided=collide_mask)
+            downed_enemy_sprites = groupcollide(enemy_sprite,player_lasers,True,True,collided=collide_mask)
             
-            if collided_enemy_sprites:
+            if downed_enemy_sprites:
                 # mark down time of kill shot
                 kill_confirmed = True
                 kill_time = pg.time.get_ticks()
                 
                 # create explosion at location of killed enemy sprites
-                for collided_enemy_sprite in collided_enemy_sprites:
+                for downed_enemy_sprite in downed_enemy_sprites:
                     BasicAnimation(screen,
                                    all_animation_meta_data['explosion'],
                                     fps,
                                     explosions,
-                                    center=collided_enemy_sprite._center)
+                                    center=downed_enemy_sprite._center)
                 
             # spawn new enemy if necessary
             if kill_confirmed:
