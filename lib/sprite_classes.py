@@ -26,7 +26,7 @@ class MaskedSprite(Sprite):
                  *groups,
                  angle=0,
                  speed=0,
-                 center=np.array([0,0]).astype('float')):
+                 center=np.zeros(2)):
         '''image: path to sprite image
         *groups: optional (unnamed) list of groups the sprite will be added to
                           when created
@@ -127,10 +127,24 @@ class FighterSprite(MaskedSprite):
     
     gun_muzzle_flash_frames = 10 # number of frames the gun muzzle flare should be visible after firing
     
-    def __init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,*groups,**initial_values):
+    def __init__(self,
+                 screen,
+                 sprite_meta_data,
+                 laser_meta_data,
+                 laser_beams_group,
+                 *groups,
+                 angle=0,
+                 speed=0,
+                 center=np.zeros(2)):
         
         # call parent class __init__
-        MaskedSprite.__init__(self,screen,sprite_meta_data,*groups,**initial_values)
+        MaskedSprite.__init__(self,
+                              screen,
+                              sprite_meta_data,
+                              *groups,
+                              angle=angle,
+                              speed=speed,
+                              center=center)
         
         # set meta attibutes dependent on chosen fighter type
         self._d_angle = self.meta_data['rotation_speed'] # rotation rate for this ship type (in degrees)
@@ -341,9 +355,26 @@ class EnemySprite(FighterSprite):
     piloting_cone_sine = 0.05
     gunning_cone_sine = 0.1
     #screen,meta_data,sprite_name,*groups,**initial_values
-    def __init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,player,*groups,**initial_values):
+    def __init__(self,
+                 screen,
+                 sprite_meta_data,
+                 laser_meta_data,
+                 laser_beams_group,
+                 player,
+                 *groups,
+                 angle=0,
+                 speed=0,
+                 center=np.zeros((1,1))):
         
-        FighterSprite.__init__(self,screen,sprite_meta_data,laser_meta_data,laser_beams_group,*groups,**initial_values)
+        FighterSprite.__init__(self,
+                               screen,
+                               sprite_meta_data,
+                               laser_meta_data,
+                               laser_beams_group,
+                               *groups,
+                               angle=angle,
+                               speed=speed,
+                               center=center)
         
         # attach group containing player sprite
         self.player = player
@@ -417,7 +448,7 @@ class LaserSprite(MaskedSprite):
                  *groups,
                  angle=0,
                  speed=0,
-                 center=0):
+                 center=np.zeros(2)):
         
         MaskedSprite.__init__(self,
                               screen,
