@@ -312,8 +312,11 @@ class ShipSprite(BasicSprite):
     def kill(self):
         '''Base class kill method plus moving explosion animation.'''
         
+        # play sound of explosion
+        self._explosion_sound.play()
+        
         # remove self from all groups
-        self.kill()
+        BasicSprite.kill(self)
         
         # create explosion animation
         BasicAnimation(self._fps,
@@ -470,7 +473,7 @@ class EnemyShipSprite(ShipSprite):
                                                 -unit_direction[0]])
         
         # get clockwise rotated orthogonal to unit vector pointing towards player position
-        towards_player_vector = (self.player._center - self._center)
+        towards_player_vector = (self._player_sprite._center - self._center)
         unit_towards_player_vector = towards_player_vector / np.linalg.norm(towards_player_vector)
         
         # turn towards player, whichever way is more aligned with current direction of movement

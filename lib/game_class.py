@@ -14,7 +14,7 @@ import numpy as np
 import yaml
 
 from pygame.sprite import Group, collide_mask, groupcollide
-from sprite_classes import PlayerShipSprite
+from sprite_classes import PlayerShipSprite, EnemyShipSprite
 from animation_classes import BasicAnimation
 
 class Game(object):
@@ -50,6 +50,7 @@ class Game(object):
             
         # player cannon positions
         player_cannon_positions = sprite_meta_data['a_wing']['cannon_tip_positions']
+        enemy_cannon_positions = sprite_meta_data['tie_fighter']['cannon_tip_positions']
         
         # load sounds
         laser_sound = pg.mixer.Sound('./sounds/missile.wav')
@@ -71,7 +72,7 @@ class Game(object):
         
         
         # create player sprite and add to relevant groups / provide with relevant groups
-        PlayerShipSprite(fps,
+        player = PlayerShipSprite(fps,
                  screen,
                  player_images,
                  player_cannon_positions,
@@ -91,17 +92,33 @@ class Game(object):
                  speed = 3000,
                  d_angle_degrees_per_second = 100,
                  d_speed_pixel_per_second = 500,
-                 max_speed_pixel_per_second = 40000) 
+                 max_speed_pixel_per_second = 30000) 
         
-        # create explosion animation
-        BasicAnimation(fps,
-                 screen,
-                 explosion_images,
-                 0.2,
-                 (explosion_animations,all_sprites),
-                 center = np.array([400,400]),
-                 angle = 0,
-                 speed = 0)
+        EnemyShipSprite(fps,
+                        screen,
+                        enemy_images,
+                        enemy_cannon_positions,
+                        enemy_laser_sprites,
+                        laser_sound,
+                        laser_images_green,
+                        1.5,
+                        10000,
+                        2,
+                        explosion_animations,
+                        explosion_sound,
+                        explosion_images,
+                        0.15,
+                        player,
+                        0.1,
+                        0.1,
+                        (enemy_sprites, all_sprites),
+                        center = np.array([3*screen_width/4,screen_height/2]),
+                        angle=0,
+                        speed=20000,
+                        d_angle_degrees_per_second = 100,
+                        d_speed_pixel_per_second = 500,
+                        max_speed_pixel_per_second = 20000)
+                        
         
         # start main game loop
         while True:
@@ -114,15 +131,31 @@ class Game(object):
             # update all sprites
             all_sprites.update()
             player_laser_sprites.update()
+            enemy_laser_sprites.update()
+            explosion_animations.update()
             
             # draw new game state    
             screen.fill(white) # paint over old game state
             
             all_sprites.draw(screen) # draw all sprites
-            player_laser_sprites.draw(screen) # draw lasers
+            player_laser_sprites.draw(screen) # draw player lasers
+            enemy_laser_sprites.draw(screen) # draw enemy lasers
+            explosion_animations.draw(screen) # draw explosions
                        
             # flip canvas
             pg.display.flip()
+            
+            # check for player kills
+            downed_enemies = groupcollide(enemy_sprites,player_laser_sprites,True,True,collide_mask)
+            
+            for downed_enemy in downed_enemies:
+                downed_enemy.kill()
+                
+            # check for enemy kills
+            downed_players = groupcollide(player_sprite,enemy_laser_sprites,True,True,collide_mask)
+            
+            for downed_player in downed_players:
+                downed_player.kill()
                         
             # control pace
             clock.tick(fps)
