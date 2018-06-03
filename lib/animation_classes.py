@@ -14,11 +14,11 @@ Created on Sat Jun  2 14:00:12 2018
  sprite through time (like gun flashes, missile propulsion, engine fire etc.)'''
  
 #from pygame.sprite import Sprite, Group
-from sprite_classes import BasicSprite
+from basic_sprite_class import BasicSprite
  
 import numpy as np
 
-class BasicAnimationNew(BasicSprite):
+class BasicAnimation(BasicSprite):
     '''Base class for animations used in game.'''
     
     def __init__(self,

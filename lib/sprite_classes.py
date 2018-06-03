@@ -12,158 +12,13 @@ The FighterSprite class serves as a sub-base class for the spaceship/fighter pla
 sprites (either player or pc controlled) \'PlayerSprite\' and \'EnemySprite\'.
 The \'LaserSprite\' class is based directly on the MaskedSprite class.'''
 
-from pygame.sprite import Sprite
-from animation_classes import BasicAnimationNew
+from basic_sprite_class import BasicSprite
+from animation_classes import BasicAnimation
 from math import cos, sin, pi
 
 import pygame as pg
 import numpy as np
 
-class BasicSprite(Sprite):
-    '''Base class for all masked sprites that appear in the game.'''
-    
-    def __init__(self,
-                 fps,
-                 screen,
-                 original_images,
-                 *groups,
-                 center = np.zeros(2),
-                 angle = 0,
-                 speed = 0,
-                 is_transparent = True,
-                 transparent_color = (255,255,255)):
-        
-        '''Arguments:
-            
-            fps: frames per second ratio of surrounding pygame
-             screen: the main screen the game is displayed on (pygame Surface).
-                    Needed to 'wrap' sprites around edges to produce 'donut topology'.
-            original_images: list of surface objects that will be used to display the sprite.
-                    By default, the first list element will be used.
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
-                    when initialized.
-            center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
-                    Sets the sprite's initial position on the 'screen' surface.
-            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
-                    an angle of zero meaning no rotation of the original surface.
-            speed: initial speed of sprite (pixels per second). scaler of float type.
-                    Default is 0.
-            is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
-                    color argument in the surfaces contained in 'original_images' will be made transparent.
-                    Default is True
-            transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
-                    is set to true. Default to (255,255,255), which corresponds to the color white.'''
-                    
-        # call Sprite base class init - add self to all groups specified
-        Sprite.__init__(self,*groups)
-        
-        # set surrounding pygame variables as attributes
-        self._screen = screen
-        self._fps = fps
-        
-        # if necessary, make original image surfaces transparent; then attach
-        if is_transparent:
-            for original_image in original_images:
-                original_image.set_colorkey(transparent_color)
-                
-        self._original_images = original_images
-        
-        # set positional attributes using initial values passed
-        self._center = np.array(center,dtype='float')
-        self._angle = angle
-        self._speed = speed / fps # convert to pixel per frame
-        
-        # set sprite up
-        # set image and rect - these will be called by Group object methods; get mask
-        self._image_index = 0 # always start with first image in original_images
-        self.image = pg.transform.rotate(self._original_images[self._image_index],
-                                         self._angle)
-        
-        # update object type attribute: mask
-        self.mask = pg.mask.from_surface(self.image)
-        
-        # update object type attributes: positional rectangle
-        self.rect = self.image.get_rect()
-        self.rect.center = self._center
-        
-    def update_positional_attributes(self,
-                                     d_angle=0,
-                                     d_speed=0):
-        '''Updates the sprites positional attributes '_angle' and '_speed'.
-        Does not update the 'image','rect' or 'mask' attributes.'''
-        
-        # update angle argument
-        self._angle += d_angle
-        
-        # update speed argument
-        self._speed += d_speed
-        
-        # update center argument
-        self._center += self.get_velocity_vector()
-        
-        # get main screen and current sprite image's dimensions for wrap checks
-        screen_w, screen_h= self._screen.get_size()
-        image_w, image_h = self.image.get_size()
-        
-        # wrap horizontaly if needed
-        if self._center[0] < - image_w / 2:
-            self._center[0] = screen_w + image_w / 2
-        elif self._center[0] > screen_w + image_w / 2:
-            self._center[0] = - image_w / 2
-                        
-        # wrap vertically if needed
-        if self._center[1] < - image_h / 2:
-            self._center[1] = screen_h + image_h / 2
-        elif self._center[1] > screen_h + image_h / 2:
-            self._center[1] = - image_h / 2
-            
-        
-    def get_velocity_vector(self):
-        '''Calculates a 2-dim velocity vector (units: frames per second) based
-        on 'self._angle' and 'self._speed' attributes.'''
-        
-        # convert angle to radian
-        radian_angle = self._angle * pi / 180
-        
-        # convert speed (pixel per second) into frame_speed (pixel per frame)
-        frame_speed = self._speed / self._fps
-        
-        # compute velocity vector
-        velocity = frame_speed * np.array([cos(radian_angle),
-                                           -sin(radian_angle)]).reshape((1,2)) # in pygame coordinates, the y-axis has negative orientation
-        
-        return velocity.reshape(2)
-    
-    def get_pilot_commands(self):
-        '''Calculates scalar floats d_angle and d_speed which can be 
-        picked up by the self.update_positional_Attributes method called from within
-        the update() method. For this base class, it returns trivial changes 0 for both
-        arguments, but can be edited in more sophisticated classes to effectively
-        implement player controls input or an AI pilot.'''
-        
-        return 0, 0
-    
-    def update(self):
-        '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 
-        updated numerical positional attributes'self._angle','self._speed' and self_center'.'''
-        
-        # get directional changes
-        d_angle, d_speed = self.get_pilot_commands()
-        
-        # update numerical positional attributes
-        self.update_positional_attributes(d_angle,
-                                          d_speed)
-        
-        # update object type attributes: surface
-        self.image = pg.transform.rotate(self._original_images[self._image_index],
-                                         self._angle)
-
-        # update object type attribute: mask
-        self.mask = pg.mask.from_surface(self.image)
-        
-        # update object type attributes: positional rectangle
-        self.rect = self.image.get_rect()
-        self.rect.center = self._center
         
 class MissileSprite(BasicSprite):
     '''Class used for projectiles fired by player or enemy sprites.'''
@@ -235,6 +90,8 @@ class MissileSprite(BasicSprite):
 
 class ShipSprite(BasicSprite):
     '''Base sprite class for both the player's and the enemy ship(s).'''
+    
+    _muzzle_flash_lifetime_in_seconds = 0.1
     
     def __init__(self,
                  fps,
@@ -326,11 +183,11 @@ class ShipSprite(BasicSprite):
         self._laser_range_in_seconds = laser_range_in_seconds
         self._laser_speed_in_seconds = laser_speed_in_seconds
         self._laser_rate_in_seconds = laser_rate_in_seconds
-        self._time_of_last_shot = pg.time_get_ticks() - (1 / self._laser_rate_in_seconds) * 1000 # this allows to fire laser from the beginning
+        self._time_of_last_shot = pg.time.get_ticks() - (1 / self._laser_rate_in_seconds) * 1000 # this allows to fire laser from the beginning
         
         # set attributes for explosion animation at death
         self._explosion_group = explosion_group
-        self._explosion_sound - explosion_sound
+        self._explosion_sound = explosion_sound
         self._original_explosion_images = original_explosion_images
         self._explosion_seconds_per_image = explosion_seconds_per_image
         
@@ -353,7 +210,9 @@ class ShipSprite(BasicSprite):
         attribute.'''
         
         # get time between now and last shot in seconds
-        cannon_down_time = (self._time_of_last_shot - pg.time.get_ticks()) / 1000
+        cannon_down_time = (pg.time.get_ticks() - self._time_of_last_shot) / 1000
+                           
+        #print('cannon down time:',cannon_down_time)
         
         # make sure enough time has passed since last shot
         if cannon_down_time > 1 / self._laser_rate_in_seconds:
@@ -403,7 +262,7 @@ class ShipSprite(BasicSprite):
         for gun_muzzle_flash_position in gun_muzzle_flash_positions:
             pg.draw.circle(self.image,
                            (255,0,0),
-                           gun_muzzle_flash_position,
+                           gun_muzzle_flash_position.astype('int'),
                            2)
         
     
@@ -438,7 +297,9 @@ class ShipSprite(BasicSprite):
         # call base class update method
         BasicSprite.update(self)
         
-        fire = self.get_gunner_commands(self)
+        fire = self.get_gunner_commands()
+        
+        #print('cannon ready:',self._is_cannon_ready())
         
         if fire and self._is_cannon_ready():
             # fire the cannon
@@ -455,7 +316,7 @@ class ShipSprite(BasicSprite):
         self.kill()
         
         # create explosion animation
-        BasicAnimationNew(self._fps,
+        BasicAnimation(self._fps,
                           self._screen,
                           self._original_explosion_images,
                           self._explosion_seconds_per_image,
@@ -510,6 +371,8 @@ class PlayerShipSprite(ShipSprite):
         '''Handles shooting player controls, i.e. firing lasers.
         Returns True if player has the space bar pressed, and False
         otherwise'''
+        
+        #print(pg.key.get_pressed()[pg.K_SPACE])
         
         # space bar is pressed, fire command is given
         return pg.key.get_pressed()[pg.K_SPACE]
