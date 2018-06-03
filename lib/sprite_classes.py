@@ -18,6 +18,115 @@ from math import cos, sin, pi
 import pygame as pg
 import numpy as np
 
+class BasicSprite(Sprite):
+    '''Base class for all masked sprites that appear in the game.'''
+    
+    def __init__(self,
+                 fps,
+                 screen,
+                 original_images,
+                 center = np.zeros(2),
+                 angle = 0,
+                 speed = 0,
+                 is_transparent = True,
+                 transparent_color = (255,255,255),
+                 *groups):
+        
+        '''Arguments:
+            
+            fps: frames per second ratio of surrounding pygame
+             screen: the main screen the game is displayed on (pygame Surface).
+                    Needed to 'wrap' sprites around edges to produce 'donut topology'.
+            original_images: list of surface objects that will be used to display the sprite.
+                    By default, the first list element will be used.
+            center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
+                    Sets the sprite's initial position on the 'screen' surface.
+            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
+                    an angle of zero meaning no rotation of the original surface.
+            speed: initial speed of sprite (pixels per second). scaler of float type.
+                    Default is 0.
+            is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
+                    color argument in the surfaces contained in 'original_images' will be made transparent.
+                    Default is True
+            transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
+                    is set to true. Default to (255,255,255), which corresponds to the color white.
+            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+                    when initialized.'''
+                    
+        # call Sprite base class init - add self to all groups specified
+        Sprite.__init__(self,*groups)
+        
+        # set surrounding pygame variables as attributes
+        self._screen = screen
+        self._fps = fps
+        
+        # if necessary, make original image surfaces transparent; then attach
+        if is_transparent:
+            for original_image in original_images:
+                original_image.set_colorkey(transparent_color)
+                
+        self._original_images = original_images
+        
+        # set positional attributes using initial values passed
+        self._center = center
+        self._angle = angle
+        self._speed = speed
+        
+        # set image and rect - these will be called by Group object methods; get mask
+        self.update()
+        
+    def update_positional_attributes(self,
+                                     d_angle=0,
+                                     d_speed=0):
+        '''Updates the sprites positional attributes '_angle' and '_speed'.
+        Does not update the 'image','rect' or 'mask' attributes.'''
+        
+        # update angle argument
+        self._angle += d_angle
+        
+        # update speed argument
+        self._speed += d_speed
+        
+        # update center argument
+        self._center += self.get_velocity_vector()
+        
+        # wrap around if necessary
+
+        
+    def get_velocity_vector(self):
+        '''Calculates a 2-dim velocity vector (units: frames per second) based
+        on 'self._angle' and 'self._speed' attributes.'''
+        
+        # convert angle to radian
+        radian_angle = self._angle * pi / 180
+        
+        # convert speed (pixel per second) into frame_speed (pixel per frame)
+        frame_speed = self._speed / self.fps
+        
+        # compute velocity vector
+        velocity = frame_speed * np.array([cos(radian_angle),
+                                           -sin(radian_angle)]).reshape((1,2)) # in pygame coordinates, the y-axis has negative orientation
+        
+        return velocity
+    
+    def update(self):
+        '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 
+        updated numerical positional attributes'self._angle','self._speed' and self_center'.'''
+        
+        # update numerical positional attributes
+        self.update_positional_attributes()
+        
+        # update object type attributes: surface
+        self.image = pg.transform.rotate(self._original_images[0],
+                                         self._angle)
+
+        # update object type attribute: mask
+        self.mask = pg.mask.from_surface(self.image)
+        
+        # update object type attributes: positional rectangle
+        self.rect = self.image.get_rect()
+        self.rect.center = self._center
+
 class MaskedSprite(Sprite):
     
     def __init__(self,
