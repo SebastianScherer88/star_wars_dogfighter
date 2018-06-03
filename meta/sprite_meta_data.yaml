@@ -46,6 +46,7 @@ f35:
   weapon_cool_down: 40
 green_laser:
   image_paths: [./graphics/greenlaser.bmp]
+  sound_path: ./sounds/missile.wav
 hornet:
   acceleration: 0.25
   cannon_tip_positions: !!python/object/apply:numpy.core.multiarray._reconstruct
@@ -70,6 +71,7 @@ hornet:
   weapon_cool_down: 30
 red_laser:
   image_paths: [./graphics/redlaser.bmp]
+  sound_path: ./sounds/missile.wav
 tie_fighter:
   acceleration: 0.4
   cannon_tip_positions: !!python/object/apply:numpy.core.multiarray._reconstruct

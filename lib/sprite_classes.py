@@ -457,6 +457,10 @@ class LaserSprite(MaskedSprite):
                               angle=angle,
                               speed=speed,
                               center=center)
+        
+        # load sound file specified in meta data and play
+        laser_sound = pg.mixer.Sound(file=laser_meta_data['sound_path']) # load wav file into sound object
+        laser_sound.play() # play sound object on any available channnel
 
         # set life time attribute
         self.time_left = time_left

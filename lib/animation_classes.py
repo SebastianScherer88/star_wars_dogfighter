@@ -41,6 +41,11 @@ class BasicAnimation(MaskedSprite):
                              speed=speed,
                              center=center)
         
+        # load sound file specified in metadat and play
+        animation_sound = pg.mixer.Sound(file=animation_meta_data['sound_path'])
+        animation_sound.play() # play on any channel available
+        
+        
         # set last image index
         self.last_image_index = len(self._original_images) - 1
         

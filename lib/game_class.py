@@ -24,7 +24,11 @@ class Game(object):
                  all_animation_meta_data=None):
         '''Initializes the game object and also the game'''
         
+        # initialize pygame (handles pretty much eveything)
         pg.init()
+        
+        # initialize pygame mixer (handles audio playback)
+        pg.mixer.init()
         
         # create clock    
         clock = pg.time.Clock()
