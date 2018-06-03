@@ -39,6 +39,8 @@ class BasicSprite(Sprite):
                     Needed to 'wrap' sprites around edges to produce 'donut topology'.
             original_images: list of surface objects that will be used to display the sprite.
                     By default, the first list element will be used.
+            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+                    when initialized.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
             angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
@@ -49,9 +51,7 @@ class BasicSprite(Sprite):
                     color argument in the surfaces contained in 'original_images' will be made transparent.
                     Default is True
             transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
-                    is set to true. Default to (255,255,255), which corresponds to the color white.
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
-                    when initialized.'''
+                    is set to true. Default to (255,255,255), which corresponds to the color white.'''
                     
         # call Sprite base class init - add self to all groups specified
         Sprite.__init__(self,*groups)
@@ -133,12 +133,25 @@ class BasicSprite(Sprite):
         
         return velocity.reshape(2)
     
+    def get_pilot_commands(self):
+        '''Calculates scalar floats d_angle and d_speed which can be 
+        picked up by the self.update_positional_Attributes method called from within
+        the update() method. For this base class, it returns trivial changes 0 for both
+        arguments, but can be edited in more sophisticated classes to effectively
+        implement player controls input or an AI pilot.'''
+        
+        return 0, 0
+    
     def update(self):
         '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 
         updated numerical positional attributes'self._angle','self._speed' and self_center'.'''
         
+        # get directional changes
+        d_angle, d_speed = self.get_pilot_commands()
+        
         # update numerical positional attributes
-        self.update_positional_attributes()
+        self.update_positional_attributes(d_angle,
+                                          d_speed)
         
         # update object type attributes: surface
         self.image = pg.transform.rotate(self._original_images[self._image_index],
@@ -174,6 +187,8 @@ class MissileSprite(BasicSprite):
             original_images: list of surface objects that will be used to display the sprite.
                     By default, the first list element will be used.
             lifetime: lifetime pf sprite (in seconds).
+            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+                    when initialized.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
             angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
@@ -184,9 +199,7 @@ class MissileSprite(BasicSprite):
                     color argument in the surfaces contained in 'original_images' will be made transparent.
                     Default is True
             transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
-                    is set to true. Default to (255,255,255), which corresponds to the color white.
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
-                    when initialized.'''
+                    is set to true. Default to (255,255,255), which corresponds to the color white.'''
                     
         # initialize and add to groups if sensible
         BasicSprite.__init__(self,
@@ -222,7 +235,67 @@ class MissileSprite(BasicSprite):
 class ShipSprite(BasicSprite):
     '''Base sprite class for both the player's and the enemy ship(s).'''
     
-                                                                 
+    def __init__(self,
+                 fps,
+                 screen,
+                 original_images,
+                 laser_group,
+                 laser_sound,
+                 laser_original_images,
+                 laser_range_in_seconds,
+                 *groups,
+                 center = np.zeros(2),
+                 angle = 0,
+                 speed = 0,
+                 is_transparent = True,
+                 transparent_color = (255,255,255)):
+    
+        '''Arguments:
+            
+            fps: frames per second ratio of surrounding pygame
+             screen: the main screen the game is displayed on (pygame Surface).
+                    Needed to 'wrap' sprites around edges to produce 'donut topology'.
+            original_images: list of surface objects that will be used to display the sprite.
+                    By default, the first list element will be used.
+            laser_group: pygame Group object. Any laser created by the ShipSprite's firing method
+                    will be added to this group to help track laser fire collisions.
+            laser_sound: pygame.mixer.Sound object. Will be played by the ShipSprite's firing method.
+            laser_original_images: The original_images sequence that will be passed to the MissileSprite
+                    object created by the ShipSprite's firing method. A list of pygame surfaces.
+            laser_range_in_seconds: effectively the laser weapon range of the ship sprite. When the 
+                    ShipSprite's firing method creates a MissileSprite, this value will be passed to it
+                    as its lifetime_in_seconds argument.
+            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+                    when initialized.
+            center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
+                    Sets the sprite's initial position on the 'screen' surface.
+            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
+                    an angle of zero meaning no rotation of the original surface.
+            speed: initial speed of sprite (pixels per second). scaler of float type.
+                    Default is 0.
+            is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
+                    color argument in the surfaces contained in 'original_images' will be made transparent.
+                    Default is True
+            transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
+                    is set to true. Default to (255,255,255), which corresponds to the color white.'''
+                    
+        # initialize and add to groups if sensible
+        BasicSprite.__init__(self,
+                             fps,
+                             screen,
+                             original_images,
+                             *groups,
+                             center=center,
+                             angle=angle,
+                             speed=speed,
+                             is_transparent=is_transparent,
+                             transparent_color=transparent_color)
+        
+        # set attributes for lasers
+        self._laser_group = laser_group
+        self._laser_sound = laser_sound
+        self._laser_original_images = laser_original_images
+        self._laser_range_in_seconds = laser_range_in_seconds
 
 class MaskedSprite(Sprite):
     
