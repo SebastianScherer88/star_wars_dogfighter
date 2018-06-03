@@ -14,8 +14,78 @@ import numpy as np
 import yaml
 
 from pygame.sprite import Group, collide_mask, groupcollide
-from sprite_classes import PlayerSprite, EnemySprite
-from animation_classes import BasicAnimation
+from sprite_classes import PlayerSprite, EnemySprite, BasicSprite
+from animation_classes import BasicAnimation, BasicAnimationNew
+
+class Game2(object):
+    
+    def __init__(self,
+                 screen_width=1200,
+                 screen_height=600):
+        '''Initializes the game object and also the game'''
+        
+        # initialize pygame (handles pretty much eveything)
+        pg.init()
+        
+        # create clock    
+        clock = pg.time.Clock()
+        
+        white = 255, 255, 255
+        fps = 60
+        
+        # initialize main screen
+        size = screen_width, screen_height # set screen size
+        screen = pg.display.set_mode(size)
+        
+        # load images5
+        sprite_images = [pg.image.load('./graphics/awing.bmp')]
+        explosion_images = [pg.image.load('./graphics/explosion' + str(i+1) + '.bmp') for i in range(9)]
+        
+        # initialize empty sprite groups
+        all_sprites = Group()
+        
+        
+        
+        # create player sprite and add to relevant groups / provide with relevant groups
+        BasicSprite(fps,
+                     screen,
+                     sprite_images,
+                     all_sprites,
+                     center = np.array([400,400]),
+                     angle = -45,
+                     speed = 0) 
+        
+        # create explosion animation
+        BasicAnimationNew(fps,
+                 screen,
+                 explosion_images,
+                 0.2,
+                 all_sprites,
+                 center = np.array([400,400]),
+                 angle = 0,
+                 speed = 0)
+        
+        # start main game loop
+        while True:
+            # check for exit events
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+            
+            # update all sprites
+            all_sprites.update()
+            
+            # draw new game state    
+            screen.fill(white) # paint over old game state
+            
+            all_sprites.draw(screen) # draw all sprites
+                       
+            # flip canvas
+            pg.display.flip()
+                        
+            # control pace
+            clock.tick(fps)
 
 class Game(object):
     
@@ -194,16 +264,18 @@ def main():
     os.chdir('C:/Users/bettmensch/GitReps/star_wars_dogfighter')
     
     # get game meta data for sprites
-    with open('./meta/sprite_meta_data.yaml','r') as sprite_meta_data_file:
-        sprite_meta_data = yaml.load(sprite_meta_data_file)
+    #with open('./meta/sprite_meta_data.yaml','r') as sprite_meta_data_file:
+    #    sprite_meta_data = yaml.load(sprite_meta_data_file)
         
     # get game meta dat for animations
-    with open('./meta/animation_meta_data.yaml','r') as animation_meta_data_file:
-        animation_meta_data = yaml.load(animation_meta_data_file)
+    #with open('./meta/animation_meta_data.yaml','r') as animation_meta_data_file:
+    #    animation_meta_data = yaml.load(animation_meta_data_file)
     
     # create new game with all the meta data
-    Game(all_sprite_meta_data=sprite_meta_data,
-         all_animation_meta_data=animation_meta_data)
+    #Game(all_sprite_meta_data=sprite_meta_data,
+    #     all_animation_meta_data=animation_meta_data)
+    
+    Game2()
     
 if __name__=='__main__':
     main()

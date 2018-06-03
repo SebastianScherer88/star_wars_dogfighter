@@ -25,12 +25,12 @@ class BasicSprite(Sprite):
                  fps,
                  screen,
                  original_images,
+                 *groups,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
                  is_transparent = True,
-                 transparent_color = (255,255,255),
-                 *groups):
+                 transparent_color = (255,255,255)):
         
         '''Arguments:
             
@@ -68,12 +68,22 @@ class BasicSprite(Sprite):
         self._original_images = original_images
         
         # set positional attributes using initial values passed
-        self._center = center
+        self._center = np.array(center,dtype='float')
         self._angle = angle
         self._speed = speed
         
+        # set sprite up
         # set image and rect - these will be called by Group object methods; get mask
-        self.update()
+        self._image_index = 0 # always start with first image in original_images
+        self.image = pg.transform.rotate(self._original_images[self._image_index],
+                                         self._angle)
+        
+        # update object type attribute: mask
+        self.mask = pg.mask.from_surface(self.image)
+        
+        # update object type attributes: positional rectangle
+        self.rect = self.image.get_rect()
+        self.rect.center = self._center
         
     def update_positional_attributes(self,
                                      d_angle=0,
@@ -90,8 +100,22 @@ class BasicSprite(Sprite):
         # update center argument
         self._center += self.get_velocity_vector()
         
-        # wrap around if necessary
-
+        # get main screen and current sprite image's dimensions for wrap checks
+        screen_w, screen_h= self._screen.get_size()
+        image_w, image_h = self.image.get_size()
+        
+        # wrap horizontaly if needed
+        if self._center[0] < - image_w / 2:
+            self._center[0] = screen_w + image_w / 2
+        elif self._center[0] > screen_w + image_w / 2:
+            self._center[0] = - image_w / 2
+                        
+        # wrap vertically if needed
+        if self._center[1] < - image_h / 2:
+            self._center[1] = screen_h + image_h / 2
+        elif self._center[1] > screen_h + image_h / 2:
+            self._center[1] = - image_h / 2
+            
         
     def get_velocity_vector(self):
         '''Calculates a 2-dim velocity vector (units: frames per second) based
@@ -101,13 +125,13 @@ class BasicSprite(Sprite):
         radian_angle = self._angle * pi / 180
         
         # convert speed (pixel per second) into frame_speed (pixel per frame)
-        frame_speed = self._speed / self.fps
+        frame_speed = self._speed / self._fps
         
         # compute velocity vector
         velocity = frame_speed * np.array([cos(radian_angle),
                                            -sin(radian_angle)]).reshape((1,2)) # in pygame coordinates, the y-axis has negative orientation
         
-        return velocity
+        return velocity.reshape(2)
     
     def update(self):
         '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 
@@ -117,7 +141,7 @@ class BasicSprite(Sprite):
         self.update_positional_attributes()
         
         # update object type attributes: surface
-        self.image = pg.transform.rotate(self._original_images[0],
+        self.image = pg.transform.rotate(self._original_images[self._image_index],
                                          self._angle)
 
         # update object type attribute: mask
@@ -126,6 +150,79 @@ class BasicSprite(Sprite):
         # update object type attributes: positional rectangle
         self.rect = self.image.get_rect()
         self.rect.center = self._center
+        
+class MissileSprite(BasicSprite):
+    '''Class used for projectiles fired by player or enemy sprites.'''
+    
+    def __init__(self,
+                 fps,
+                 screen,
+                 original_images,
+                 lifetime_in_seconds,
+                 *groups,
+                 center = np.zeros(2),
+                 angle = 0,
+                 speed = 0,
+                 is_transparent = True,
+                 transparent_color = (255,255,255)):
+        
+        '''Arguments:
+            
+            fps: frames per second ratio of surrounding pygame
+             screen: the main screen the game is displayed on (pygame Surface).
+                    Needed to 'wrap' sprites around edges to produce 'donut topology'.
+            original_images: list of surface objects that will be used to display the sprite.
+                    By default, the first list element will be used.
+            lifetime: lifetime pf sprite (in seconds).
+            center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
+                    Sets the sprite's initial position on the 'screen' surface.
+            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
+                    an angle of zero meaning no rotation of the original surface.
+            speed: initial speed of sprite (pixels per second). scaler of float type.
+                    Default is 0.
+            is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
+                    color argument in the surfaces contained in 'original_images' will be made transparent.
+                    Default is True
+            transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
+                    is set to true. Default to (255,255,255), which corresponds to the color white.
+            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+                    when initialized.'''
+                    
+        # initialize and add to groups if sensible
+        BasicSprite.__init__(self,
+                             fps,
+                             screen,
+                             original_images,
+                             *groups,
+                             center=center,
+                             angle=angle,
+                             speed=speed,
+                             is_transparent=is_transparent,
+                             transparent_color=transparent_color)
+        
+        # set lifetime related attributes
+        self._lifetime_in_frames = fps * lifetime_in_seconds
+        self.frames_passed = 0
+        
+    def update(self):
+        '''BasicSprite update method plus checks & handling against MissileSprite's
+        lifetime  attribute.'''
+        
+        # call base class update
+        BasicSprite.update(self)
+        
+        # update frame counter
+        self.frames_passed += 1
+                    
+        # if life time is over, terminate MissileSprite
+        if self.frames_passed > self._lifetime_in_frames:
+            self.kill()
+            
+
+class ShipSprite(BasicSprite):
+    '''Base sprite class for both the player's and the enemy ship(s).'''
+    
+                                                                 
 
 class MaskedSprite(Sprite):
     
