@@ -132,6 +132,7 @@ class FighterSprite(MaskedSprite):
                  sprite_meta_data,
                  laser_meta_data,
                  laser_beams_group,
+                 laser_sound,
                  *groups,
                  angle=0,
                  speed=0,
@@ -157,9 +158,12 @@ class FighterSprite(MaskedSprite):
         
         # attach laser beam meta data
         self.laser_meta_data = laser_meta_data
-                                                       
+                                                               
         # attach laser beam 'basket' group
         self.laser_beams = laser_beams_group
+
+        # attach laser soud
+        self._laser_sound = laser_sound
         
         # set the weapon cool down counter
         self.weapon_cooling = 0
@@ -243,6 +247,7 @@ class FighterSprite(MaskedSprite):
             # spawn laser at gun tip
             LaserSprite(laser_screen,
                         self.laser_meta_data,
+                        self._laser_sound,
                         laser_lifetime,
                         self.laser_beams,
                         speed=laser_speed,
@@ -360,6 +365,7 @@ class EnemySprite(FighterSprite):
                  sprite_meta_data,
                  laser_meta_data,
                  laser_beams_group,
+                 laser_sound,
                  player,
                  *groups,
                  angle=0,
@@ -371,6 +377,7 @@ class EnemySprite(FighterSprite):
                                sprite_meta_data,
                                laser_meta_data,
                                laser_beams_group,
+                               laser_sound,
                                *groups,
                                angle=angle,
                                speed=speed,
@@ -444,6 +451,7 @@ class LaserSprite(MaskedSprite):
     def __init__(self,
                  screen,
                  laser_meta_data,
+                 laser_sound_object,
                  time_left,
                  *groups,
                  angle=0,
@@ -459,8 +467,10 @@ class LaserSprite(MaskedSprite):
                               center=center)
         
         # load sound file specified in meta data and play
-        laser_sound = pg.mixer.Sound(file=laser_meta_data['sound_path']) # load wav file into sound object
-        laser_sound.play() # play sound object on any available channnel
+        #laser_sound = pg.mixer.Sound(file=laser_meta_data['sound_path']) # load wav file into sound object
+        #laser_sound.play() # play sound object on any available channnel
+        
+        laser_sound_object.play()
 
         # set life time attribute
         self.time_left = time_left

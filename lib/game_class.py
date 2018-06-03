@@ -30,6 +30,10 @@ class Game(object):
         # initialize pygame mixer (handles audio playback)
         pg.mixer.init()
         
+        # load sound objects
+        explosion_sound = pg.mixer.Sound(file=all_animation_meta_data['explosion']['sound_path'])
+        laser_sound = pg.mixer.Sound(file=all_sprite_meta_data['red_laser']['sound_path'])
+        
         # create clock    
         clock = pg.time.Clock()
         
@@ -54,6 +58,7 @@ class Game(object):
                               all_sprite_meta_data['x_wing'],
                               all_sprite_meta_data['red_laser'],
                               player_lasers,
+                              laser_sound,
                               (player_sprite,all_sprites),
                               angle=-45)
         
@@ -62,11 +67,13 @@ class Game(object):
                     all_sprite_meta_data['tie_fighter'],
                     all_sprite_meta_data['green_laser'],
                     enemy_lasers,
+                    laser_sound,
                     player,
                     (enemy_sprite,all_sprites),
                     angle=-45,
                     center=[200,400],
                     speed=5)
+        
         
         kill_confirmed= False
         
@@ -113,6 +120,7 @@ class Game(object):
             if collided_enemy_sprites or collided_enemy_lasers:
                 BasicAnimation(screen,
                                all_animation_meta_data['explosion'],
+                                explosion_sound,
                                 fps,
                                 explosions,
                                 center=player._center)
@@ -121,6 +129,7 @@ class Game(object):
                 for collided_enemy_sprite in collided_enemy_sprites:
                     BasicAnimation(screen,
                                    all_animation_meta_data['explosion'],
+                                    explosion_sound,
                                     fps,
                                     explosions,
                                     center=collided_enemy_sprite._center)
@@ -137,6 +146,7 @@ class Game(object):
                 for downed_enemy_sprite in downed_enemy_sprites:
                     BasicAnimation(screen,
                                    all_animation_meta_data['explosion'],
+                                    explosion_sound,
                                     fps,
                                     explosions,
                                     center=downed_enemy_sprite._center)
@@ -164,11 +174,13 @@ class Game(object):
                                         all_sprite_meta_data['tie_fighter'],
                                         all_sprite_meta_data['green_laser'],
                                         enemy_lasers,
+                                        laser_sound,
                                         player,
                                         (enemy_sprite,all_sprites),
                                         angle=-45,
                                         center=[200,400],
                                         speed=5)
+                            
                             
                             # break loop when done
                             too_close = False

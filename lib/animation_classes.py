@@ -27,6 +27,7 @@ class BasicAnimation(MaskedSprite):
     def __init__(self,
                  screen,
                  animation_meta_data,
+                 animation_sound_object,
                  frames_per_second,
                  *groups,
                  angle=0,
@@ -42,9 +43,10 @@ class BasicAnimation(MaskedSprite):
                              center=center)
         
         # load sound file specified in metadat and play
-        animation_sound = pg.mixer.Sound(file=animation_meta_data['sound_path'])
-        animation_sound.play() # play on any channel available
+        #animation_sound = pg.mixer.Sound(file=animation_meta_data['sound_path'])
+        #animation_sound.play() # play on any channel available
         
+        animation_sound_object.play()
         
         # set last image index
         self.last_image_index = len(self._original_images) - 1
