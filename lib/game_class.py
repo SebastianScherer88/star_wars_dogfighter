@@ -76,18 +76,20 @@ class Game(object):
         
         # create player sprite and add to relevant groups / provide with relevant groups
         player = self.spawn_player(center=np.array([1000,300]),
-                                   angle=180)
+                                   angle=180,
+                                   speed=15000,
+                                   max_speed_pixel_per_second=18000)
         
         # create three enemies
         self.spawn_enemy(player,
                          center=np.array([40,50]),
-                         speed=0)# enemy #1
+                         speed=12000)# enemy #1
         self.spawn_enemy(player,
                          center=np.array([40,250]),
-                        speed=0) # enemy #1
+                        speed=12000) # enemy #1
         self.spawn_enemy(player,
                          center=np.array([40,450]),
-                        speed=0) # enemy #1
+                        speed=12000) # enemy #1
                                         
                         
         # initialize enemy down time so that 2 enemies are spawned at beginning of game
@@ -105,7 +107,8 @@ class Game(object):
             # spawn enemies if needed
             if enemy_down:
                 # create first two enemy sprites and add to relevant groups / provide with relevant groups
-                self.spawn_enemy(player) # enemy #1
+                self.spawn_enemy(player,
+                                 speed=12000) # enemy #1
 
                 
             if player_down:
@@ -189,7 +192,7 @@ class Game(object):
     def spawn_enemy(self,
                     player,
                     center = np.array([1200,50]),
-                    angle=180,
+                    angle=0,
                     speed=20000,
                     d_angle_degrees_per_second = 100,
                     d_speed_pixel_per_second = 500,
