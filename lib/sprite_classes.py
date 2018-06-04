@@ -437,7 +437,7 @@ class EnemyShipSprite(ShipSprite):
                              original_explosion_images,
                              explosion_seconds_per_image,
                              *groups,
-                             center = np.zeros(2),
+                             center = center,
                              angle = angle,
                              speed = speed,
                              d_angle_degrees_per_second = d_angle_degrees_per_second,
