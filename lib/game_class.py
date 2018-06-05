@@ -19,10 +19,10 @@ from sprite_classes import PlayerShipSprite, EnemyShipSprite
 class Game(object):
     
     def __init__(self,
-                 screen_width=1200,
-                 screen_height=600,
+                 screen_width=1500,
+                 screen_height=700,
                  fps=60,
-                 background_color = (255,255,255),
+                 background_image = None,
                 enemy_down_time_in_seconds = 2):
         '''Initializes the game object and also the game'''
         
@@ -32,7 +32,7 @@ class Game(object):
         # create clock    
         self.clock = pg.time.Clock()
         
-        self.background_color = background_color
+        self.background_image = pg.image.load('./graphics/star_wars_background_24bit.bmp')
         self.fps = fps
         self.enemy_down_time_in_seconds = enemy_down_time_in_seconds
         
@@ -41,7 +41,7 @@ class Game(object):
         self.screen = pg.display.set_mode(size)
         
         # load images
-        self.player_images = [pg.image.load('./graphics/xwing.bmp')]
+        self.player_images = [pg.image.load('./graphics/awing.bmp')]
         self.enemy_images = [pg.image.load('./graphics/tiefighter.bmp')]
         self.laser_images_red = [pg.image.load('./graphics/redlaser.bmp')]
         self.laser_images_green = [pg.image.load('./graphics/greenlaser.bmp')]
@@ -52,7 +52,7 @@ class Game(object):
             sprite_meta_data = yaml.load(sprite_meta_data_yaml)
             
         # player cannon positions
-        self.player_cannon_positions = sprite_meta_data['a_wing']['cannon_tip_positions']
+        self.player_cannon_positions = sprite_meta_data['x_wing']['cannon_tip_positions']
         self.enemy_cannon_positions = sprite_meta_data['tie_fighter']['cannon_tip_positions']
         
         # load sounds
@@ -145,7 +145,7 @@ class Game(object):
         surface to display the drawings.'''
         
         # draw new game state    
-        self.screen.fill(self.background_color) # paint over old game state
+        self.screen.blit(self.background_image,(0,0)) # paint over old game state
         
         self.all_sprites.draw(self.screen) # draw all sprites
         self.player_laser_sprites.draw(self.screen) # draw player lasers
@@ -267,6 +267,7 @@ class Game(object):
 def main():
     # make sure directory is repo head
     os.chdir('C:/Users/bettmensch/GitReps/star_wars_dogfighter')
+    
     
     Game()
     
