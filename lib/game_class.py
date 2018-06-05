@@ -41,8 +41,8 @@ class Game(object):
         self.screen = pg.display.set_mode(size)
         
         # load images
-        self.player_images = [pg.image.load('./graphics/ywing.bmp')]
-        self.enemy_images = [pg.image.load('./graphics/awing.bmp')]
+        self.player_images = [pg.image.load('./graphics/awing.bmp')]
+        self.enemy_images = [pg.image.load('./graphics/tiefighter.bmp')]
         self.laser_images_red = [pg.image.load('./graphics/redlaser.bmp')]
         self.laser_images_green = [pg.image.load('./graphics/greenlaser.bmp')]
         self.explosion_images = [pg.image.load('./graphics/explosion' + str(i+1) + '.bmp') for i in range(9)]
@@ -52,8 +52,8 @@ class Game(object):
             sprite_meta_data = yaml.load(sprite_meta_data_yaml)
             
         # player cannon positions
-        self.player_cannon_positions = sprite_meta_data['tie_fighter']['cannon_tip_positions']
-        self.enemy_cannon_positions = sprite_meta_data['a_wing']['cannon_tip_positions']
+        self.player_cannon_positions = sprite_meta_data['a_wing']['cannon_tip_positions']
+        self.enemy_cannon_positions = sprite_meta_data['tie_fighter']['cannon_tip_positions']
         
         # load sounds
         self.laser_sound = pg.mixer.Sound('./sounds/missile.wav')
@@ -171,7 +171,7 @@ class Game(object):
                  self.player_cannon_positions,
                  self.player_laser_sprites,
                  self.laser_sound,
-                 self.laser_images_green,
+                 self.laser_images_red,
                  1.2 , # laser range in seconds
                  150, # laser speed in pixel per second
                  2, # laser rate of fire in seconds
@@ -206,7 +206,7 @@ class Game(object):
                         self.enemy_cannon_positions,
                         self.enemy_laser_sprites,
                         self.laser_sound,
-                        self.laser_images_red,
+                        self.laser_images_green,
                         1,
                         150,
                         2,
