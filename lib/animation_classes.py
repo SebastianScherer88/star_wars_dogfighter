@@ -30,6 +30,7 @@ class BasicAnimation(BasicSprite):
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
+                 looping = False,
                  is_transparent = True,
                  transparent_color = (255,255,255)):
     
@@ -66,6 +67,9 @@ class BasicAnimation(BasicSprite):
                              speed=speed,
                              is_transparent=is_transparent,
                              transparent_color=transparent_color)
+        
+        # if animation looping?
+        self.is_looping = looping
         
         # initialize frame counter
         self.frames_passed = 1
@@ -104,11 +108,18 @@ class BasicAnimation(BasicSprite):
         image_number = self.get_interval_index(self.frames_passed,
                                                self.frame_image_intervals)
         
-        # if index is 'False', the time is up; terminate animation
+        # if index is 'False', the time is up; 
         if not image_number:
-            self.kill()
+            if not self.is_looping:
+                # animation is not of looping type and is out of type -> terminate
+                self.kill()
+            else:
+                # animation is of looping type and is out of time -> restart from beginning
+                self.frames_passed = 1
+                self._image_index = 0
         # actual index is returned; perform base class update on appropriate image sequence element
         else:
             self._image_index = image_number - 1
-            # call base class update
-            BasicSprite.update(self)
+        
+        # call base class update
+        BasicSprite.update(self)
