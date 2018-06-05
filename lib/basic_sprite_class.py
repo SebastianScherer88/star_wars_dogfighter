@@ -117,11 +117,8 @@ class BasicSprite(Sprite):
         # convert angle to radian
         radian_angle = self._angle * pi / 180
         
-        # convert speed (pixel per second) into frame_speed (pixel per frame)
-        frame_speed = self._speed / self._fps
-        
         # compute velocity vector
-        velocity = frame_speed * np.array([cos(radian_angle),
+        velocity = self._speed * np.array([cos(radian_angle),
                                            -sin(radian_angle)]).reshape((1,2)) # in pygame coordinates, the y-axis has negative orientation
         
         return velocity.reshape(2)

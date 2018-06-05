@@ -41,7 +41,7 @@ class Game(object):
         self.screen = pg.display.set_mode(size)
         
         # load images
-        self.player_images = [pg.image.load('./graphics/tiefighter.bmp')]
+        self.player_images = [pg.image.load('./graphics/ywing.bmp')]
         self.enemy_images = [pg.image.load('./graphics/awing.bmp')]
         self.laser_images_red = [pg.image.load('./graphics/redlaser.bmp')]
         self.laser_images_green = [pg.image.load('./graphics/greenlaser.bmp')]
@@ -77,19 +77,19 @@ class Game(object):
         # create player sprite and add to relevant groups / provide with relevant groups
         player = self.spawn_player(center=np.array([1000,300]),
                                    angle=180,
-                                   speed=15000,
-                                   max_speed_pixel_per_second=18000)
+                                   speed=250,
+                                   max_speed_pixel_per_second=300)
         
         # create three enemies
         self.spawn_enemy(player,
                          center=np.array([40,50]),
-                         speed=12000)# enemy #1
+                         speed=300)# enemy #1
         self.spawn_enemy(player,
                          center=np.array([40,250]),
-                        speed=12000) # enemy #1
+                        speed=300) # enemy #1
         self.spawn_enemy(player,
                          center=np.array([40,450]),
-                        speed=12000) # enemy #1
+                        speed=300) # enemy #1
                                         
                         
         # initialize enemy down time so that 2 enemies are spawned at beginning of game
@@ -108,7 +108,7 @@ class Game(object):
             if enemy_down:
                 # create first two enemy sprites and add to relevant groups / provide with relevant groups
                 self.spawn_enemy(player,
-                                 speed=12000) # enemy #1
+                                 speed=200) # enemy #1
 
                 
             if player_down:
@@ -158,10 +158,10 @@ class Game(object):
     def spawn_player(self,
                      center = np.array([900,300]),
                     angle=0,
-                    speed=20000,
+                    speed=200,
                     d_angle_degrees_per_second = 100,
-                    d_speed_pixel_per_second = 500,
-                    max_speed_pixel_per_second = 30000):
+                    d_speed_pixel_per_second = 10,
+                    max_speed_pixel_per_second = 3000):
         
         '''Creates a new PlayerShipSprite object and adds it to the game.'''
         
@@ -173,7 +173,7 @@ class Game(object):
                  self.laser_sound,
                  self.laser_images_green,
                  1.2 , # laser range in seconds
-                 15000, # laser speed in pixel per second
+                 150, # laser speed in pixel per second
                  2, # laser rate of fire in seconds
                  self.explosion_animations, # explosion group
                  self.explosion_sound, # sound of explosion animation
@@ -193,10 +193,10 @@ class Game(object):
                     player,
                     center = np.array([1200,50]),
                     angle=0,
-                    speed=20000,
+                    speed=200,
                     d_angle_degrees_per_second = 100,
-                    d_speed_pixel_per_second = 500,
-                    max_speed_pixel_per_second = 20000):
+                    d_speed_pixel_per_second = 10,
+                    max_speed_pixel_per_second = 2000):
         
         '''Creates a new EnemyShipSprite and adds it to the game.'''
         
@@ -208,7 +208,7 @@ class Game(object):
                         self.laser_sound,
                         self.laser_images_red,
                         1,
-                        10000,
+                        150,
                         2,
                         self.explosion_animations,
                         self.explosion_sound,
