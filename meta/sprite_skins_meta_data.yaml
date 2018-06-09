@@ -33,9 +33,11 @@ tiefighter:
   image_paths: [./graphics/sprite_skins/tiefighter.bmp]
 xwing:
   engine_offsets:
-  - [-20, -8]
-  - [-20, 8]
+  - [-20, -6]
+  - [-20, 6]
   gun_offsets:
-  - [9, -18]
-  - [9, 18]
+  - [11, -19]
+  - [11, 18]
+  - [12, -17]
+  - [12, 16]
   image_paths: [./graphics/sprite_skins/xwing.bmp]

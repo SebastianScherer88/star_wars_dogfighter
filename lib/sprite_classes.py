@@ -181,7 +181,7 @@ class ShipSprite(BasicSprite):
                              transparent_color=transparent_color)
         
         # set attributes for lasers
-        self._original_laser_cannon_offsets = laser_cannon_offsets
+        self._original_laser_cannon_offsets = laser_cannon_offsets * self._size_factor
         self._laser_group = laser_group
         self._laser_sound = laser_sound
         self._laser_original_images = laser_original_images
@@ -216,7 +216,7 @@ class ShipSprite(BasicSprite):
                                                              original_engine_flame_images,
                                                              engine_flame_seconds_per_image,
                                                              self,
-                                                             engine_flame_offset,
+                                                             engine_flame_offset * self._size_factor,
                                                              animation_group,
                                                              looping = True))
         

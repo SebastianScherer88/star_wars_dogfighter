@@ -52,7 +52,7 @@ class Game(object):
         print('AAAAA')
         
         # set player and enemy ship and laser types
-        player_ship, player_laser = 'awing', 'red'
+        player_ship, player_laser = 'xwing', 'red'
         enemy_ship, enemy_laser = 'tiefighter', 'green'
         
         # set game attributes from meta data for player
