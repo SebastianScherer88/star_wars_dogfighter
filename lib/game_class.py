@@ -8,6 +8,7 @@ Created on Sun May 27 22:09:47 2018
 # demo gam states here
 import sys
 import os
+import yaml
 
 import pygame as pg
 import numpy as np
@@ -39,32 +40,62 @@ class Game(object):
         size = screen_width, screen_height # set screen size
         self.screen = pg.display.set_mode(size)
         
-        # load images
-        self.player_images = [pg.image.load('./graphics/sprite_skins/awing.bmp')]
-        self.enemy_images = [pg.image.load('./graphics/sprite_skins/tiefighter.bmp')]
-        self.laser_images_red = [pg.image.load('./graphics/sprite_skins/redlaser.bmp')]
-        self.laser_images_green = [pg.image.load('./graphics/sprite_skins/greenlaser.bmp')]
+        # load meta data
+        with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
+            skins_meta_data = yaml.load(skins_meta_file)
         
-        # load animationa image sequences
-        self.explosion_images = [pg.image.load('./graphics/explosion/explosion' + str(i+1) + '.bmp') for i in range(9)]
-        self.engine_flame_images = [pg.image.load('./graphics/engine_flame/engine_flame' + str(i+1) + '.bmp') for i in range(4)]
-        self.muzzle_flash_images_red = [pg.image.load('./graphics/red_muzzle_flash/red_muzzle_flash' + str(i+1) + '.bmp') for i in range(6)]
-        self.muzzle_flash_images_green = [pg.image.load('./graphics/green_muzzle_flash/green_muzzle_flash' + str(i+1) + '.bmp') for i in range(6)]
+        with open('./meta/animations_meta_data.yaml','r') as animations_meta_file:
+            animations_meta_data = yaml.load(animations_meta_file)
         
-        # set engine flame offsets
-        self.engine_offsets_awing = np.array([[-20,-8],
-                                              [-20,8]])
-        self.engine_offsets_tie = np.array([[-11,0]])
+        print(skins_meta_data)
         
-        # set gun muzzle offsets
-        self.player_cannon_offsets = np.array([[9,-15],
-                                              [9,15]])
-        self.enemy_cannon_offsets = np.array([[9,-2],
-                                             [9,3]])
+        print('AAAAA')
         
-        # load sounds
-        self.laser_sound = pg.mixer.Sound('./sounds/missile.wav')
-        self.explosion_sound = pg.mixer.Sound('./sounds/explosion.wav')
+        # set player and enemy ship and laser types
+        player_ship, player_laser = 'awing', 'red'
+        enemy_ship, enemy_laser = 'tiefighter', 'green'
+        
+        # set game attributes from meta data for player
+        
+        # skin specific
+        self.player_images = [pg.image.load(image_path) for image_path in skins_meta_data[player_ship]['image_paths']]
+        self.player_gun_offsets = np.array(skins_meta_data[player_ship]['gun_offsets']).astype('float')
+        self.player_engine_offsets = np.array(skins_meta_data[player_ship]['engine_offsets']).astype('float')
+        
+        # laser specific
+        self.player_laser_images = [pg.image.load(image_path) for image_path in skins_meta_data[player_laser]['image_paths']]
+        self.player_laser_sound = pg.mixer.Sound(animations_meta_data[player_laser]['sound'])
+        self.player_muzzle_images = [pg.image.load(image_path) for image_path in animations_meta_data[player_laser]['image_paths']]
+        self.player_muzzle_spi = animations_meta_data[player_laser]['spi']
+        
+        
+        # set game attributes from meta data for enemies
+        
+        # behavioural
+        self.enemy_piloting_cone_sine = 0.05
+        self.enemy_gunning_cone_sine = 0.1
+        
+        # skin specific
+        self.enemy_images = [pg.image.load(image_path) for image_path in skins_meta_data[enemy_ship]['image_paths']]
+        self.enemy_gun_offsets = np.array(skins_meta_data[enemy_ship]['gun_offsets']).astype('float')
+        self.enemy_engine_offsets = np.array(skins_meta_data[enemy_ship]['engine_offsets']).astype('float')
+        
+        # laser specific
+        self.enemy_laser_images = [pg.image.load(image_path) for image_path in skins_meta_data[enemy_laser]['image_paths']]
+        self.enemy_laser_sound = pg.mixer.Sound(animations_meta_data[enemy_laser]['sound'])
+        self.enemy_muzzle_images = [pg.image.load(image_path) for image_path in animations_meta_data[enemy_laser]['image_paths']]
+        self.enemy_muzzle_spi = animations_meta_data[enemy_laser]['spi']
+        
+        # load universal game animation attributes from meta data
+        
+        # explosion
+        self.explosion_images = [pg.image.load(image_path) for image_path in animations_meta_data['explosion']['image_paths']]
+        self.explosion_sound = pg.mixer.Sound(animations_meta_data['explosion']['sound'])
+        self.explosion_spi = animations_meta_data['explosion']['spi']
+        
+        # engine flame
+        self.engine_images = [pg.image.load(image_path) for image_path in animations_meta_data['engine']['image_paths']]
+        self.engine_spi = animations_meta_data['engine']['spi']
         
         # initialize empty sprite groups
         self.all_sprites = Group()
@@ -177,21 +208,21 @@ class Game(object):
         player = PlayerShipSprite(self.fps,
                  self.screen,
                  self.player_images,
-                 self.player_cannon_offsets,
+                 self.player_gun_offsets,
                  self.player_laser_sprites,
-                 self.laser_sound,
-                 self.laser_images_red,
+                 self.player_laser_sound,
+                 self.player_laser_images,
                  1.2 , # laser range in seconds
                  150, # laser speed in pixel per second
                  2, # laser rate of fire in seconds
-                 self.muzzle_flash_images_red,
-                 0.02, # seconds per image for muzzle flash
+                 self.player_muzzle_images,
+                 self.player_muzzle_spi, # seconds per image for muzzle flash
                  self.explosion_sound, # sound of explosion animation
                  self.explosion_images,
-                 0.15, # seconds per image for explosions animation at death
-                 self.engine_offsets_awing,
-                 self.engine_flame_images,
-                 0.1,
+                 self.explosion_spi, # seconds per image for explosions animation at death
+                 self.player_engine_offsets,
+                 self.engine_images,
+                 self.engine_spi,
                  self.animations,
                  (self.player_sprite,self.all_sprites), # groups that player will be added to
                  center = center,
@@ -218,25 +249,25 @@ class Game(object):
         EnemyShipSprite(self.fps,
                         self.screen, # main screen
                         self.enemy_images, # sequence with ShipSprite's skin
-                        self.enemy_cannon_offsets, # 
+                        self.enemy_gun_offsets, # 
                         self.enemy_laser_sprites,
-                        self.laser_sound, # pygame sound object; laser fire sound
-                        self.laser_images_green, # sequence with laser beam skin
+                        self.enemy_laser_sound, # pygame sound object; laser fire sound
+                        self.enemy_laser_images, # sequence with laser beam skin
                         1.2,
                         150,
                         2, # laser rate of fire in shots/second
-                        self.muzzle_flash_images_green, # sequence of images for muzzle flash animation
-                        0.02, # seconds per image for muzzle flash animation
+                        self.enemy_muzzle_images, # sequence of images for muzzle flash animation
+                        self.enemy_muzzle_spi, # seconds per image for muzzle flash animation
                         self.explosion_sound,
                         self.explosion_images,
-                        0.15,
-                        self.engine_offsets_tie,
-                        self.engine_flame_images,
-                         0.1,
+                        self.explosion_spi,
+                        self.enemy_engine_offsets,
+                        self.engine_images,
+                        self.engine_spi,
                         self.animations,
                         player,
-                        0.1,
-                        0.1,
+                        self.enemy_piloting_cone_sine,
+                        self.enemy_gunning_cone_sine,
                         (self.enemy_sprites, self.all_sprites),
                         center = center,
                         angle=angle,

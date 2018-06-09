@@ -1,6 +1,0 @@
-explosion:
-  image_paths: [./graphics/explosion1.bmp, ./graphics/explosion2.bmp, ./graphics/explosion3.bmp,
-    ./graphics/explosion4.bmp, ./graphics/explosion5.bmp, ./graphics/explosion6.bmp,
-    ./graphics/explosion7.bmp,./graphics/explosion8.bmp, ./graphics/explosion9.bmp]
-  seconds_per_image: 0.1
-  sound_path: ./sounds/explosion.wav
