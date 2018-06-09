@@ -11,7 +11,6 @@ import os
 
 import pygame as pg
 import numpy as np
-import yaml
 
 from pygame.sprite import Group, collide_mask, groupcollide
 from sprite_classes import PlayerShipSprite, EnemyShipSprite
@@ -41,27 +40,27 @@ class Game(object):
         self.screen = pg.display.set_mode(size)
         
         # load images
-        self.player_images = [pg.image.load('./graphics/awing.bmp')]
-        self.enemy_images = [pg.image.load('./graphics/tiefighter.bmp')]
-        self.laser_images_red = [pg.image.load('./graphics/redlaser.bmp')]
-        self.laser_images_green = [pg.image.load('./graphics/greenlaser.bmp')]
+        self.player_images = [pg.image.load('./graphics/sprite_skins/awing.bmp')]
+        self.enemy_images = [pg.image.load('./graphics/sprite_skins/tiefighter.bmp')]
+        self.laser_images_red = [pg.image.load('./graphics/sprite_skins/redlaser.bmp')]
+        self.laser_images_green = [pg.image.load('./graphics/sprite_skins/greenlaser.bmp')]
         
         # load animationa image sequences
-        self.explosion_images = [pg.image.load('./graphics/explosion' + str(i+1) + '.bmp') for i in range(9)]
-        self.engine_flame_images = [pg.image.load('./graphics/engine_flame' + str(i+1) + '.bmp') for i in range(6)]
+        self.explosion_images = [pg.image.load('./graphics/explosion/explosion' + str(i+1) + '.bmp') for i in range(9)]
+        self.engine_flame_images = [pg.image.load('./graphics/engine_flame/engine_flame' + str(i+1) + '.bmp') for i in range(4)]
+        self.muzzle_flash_images_red = [pg.image.load('./graphics/red_muzzle_flash/red_muzzle_flash' + str(i+1) + '.bmp') for i in range(6)]
+        self.muzzle_flash_images_green = [pg.image.load('./graphics/green_muzzle_flash/green_muzzle_flash' + str(i+1) + '.bmp') for i in range(6)]
         
         # set engine flame offsets
         self.engine_offsets_awing = np.array([[-20,-8],
-                                        [-20,8]])
+                                              [-20,8]])
         self.engine_offsets_tie = np.array([[-11,0]])
         
-        # load metadata
-        with open('./meta/sprite_meta_data.yaml','r') as sprite_meta_data_yaml:
-            sprite_meta_data = yaml.load(sprite_meta_data_yaml)
-            
-        # player cannon positions
-        self.player_cannon_positions = sprite_meta_data['a_wing']['cannon_tip_positions']
-        self.enemy_cannon_positions = sprite_meta_data['tie_fighter']['cannon_tip_positions']
+        # set gun muzzle offsets
+        self.player_cannon_offsets = np.array([[9,-15],
+                                              [9,15]])
+        self.enemy_cannon_offsets = np.array([[9,-2],
+                                             [9,3]])
         
         # load sounds
         self.laser_sound = pg.mixer.Sound('./sounds/missile.wav')
@@ -78,12 +77,8 @@ class Game(object):
         self.enemy_sprites = Group()
         self.enemy_laser_sprites = Group()
         
-        # explosion group
-        self.explosion_animations = Group()
-        
-        # engine flame group
-        self.engine_flames = Group()
-        
+        # animation group
+        self.animations = Group()        
         
         # create player sprite and add to relevant groups / provide with relevant groups
         player = self.spawn_player(center=np.array([1000,300]),
@@ -94,13 +89,13 @@ class Game(object):
         # create three enemies
         self.spawn_enemy(player,
                          center=np.array([40,50]),
-                         speed=300)# enemy #1
-        self.spawn_enemy(player,
-                         center=np.array([40,250]),
-                        speed=300) # enemy #1
-        self.spawn_enemy(player,
-                         center=np.array([40,450]),
-                        speed=300) # enemy #1
+                         speed=200)# enemy #1
+        #self.spawn_enemy(player,
+        #                 center=np.array([40,250]),
+        #                speed=200) # enemy #2
+        #self.spawn_enemy(player,
+        #                 center=np.array([40,450]),
+        #                speed=200) # enemy #3
                                         
                         
         # initialize enemy down time so that 2 enemies are spawned at beginning of game
@@ -119,12 +114,14 @@ class Game(object):
             if enemy_down:
                 # create first two enemy sprites and add to relevant groups / provide with relevant groups
                 self.spawn_enemy(player,
-                                 speed=200) # enemy #1
+                                 speed=200,
+                                 max_speed_pixel_per_second=200) # enemy #1
 
                 
             if player_down:
                 # reanimate player
-                player = self.spawn_player()
+                player = self.spawn_player(speed=300,
+                                           max_speed_pixel_per_second=300)
                 
                 # update enemies target computers
                 for enemy in self.enemy_sprites:
@@ -148,8 +145,7 @@ class Game(object):
         self.all_sprites.update()
         self.player_laser_sprites.update()
         self.enemy_laser_sprites.update()
-        self.explosion_animations.update()
-        self.engine_flames.update()
+        self.animations.update()
         
     def draw_game_state(self):
         '''Draws updated game state by wiping the game's main surface,
@@ -162,8 +158,7 @@ class Game(object):
         self.all_sprites.draw(self.screen) # draw all sprites
         self.player_laser_sprites.draw(self.screen) # draw player lasers
         self.enemy_laser_sprites.draw(self.screen) # draw enemy lasers
-        self.explosion_animations.draw(self.screen) # draw explosions
-        self.engine_flames.draw(self.screen)
+        self.animations.draw(self.screen) # draw animations
                    
         # flip canvas
         pg.display.flip()
@@ -174,7 +169,7 @@ class Game(object):
                     speed=200,
                     d_angle_degrees_per_second = 100,
                     d_speed_pixel_per_second = 10,
-                    max_speed_pixel_per_second = 3000):
+                    max_speed_pixel_per_second = 300):
         
         '''Creates a new PlayerShipSprite object and adds it to the game.'''
         
@@ -182,21 +177,22 @@ class Game(object):
         player = PlayerShipSprite(self.fps,
                  self.screen,
                  self.player_images,
-                 self.player_cannon_positions,
+                 self.player_cannon_offsets,
                  self.player_laser_sprites,
                  self.laser_sound,
                  self.laser_images_red,
                  1.2 , # laser range in seconds
                  150, # laser speed in pixel per second
                  2, # laser rate of fire in seconds
-                 self.explosion_animations, # explosion group
+                 self.muzzle_flash_images_red,
+                 0.02, # seconds per image for muzzle flash
                  self.explosion_sound, # sound of explosion animation
                  self.explosion_images,
                  0.15, # seconds per image for explosions animation at death
                  self.engine_offsets_awing,
-                 self.engine_flames,
                  self.engine_flame_images,
                  0.1,
+                 self.animations,
                  (self.player_sprite,self.all_sprites), # groups that player will be added to
                  center = center,
                  angle = angle,
@@ -214,29 +210,30 @@ class Game(object):
                     speed=200,
                     d_angle_degrees_per_second = 100,
                     d_speed_pixel_per_second = 10,
-                    max_speed_pixel_per_second = 2000):
+                    max_speed_pixel_per_second = 200):
         
         '''Creates a new EnemyShipSprite and adds it to the game.'''
         
         
         EnemyShipSprite(self.fps,
-                        self.screen,
-                        self.enemy_images,
-                        self.enemy_cannon_positions,
+                        self.screen, # main screen
+                        self.enemy_images, # sequence with ShipSprite's skin
+                        self.enemy_cannon_offsets, # 
                         self.enemy_laser_sprites,
-                        self.laser_sound,
-                        self.laser_images_green,
-                        1,
+                        self.laser_sound, # pygame sound object; laser fire sound
+                        self.laser_images_green, # sequence with laser beam skin
+                        1.2,
                         150,
-                        2,
-                        self.explosion_animations,
+                        2, # laser rate of fire in shots/second
+                        self.muzzle_flash_images_green, # sequence of images for muzzle flash animation
+                        0.02, # seconds per image for muzzle flash animation
                         self.explosion_sound,
                         self.explosion_images,
                         0.15,
                         self.engine_offsets_tie,
-                        self.engine_flames,
                         self.engine_flame_images,
-                         0.1,   
+                         0.1,
+                        self.animations,
                         player,
                         0.1,
                         0.1,

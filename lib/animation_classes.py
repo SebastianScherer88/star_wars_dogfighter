@@ -197,6 +197,7 @@ class TrackingAnimation(BasicAnimation):
         # attach original offsets
         self._original_offset = original_offset
         
+        
     def update(self):
         '''Updates the animations position and orientation based on tracked sprite.
         Then updates animation's rect and image attributes accordingly through the base
@@ -208,10 +209,9 @@ class TrackingAnimation(BasicAnimation):
         # get .center and offsets from tracked sprite
         self._center = self._tracked_sprite._center + self._get_rotated_offset()
 
-        
         # before you call this, make sure:
         # self._speed == 0
-        BasicAnimation.update(self)
+        BasicAnimation.update(self)        
         
         
     def _get_rotated_offset(self):

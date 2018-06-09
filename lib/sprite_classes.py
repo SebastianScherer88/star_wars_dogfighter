@@ -97,21 +97,22 @@ class ShipSprite(BasicSprite):
                  fps,
                  screen,
                  original_images,
-                 original_laser_cannon_positions,
+                 laser_cannon_offsets,
                  laser_group,
                  laser_sound,
                  laser_original_images,
                  laser_range_in_seconds,
                  laser_speed_in_seconds,
                  laser_rate_in_seconds,
-                 explosion_group,
+                 original_muzzle_flash_images,
+                 muzzle_flash_seconds_per_image,
                  explosion_sound,
                  original_explosion_images,
                  explosion_seconds_per_image,
                  engine_flame_offsets,
-                 engine_flame_group,
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
+                 animation_group,
                  *groups,
                  center = np.zeros(2),
                  angle = 0,
@@ -180,7 +181,7 @@ class ShipSprite(BasicSprite):
                              transparent_color=transparent_color)
         
         # set attributes for lasers
-        self._original_laser_cannon_positions = original_laser_cannon_positions
+        self._original_laser_cannon_offsets = laser_cannon_offsets
         self._laser_group = laser_group
         self._laser_sound = laser_sound
         self._laser_original_images = laser_original_images
@@ -188,12 +189,18 @@ class ShipSprite(BasicSprite):
         self._laser_speed_in_seconds = laser_speed_in_seconds
         self._laser_rate_in_seconds = laser_rate_in_seconds
         self._time_of_last_shot = pg.time.get_ticks() - (1 / self._laser_rate_in_seconds) * 1000 # this allows to fire laser from the beginning
+
+        # attach animations group to sprite
+        self._animation_group = animation_group
         
         # set attributes for explosion animation at death
-        self._explosion_group = explosion_group
         self._explosion_sound = explosion_sound
         self._original_explosion_images = original_explosion_images
         self._explosion_seconds_per_image = explosion_seconds_per_image
+        
+        # set attributes for muzzle flash animations when firing
+        self._muzzle_flash_original_images = original_muzzle_flash_images
+        self._muzzle_flash_seconds_per_image = muzzle_flash_seconds_per_image
         
         # set motion control attributes
         self._d_angle_degrees_per_frame = d_angle_degrees_per_second / self._fps
@@ -201,15 +208,17 @@ class ShipSprite(BasicSprite):
         self._max_speed_pixel_per_frame = max_speed_pixel_per_second / self._fps
         
         # create engine flame animation(s)
+        self._engine_animations = []
+        
         for engine_flame_offset in engine_flame_offsets:
-            TrackingAnimation(self._fps,
-                             self._screen,
-                             original_engine_flame_images,
-                             engine_flame_seconds_per_image,
-                             self,
-                             engine_flame_offset,
-                             engine_flame_group,
-                             looping = True)
+            self._engine_animations.append(TrackingAnimation(self._fps,
+                                                             self._screen,
+                                                             original_engine_flame_images,
+                                                             engine_flame_seconds_per_image,
+                                                             self,
+                                                             engine_flame_offset,
+                                                             animation_group,
+                                                             looping = True))
         
     def get_gunner_commands(self):
         '''Returns True if ShipSprite should fire, or False otherwise.
@@ -225,19 +234,11 @@ class ShipSprite(BasicSprite):
         
         # get time between now and last shot in seconds
         cannon_down_time = (pg.time.get_ticks() - self._time_of_last_shot) / 1000
-                           
-        #print('cannon down time:',cannon_down_time)
         
         # make sure enough time has passed since last shot
-        if cannon_down_time > 1 / self._laser_rate_in_seconds:
-            # cannon is ready
-            return True
-        elif cannon_down_time <= 1 / self._laser_rate_in_seconds:
-            # cannon is not ready
-            return False
+        return (cannon_down_time > 1 / self._laser_rate_in_seconds)
             
-    def _get_cannon_muzzle_positions(self,
-                                     absolute_positions=True):
+    def _get_rotated_gun_muzzle_positions(self):
         '''Calculates the current pixel positions of the sprite's
         gun muzzle positions w.r.t main screen's coordinate system.
         If flag is set to False, calculates them relative to ShipSprite's 
@@ -251,55 +252,46 @@ class ShipSprite(BasicSprite):
                                    [- sin(radian_angle), cos(radian_angle)]])
         
         # rotate relative gun tip positions around center of ShipSprite's surface
-        rotated_gun_muzzle_positions = np.dot(rotation_matrix,
-                                              self._original_laser_cannon_positions.T).T
+        rotated_gun_muzzle_offsets = np.dot(rotation_matrix,
+                                            self._original_laser_cannon_offsets.T).T
         
-        # if absolute_positions flag is not raised, return coordinates w.r.t to
-        # ShipSprite's surface's coordinate origin
-        if not absolute_positions:
-            gun_muzzle_positions = np.array(self.image.get_size()) / 2 + rotated_gun_muzzle_positions
-        # if absolute_position's flag is raised, return coordinates w.r.t to the
-        # main game's surface's coordinate origin
-        elif absolute_positions:
-            gun_muzzle_positions = self._center + rotated_gun_muzzle_positions
+        # calculate pixel positions of gun muzzles w.r.t main screen's coordinate system
+        rotated_gun_muzzle_positions = self._center + rotated_gun_muzzle_offsets
         
-        return gun_muzzle_positions
+        return rotated_gun_muzzle_positions
     
-    def _draw_cannon_muzzle_flashes(self):
-        '''Draws the cannon muzzle flashes from firing lasers to the ShipSprite's
-        surface as red dots, at the specified gun muzzle positions.'''
-        
-        # get positions of gun muzzle flashes
-        gun_muzzle_flash_positions = self._get_cannon_muzzle_positions(absolute_positions=False)
-        
-        # draw one flash as a red dot to SpriteShip surface for each gun
-        for gun_muzzle_flash_position in gun_muzzle_flash_positions:
-            pg.draw.circle(self.image,
-                           (255,0,0),
-                           gun_muzzle_flash_position.astype('int'),
-                           2)
-        
-    
+
     def fire(self):
         '''Creates a MissileSprite objects at SpriteShip's specified locations
         of gun muzzles.'''
         
         # get locations of gun muzzles
-        gun_muzzle_positions = self._get_cannon_muzzle_positions()
+        gun_muzzle_positions = self._get_rotated_gun_muzzle_positions()
         
         # play laser sound
-        self._laser_sound.play()
+        #self._laser_sound.play()
         
         # for each gun, create a laser at specified location
-        for gun_muzzle_position in gun_muzzle_positions:
+        for gun_muzzle_position, gun_muzzle_offset in zip(gun_muzzle_positions,
+                                                          self._original_laser_cannon_offsets):
+            # draw muzzle flash for this gun muzzle
+            TrackingAnimation(self._fps,
+                              self._screen,
+                              self._muzzle_flash_original_images,
+                              self._muzzle_flash_seconds_per_image,
+                              self,
+                              gun_muzzle_offset,
+                              self._animation_group)
+                        
+            # create laser beam shooting from this gun muzzle
             MissileSprite(self._fps,
-                 self._screen,
-                 self._laser_original_images,
-                 self._laser_range_in_seconds,
-                 self._laser_group,
-                 center = gun_muzzle_position,
-                 angle = self._angle,
-                 speed = self._speed * self._fps + self._laser_speed_in_seconds)
+                          self._screen,
+                         self._laser_original_images,
+                         self._laser_range_in_seconds,
+                         self._laser_group,
+                         center = gun_muzzle_position,
+                         angle = self._angle,
+                         speed = self._speed * self._fps + self._laser_speed_in_seconds)
             
         # (re)set last_shot_fired attribute
         self._time_of_last_shot = pg.time.get_ticks()
@@ -311,33 +303,32 @@ class ShipSprite(BasicSprite):
         # call base class update method
         BasicSprite.update(self)
         
+        # get command to fire from custom method
         fire = self.get_gunner_commands()
-        
-        #print('cannon ready:',self._is_cannon_ready())
         
         if fire and self._is_cannon_ready():
             # fire the cannon
             self.fire()
-            
-        # draw muzzle flashes to ShipSprite's surface if needed
-        if (pg.time.get_ticks() - self._time_of_last_shot) / 1000 < self.__class__._muzzle_flash_lifetime_in_seconds:
-            self._draw_cannon_muzzle_flashes()
+
             
     def kill(self):
         '''Base class kill method plus moving explosion animation.'''
         
         # play sound of explosion
-        self._explosion_sound.play()
+        #self._explosion_sound.play()
         
         # remove self from all groups
         BasicSprite.kill(self)
+        
+        # removes sprite's engine flames animations from all groups
+        [engine_flame.kill() for engine_flame in self._engine_animations]
         
         # create explosion animation
         BasicAnimation(self._fps,
                           self._screen,
                           self._original_explosion_images,
                           self._explosion_seconds_per_image,
-                          self._explosion_group,
+                          self._animation_group,
                           center = self._center,
                           angle = self._angle,
                           speed = self._speed * self._fps) # animation expects pixel/second speed unit
@@ -389,8 +380,6 @@ class PlayerShipSprite(ShipSprite):
         Returns True if player has the space bar pressed, and False
         otherwise'''
         
-        #print(pg.key.get_pressed()[pg.K_SPACE])
-        
         # space bar is pressed, fire command is given
         return pg.key.get_pressed()[pg.K_SPACE]
         
@@ -401,21 +390,22 @@ class EnemyShipSprite(ShipSprite):
                  fps,
                  screen,
                  original_images,
-                 original_laser_cannon_positions,
+                 original_laser_cannon_offsets,
                  laser_group,
                  laser_sound,
                  laser_original_images,
                  laser_range_in_seconds,
                  laser_speed_in_seconds,
                  laser_rate_in_seconds,
-                 explosion_group,
+                 original_muzzle_flash_images,
+                 muzzle_flash_seconds_per_image,
                  explosion_sound,
                  original_explosion_images,
                  explosion_seconds_per_image,
                  engine_flame_offsets,
-                 engine_flame_group,
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
+                 animation_group,
                  player_ship_sprite,
                  piloting_cone_sine,
                  gunning_cone_sine,
@@ -443,21 +433,22 @@ class EnemyShipSprite(ShipSprite):
                             fps,
                              screen,
                              original_images,
-                             original_laser_cannon_positions,
+                             original_laser_cannon_offsets,
                              laser_group,
                              laser_sound,
                              laser_original_images,
                              laser_range_in_seconds,
                              laser_speed_in_seconds,
                              laser_rate_in_seconds,
-                             explosion_group,
+                             original_muzzle_flash_images,
+                             muzzle_flash_seconds_per_image,
                              explosion_sound,
                              original_explosion_images,
                              explosion_seconds_per_image,
                              engine_flame_offsets,
-                             engine_flame_group,
                              original_engine_flame_images,
                              engine_flame_seconds_per_image,
+                             animation_group,
                              *groups,
                              center = center,
                              angle = angle,
