@@ -45,7 +45,15 @@ class Game(object):
         self.enemy_images = [pg.image.load('./graphics/tiefighter.bmp')]
         self.laser_images_red = [pg.image.load('./graphics/redlaser.bmp')]
         self.laser_images_green = [pg.image.load('./graphics/greenlaser.bmp')]
+        
+        # load animationa image sequences
         self.explosion_images = [pg.image.load('./graphics/explosion' + str(i+1) + '.bmp') for i in range(9)]
+        self.engine_flame_images = [pg.image.load('./graphics/engine_flame' + str(i+1) + '.bmp') for i in range(6)]
+        
+        # set engine flame offsets
+        self.engine_offsets_awing = np.array([[-20,-8],
+                                        [-20,8]])
+        self.engine_offsets_tie = np.array([[-11,0]])
         
         # load metadata
         with open('./meta/sprite_meta_data.yaml','r') as sprite_meta_data_yaml:
@@ -72,6 +80,9 @@ class Game(object):
         
         # explosion group
         self.explosion_animations = Group()
+        
+        # engine flame group
+        self.engine_flames = Group()
         
         
         # create player sprite and add to relevant groups / provide with relevant groups
@@ -138,6 +149,7 @@ class Game(object):
         self.player_laser_sprites.update()
         self.enemy_laser_sprites.update()
         self.explosion_animations.update()
+        self.engine_flames.update()
         
     def draw_game_state(self):
         '''Draws updated game state by wiping the game's main surface,
@@ -151,6 +163,7 @@ class Game(object):
         self.player_laser_sprites.draw(self.screen) # draw player lasers
         self.enemy_laser_sprites.draw(self.screen) # draw enemy lasers
         self.explosion_animations.draw(self.screen) # draw explosions
+        self.engine_flames.draw(self.screen)
                    
         # flip canvas
         pg.display.flip()
@@ -164,6 +177,7 @@ class Game(object):
                     max_speed_pixel_per_second = 3000):
         
         '''Creates a new PlayerShipSprite object and adds it to the game.'''
+        
         
         player = PlayerShipSprite(self.fps,
                  self.screen,
@@ -179,6 +193,10 @@ class Game(object):
                  self.explosion_sound, # sound of explosion animation
                  self.explosion_images,
                  0.15, # seconds per image for explosions animation at death
+                 self.engine_offsets_awing,
+                 self.engine_flames,
+                 self.engine_flame_images,
+                 0.1,
                  (self.player_sprite,self.all_sprites), # groups that player will be added to
                  center = center,
                  angle = angle,
@@ -200,6 +218,7 @@ class Game(object):
         
         '''Creates a new EnemyShipSprite and adds it to the game.'''
         
+        
         EnemyShipSprite(self.fps,
                         self.screen,
                         self.enemy_images,
@@ -214,6 +233,10 @@ class Game(object):
                         self.explosion_sound,
                         self.explosion_images,
                         0.15,
+                        self.engine_offsets_tie,
+                        self.engine_flames,
+                        self.engine_flame_images,
+                         0.1,   
                         player,
                         0.1,
                         0.1,

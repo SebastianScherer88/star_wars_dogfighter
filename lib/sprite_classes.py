@@ -13,7 +13,7 @@ sprites (either player or pc controlled) \'PlayerSprite\' and \'EnemySprite\'.
 The \'LaserSprite\' class is based directly on the MaskedSprite class.'''
 
 from basic_sprite_class import BasicSprite
-from animation_classes import BasicAnimation
+from animation_classes import BasicAnimation, TrackingAnimation
 from math import cos, sin, pi
 
 import pygame as pg
@@ -108,6 +108,10 @@ class ShipSprite(BasicSprite):
                  explosion_sound,
                  original_explosion_images,
                  explosion_seconds_per_image,
+                 engine_flame_offsets,
+                 engine_flame_group,
+                 original_engine_flame_images,
+                 engine_flame_seconds_per_image,
                  *groups,
                  center = np.zeros(2),
                  angle = 0,
@@ -196,6 +200,16 @@ class ShipSprite(BasicSprite):
         self._d_speed_pixel_per_frame = d_speed_pixel_per_second / self._fps
         self._max_speed_pixel_per_frame = max_speed_pixel_per_second / self._fps
         
+        # create engine flame animation(s)
+        for engine_flame_offset in engine_flame_offsets:
+            TrackingAnimation(self._fps,
+                             self._screen,
+                             original_engine_flame_images,
+                             engine_flame_seconds_per_image,
+                             self,
+                             engine_flame_offset,
+                             engine_flame_group,
+                             looping = True)
         
     def get_gunner_commands(self):
         '''Returns True if ShipSprite should fire, or False otherwise.
@@ -398,6 +412,10 @@ class EnemyShipSprite(ShipSprite):
                  explosion_sound,
                  original_explosion_images,
                  explosion_seconds_per_image,
+                 engine_flame_offsets,
+                 engine_flame_group,
+                 original_engine_flame_images,
+                 engine_flame_seconds_per_image,
                  player_ship_sprite,
                  piloting_cone_sine,
                  gunning_cone_sine,
@@ -436,6 +454,10 @@ class EnemyShipSprite(ShipSprite):
                              explosion_sound,
                              original_explosion_images,
                              explosion_seconds_per_image,
+                             engine_flame_offsets,
+                             engine_flame_group,
+                             original_engine_flame_images,
+                             engine_flame_seconds_per_image,
                              *groups,
                              center = center,
                              angle = angle,

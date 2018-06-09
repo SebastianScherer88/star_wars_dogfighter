@@ -15,6 +15,7 @@ Created on Sat Jun  2 14:00:12 2018
  
 #from pygame.sprite import Sprite, Group
 from basic_sprite_class import BasicSprite
+from math import pi, sin, cos
  
 import numpy as np
 
@@ -141,6 +142,7 @@ class TrackingAnimation(BasicAnimation):
                  original_images,
                  seconds_per_image,
                  tracked_sprite,
+                 original_offset,
                  *groups,
                  center = np.zeros(2),
                  angle = 0,
@@ -160,6 +162,8 @@ class TrackingAnimation(BasicAnimation):
                     (each image will be shown for the same duration)
             tracked_sprite: SpriteShip (based) type object that the animation will track to continuously
                         update its position and  visually stay 'attached' to that sprite.
+            original_offset: Offset between tracked sprite's center and animation's center if angle==0.
+                    Used to maintain relative position constant when tracked sprite rotates.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
             angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
@@ -189,3 +193,39 @@ class TrackingAnimation(BasicAnimation):
         
         # attach tracked sprite
         self._tracked_sprite = tracked_sprite
+        
+        # attach original offsets
+        self._original_offset = original_offset
+        
+    def update(self):
+        '''Updates the animations position and orientation based on tracked sprite.
+        Then updates animation's rect and image attributes accordingly through the base
+        class update().'''
+        
+        # get ._angle form tracked sprite
+        self._angle = self._tracked_sprite._angle
+        
+        # get .center and offsets from tracked sprite
+        self._center = self._tracked_sprite._center + self._get_rotated_offset()
+
+        
+        # before you call this, make sure:
+        # self._speed == 0
+        BasicAnimation.update(self)
+        
+        
+    def _get_rotated_offset(self):
+        '''Rotate and return the original offset.'''
+        
+        # convert ship's current angle to radian
+        radian_angle = self._angle * pi / 180
+        
+        # get rotation matrix for radian angle
+        rotation_matrix = np.array([[cos(radian_angle), sin(radian_angle)],
+                                   [- sin(radian_angle), cos(radian_angle)]])
+        
+        # rotate original offset attribute (counter-clockwise)
+        rotated_offset = np.dot(rotation_matrix,
+                                self._original_offset.T).T
+                                
+        return rotated_offset
