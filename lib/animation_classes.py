@@ -123,3 +123,69 @@ class BasicAnimation(BasicSprite):
         
         # call base class update
         BasicSprite.update(self)
+        
+class TrackingAnimation(BasicAnimation):
+    
+    '''Based on the BasicAnimation class, this animation type is designed to track a ShipSprite (based) object and
+    keep a constant position w.r.t to that tracked Sprite. 
+    
+    NOTE:It does not update its own positional coordinates 
+    incrementally like the ShipSprite (based) classes and the BasicAnimation class, but rather overrides its positional
+    attributes completely ech frame, based on the tracked sprite's positional attributes. It should therefore always be
+    initialized with initial_speed = 0; otherwise, the incremental velocity changes inherited from the BasicSprite class
+    would cause the animation to loose track of its anchor sprite.'''
+    
+    def __init__(self,
+                 fps,
+                 screen,
+                 original_images,
+                 seconds_per_image,
+                 tracked_sprite,
+                 *groups,
+                 center = np.zeros(2),
+                 angle = 0,
+                 speed = 0,
+                 looping = False,
+                 is_transparent = True,
+                 transparent_color = (255,255,255)):
+    
+        '''Arguments:
+            
+            fps: frames per second ratio of surrounding pygame
+             screen: the main screen the game is displayed on (pygame Surface).
+                    Needed to 'wrap' sprites around edges to produce 'donut topology'.
+            original_images: list of surface objects that will be used to display the sprite.
+                    By default, the first list element will be used.
+            seconds_per_image: number of seconds each image of the animation sequence will be shown.
+                    (each image will be shown for the same duration)
+            tracked_sprite: SpriteShip (based) type object that the animation will track to continuously
+                        update its position and  visually stay 'attached' to that sprite.
+            center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
+                    Sets the sprite's initial position on the 'screen' surface.
+            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
+                    an angle of zero meaning no rotation of the original surface.
+            speed: initial speed of sprite (pixels per second). scaler of float type.
+                    Default is 0.
+            is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
+                    color argument in the surfaces contained in 'original_images' will be made transparent.
+                    Default is True
+            transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
+                    is set to true. Default to (255,255,255), which corresponds to the color white.
+            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+                    when initialized.'''
+        
+        BasicAnimation.__init__(self,
+                                fps,
+                                 screen,
+                                 original_images,
+                                 seconds_per_image,
+                                 *groups,
+                                 center = center,
+                                 angle = angle,
+                                 speed = speed,
+                                 looping = looping,
+                                 is_transparent = is_transparent,
+                                 transparent_color = transparent_color)
+        
+        # attach tracked sprite
+        self._tracked_sprite = tracked_sprite
