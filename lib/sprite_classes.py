@@ -326,7 +326,7 @@ class ShipSprite(BasicSprite):
                           self._explosion_group,
                           center = self._center,
                           angle = self._angle,
-                          speed = self._speed)
+                          speed = self._speed * self._fps) # animation expects pixel/second speed unit
         
 class PlayerShipSprite(ShipSprite):
     '''Class representing the player's sprite. Based on general ShipSprite class.
