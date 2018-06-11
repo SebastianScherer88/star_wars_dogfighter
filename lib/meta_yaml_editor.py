@@ -56,32 +56,51 @@ skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing.bmp'],
                'gun_offsets':[[9,-15],
                               [9,15]],
                'engine_offsets':[[-20,-8],
-                                 [-20,8]]}
+                                 [-20,8]],
+                'fire_modes':{'single':[[0],
+                                        [1]],
+                            'coupled':[[0,1]]}}
 
 # create meta data for xwing skin
 skins_meta_data['xwing'] = {'image_paths':['./graphics/sprite_skins/xwing.bmp'],
                'gun_offsets':[[9,-18],
-                              [9,18]],
+                              [9,18],
+                              [10,-16],
+                              [10,16]],
                'engine_offsets':[[-20,-8],
-                                 [-20,8]]}
+                                 [-20,8]],
+                'fire_modes':{'single':[[0],
+                                        [1]],
+                            'coupled':[[0,1],
+                                       [2,3]],
+                            'all':[[0,1,2,3]]}}
 
 # create meta data for tie fighter skin
 skins_meta_data['tiefighter'] = {'image_paths':['./graphics/sprite_skins/tiefighter.bmp'],
                'gun_offsets':[[9,-2],
                               [9,3]],
-               'engine_offsets':[[-11,0]]}
+               'engine_offsets':[[-11,0]],
+                'fire_modes':{'single':[[0],
+                                        [1]],
+                            'coupled':[[0,1]]}}
 
 # create meta data for hornet skin
 skins_meta_data['hornet'] = {'image_paths':['./graphics/sprite_skins/hornet.bmp'],
                'gun_offsets':[[6,-2],
                               [6,3]],
-               'engine_offsets':[[-20,0]]}
+               'engine_offsets':[[-20,0]],
+                'fire_modes':{'single':[[0],
+                                        [1]],
+                            'coupled':[[0,1]]}}
 
 # create meta data for f35 skin
 skins_meta_data['f35'] = {'image_paths':['./graphics/sprite_skins/f35.bmp'],
                'gun_offsets':[[6,-2],
                               [6,3]],
-               'engine_offsets':[[-17,0]]}
+               'engine_offsets':[[-17,0]],
+                'fire_modes':{'single':[[0],
+                                        [1]],
+                            'coupled':[[0,1]]}}
 
 # create meta data for red laser beam skin
 skins_meta_data['red'] = {'image_paths':['./graphics/sprite_skins/redlaser.bmp']}

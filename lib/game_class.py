@@ -47,9 +47,6 @@ class Game(object):
         with open('./meta/animations_meta_data.yaml','r') as animations_meta_file:
             animations_meta_data = yaml.load(animations_meta_file)
         
-        print(skins_meta_data)
-        
-        print('AAAAA')
         
         # set player and enemy ship and laser types
         player_ship, player_laser = 'xwing', 'red'
@@ -61,6 +58,7 @@ class Game(object):
         self.player_images = [pg.image.load(image_path) for image_path in skins_meta_data[player_ship]['image_paths']]
         self.player_gun_offsets = np.array(skins_meta_data[player_ship]['gun_offsets']).astype('float')
         self.player_engine_offsets = np.array(skins_meta_data[player_ship]['engine_offsets']).astype('float')
+        self.player_fire_modes = skins_meta_data[player_ship]['fire_modes']
         
         # laser specific
         self.player_laser_images = [pg.image.load(image_path) for image_path in skins_meta_data[player_laser]['image_paths']]
@@ -79,6 +77,7 @@ class Game(object):
         self.enemy_images = [pg.image.load(image_path) for image_path in skins_meta_data[enemy_ship]['image_paths']]
         self.enemy_gun_offsets = np.array(skins_meta_data[enemy_ship]['gun_offsets']).astype('float')
         self.enemy_engine_offsets = np.array(skins_meta_data[enemy_ship]['engine_offsets']).astype('float')
+        self.enemy_fire_modes = skins_meta_data[enemy_ship]['fire_modes']
         
         # laser specific
         self.enemy_laser_images = [pg.image.load(image_path) for image_path in skins_meta_data[enemy_laser]['image_paths']]
@@ -140,6 +139,9 @@ class Game(object):
                 if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_f:
+                        player._toggle_fire_mode()
                     
             # spawn enemies if needed
             if enemy_down:
@@ -209,6 +211,7 @@ class Game(object):
                  self.screen,
                  self.player_images,
                  self.player_gun_offsets,
+                 self.player_fire_modes,
                  self.player_laser_sprites,
                  self.player_laser_sound,
                  self.player_laser_images,
@@ -249,7 +252,8 @@ class Game(object):
         EnemyShipSprite(self.fps,
                         self.screen, # main screen
                         self.enemy_images, # sequence with ShipSprite's skin
-                        self.enemy_gun_offsets, # 
+                        self.enemy_gun_offsets,
+                        self.enemy_fire_modes,# 
                         self.enemy_laser_sprites,
                         self.enemy_laser_sound, # pygame sound object; laser fire sound
                         self.enemy_laser_images, # sequence with laser beam skin

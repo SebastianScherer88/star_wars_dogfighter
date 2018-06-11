@@ -211,7 +211,9 @@ class TrackingAnimation(BasicAnimation):
 
         # before you call this, make sure:
         # self._speed == 0
-        BasicAnimation.update(self)        
+        BasicAnimation.update(self) 
+        
+        # 
         
         
     def _get_rotated_offset(self):
