@@ -1,0 +1,76 @@
+awing:
+  engine_offsets:
+  - [-20, -8]
+  - [-20, 8]
+  fire_modes:
+    coupled:
+    - [0, 1]
+    single:
+    - [0]
+    - [1]
+  gun_offsets:
+  - [9, -15]
+  - [9, 15]
+  image_paths: [./graphics/sprite_skins/awing.bmp]
+f35:
+  engine_offsets:
+  - [-17, 0]
+  fire_modes:
+    coupled:
+    - [0, 1]
+    single:
+    - [0]
+    - [1]
+  gun_offsets:
+  - [6, -2]
+  - [6, 3]
+  image_paths: [./graphics/sprite_skins/f35.bmp]
+green:
+  image_paths: [./graphics/sprite_skins/greenlaser.bmp]
+hornet:
+  engine_offsets:
+  - [-20, 0]
+  fire_modes:
+    coupled:
+    - [0, 1]
+    single:
+    - [0]
+    - [1]
+  gun_offsets:
+  - [6, -2]
+  - [6, 3]
+  image_paths: [./graphics/sprite_skins/hornet.bmp]
+red:
+  image_paths: [./graphics/sprite_skins/redlaser.bmp]
+tiefighter:
+  engine_offsets:
+  - [-11, 0]
+  fire_modes:
+    coupled:
+    - [0, 1]
+    single:
+    - [0]
+    - [1]
+  gun_offsets:
+  - [9, -2]
+  - [9, 3]
+  image_paths: [./graphics/sprite_skins/tiefighter.bmp]
+xwing:
+  engine_offsets:
+  - [-20, -8]
+  - [-20, 8]
+  fire_modes:
+    all:
+    - [0, 1, 2, 3]
+    coupled:
+    - [0, 1]
+    - [2, 3]
+    single:
+    - [0]
+    - [1]
+  gun_offsets:
+  - [9, -18]
+  - [9, 18]
+  - [10, -16]
+  - [10, 16]
+  image_paths: [./graphics/sprite_skins/xwing.bmp]

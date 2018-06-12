@@ -68,8 +68,12 @@ class BasicSprite(Sprite):
         # set sprite up
         # set image and rect - these will be called by Group object methods; get mask
         self._image_index = 0 # always start with first image in original_images
-        self.image = pg.transform.rotate(self._original_images[self._image_index],
-                                         self._angle)
+
+        # initialize image surface object
+        self._size_factor = 1
+        self.image = pg.transform.rotozoom(self._original_images[self._image_index],
+                                           self._angle,
+                                           self._size_factor)
         
         # update object type attribute: mask
         self.mask = pg.mask.from_surface(self.image)
@@ -117,11 +121,8 @@ class BasicSprite(Sprite):
         # convert angle to radian
         radian_angle = self._angle * pi / 180
         
-        # convert speed (pixel per second) into frame_speed (pixel per frame)
-        frame_speed = self._speed / self._fps
-        
         # compute velocity vector
-        velocity = frame_speed * np.array([cos(radian_angle),
+        velocity = self._speed * np.array([cos(radian_angle),
                                            -sin(radian_angle)]).reshape((1,2)) # in pygame coordinates, the y-axis has negative orientation
         
         return velocity.reshape(2)
@@ -147,8 +148,9 @@ class BasicSprite(Sprite):
                                           d_speed)
         
         # update object type attributes: surface
-        self.image = pg.transform.rotate(self._original_images[self._image_index],
-                                         self._angle)
+        self.image = pg.transform.rotozoom(self._original_images[self._image_index],
+                                           self._angle,
+                                           self._size_factor)
 
         # update object type attribute: mask
         self.mask = pg.mask.from_surface(self.image)
