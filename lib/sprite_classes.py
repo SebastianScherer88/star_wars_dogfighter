@@ -14,79 +14,13 @@ The \'LaserSprite\' class is based directly on the MaskedSprite class.'''
 
 from basic_sprite_class import BasicSprite
 from animation_classes import BasicAnimation, TrackingAnimation
+from weapons_classes import LaserCannon
 from math import cos, sin, pi
 
 import pygame as pg
 import numpy as np
 
-        
-class MissileSprite(BasicSprite):
-    '''Class used for projectiles fired by player or enemy sprites.'''
-    
-    def __init__(self,
-                 fps,
-                 screen,
-                 original_images,
-                 lifetime_in_seconds,
-                 *groups,
-                 center = np.zeros(2),
-                 angle = 0,
-                 speed = 0,
-                 is_transparent = True,
-                 transparent_color = (255,255,255)):
-        
-        '''Arguments:
-            
-            fps: frames per second ratio of surrounding pygame
-             screen: the main screen the game is displayed on (pygame Surface).
-                    Needed to 'wrap' sprites around edges to produce 'donut topology'.
-            original_images: list of surface objects that will be used to display the sprite.
-                    By default, the first list element will be used.
-            lifetime: lifetime pf sprite (in seconds).
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
-                    when initialized.
-            center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
-                    Sets the sprite's initial position on the 'screen' surface.
-            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
-                    an angle of zero meaning no rotation of the original surface.
-            speed: initial speed of sprite (pixels per second). scaler of float type.
-                    Default is 0.
-            is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
-                    color argument in the surfaces contained in 'original_images' will be made transparent.
-                    Default is True
-            transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
-                    is set to true. Default to (255,255,255), which corresponds to the color white.'''
-                    
-        # initialize and add to groups if sensible
-        BasicSprite.__init__(self,
-                             fps,
-                             screen,
-                             original_images,
-                             *groups,
-                             center=center,
-                             angle=angle,
-                             speed=speed,
-                             is_transparent=is_transparent,
-                             transparent_color=transparent_color)
-        
-        # set lifetime related attributes
-        self._lifetime_in_frames = fps * lifetime_in_seconds
-        self.frames_passed = 0
-        
-    def update(self):
-        '''BasicSprite update method plus checks & handling against MissileSprite's
-        lifetime  attribute.'''
-        
-        # call base class update
-        BasicSprite.update(self)
-        
-        # update frame counter
-        self.frames_passed += 1
-                    
-        # if life time is over, terminate MissileSprite
-        if self.frames_passed > self._lifetime_in_frames:
-            self.kill()
-            
+
 
 class ShipSprite(BasicSprite):
     '''Base sprite class for both the player's and the enemy ship(s).'''
@@ -101,7 +35,7 @@ class ShipSprite(BasicSprite):
                  laser_fire_modes,
                  laser_group,
                  laser_sound,
-                 laser_original_images,
+                 original_laser_beam_images,
                  laser_range_in_seconds,
                  laser_speed_in_seconds,
                  laser_rate_in_seconds,
@@ -131,8 +65,9 @@ class ShipSprite(BasicSprite):
                     Needed to 'wrap' sprites around edges to produce 'donut topology'.
             original_images: list of surface objects that will be used to display the sprite.
                     By default, the first list element will be used.
-            original_laser_cannon_positions: array of relative pixel positions of sprite's gun muzzles w.r.t
+            laser_cannon_offsets: array of relative pixel positions of sprite's gun muzzles w.r.t
                     sprite skin's center.
+            laser_fire_modes: dictionary of meta data specifyinh the ship's possible fire modes.
             laser_group: pygame Group object. Any laser created by the ShipSprite's firing method
                     will be added to this group to help track laser fire collisions.
             laser_sound: pygame.mixer.Sound object. Will be played by the ShipSprite's firing method.
@@ -181,18 +116,22 @@ class ShipSprite(BasicSprite):
                              is_transparent=is_transparent,
                              transparent_color=transparent_color)
         
-        print(laser_cannon_offsets)
         
-        # set attributes for lasers
-        self._original_laser_cannon_offsets = laser_cannon_offsets * self._size_factor
+        # intialize and attach laser weapons
+        self._laser_cannons = []
+        
+        for laser_cannon_offset in laser_cannon_offsets * sel.f._size_factor:
+            # for each weapon offset in the ship skin's meta data, we create and 
+            # attach a LaserCannon object
+            self._laser_cannons.append(LaserCannon(ship_sprite=None,
+                                                     cannon_offset=laser_cannon_offset,
+                                                     cannon_projectile_group=laser_group
+                                                     original_laser_beam_images=original_laser_beam_images,
+                                                     original_muzzle_flash_images=original_muzzle_flash_images))
+            
         self._original_laser_fire_modes = laser_fire_modes
-        self._laser_group = laser_group
         self._laser_sound = laser_sound
-        self._laser_original_images = laser_original_images
-        self._laser_range_in_seconds = laser_range_in_seconds
-        self._laser_speed_in_seconds = laser_speed_in_seconds
-        self._laser_rate_in_seconds = laser_rate_in_seconds
-        self._time_of_last_shot = pg.time.get_ticks() - (1 / self._laser_rate_in_seconds) * 1000 # this allows to fire laser from the beginning
+
 
         # attach animations group to sprite
         self._animation_group = animation_group
@@ -201,10 +140,6 @@ class ShipSprite(BasicSprite):
         self._explosion_sound = explosion_sound
         self._original_explosion_images = original_explosion_images
         self._explosion_seconds_per_image = explosion_seconds_per_image
-        
-        # set attributes for muzzle flash animations when firing
-        self._muzzle_flash_original_images = original_muzzle_flash_images
-        self._muzzle_flash_seconds_per_image = muzzle_flash_seconds_per_image
         
         # set attributes for engine animation when moving
         self._engine_flame_offsets = engine_flame_offsets
@@ -296,56 +231,6 @@ class ShipSprite(BasicSprite):
         or an AI gunner and return a non-trivial boolean.'''
         
         return False
-    
-    def _is_cannon_ready(self):
-        '''Checks if cannon is ready to fire, based on _laser_rate_in_seconds
-        attribute.'''
-        
-        # get time between now and last shot in seconds
-        cannon_down_time = (pg.time.get_ticks() - self._time_of_last_shot) / 1000
-        
-        # make sure enough time has passed since last shot
-        return (cannon_down_time > 1 / self._laser_rate_in_seconds)
-            
-    def _get_rotated_gun_muzzle_positions(self):
-        '''Calculates the current pixel positions of the sprite's
-        gun muzzle positions w.r.t main screen's coordinate system.
-        If flag is set to False, calculates them relative to ShipSprite's 
-        surface's coordinate system.'''
-        
-        # convert ship's current angle to radian
-        radian_angle = self._angle * pi / 180
-        
-        # get rotation matrix for radian angle
-        rotation_matrix = np.array([[cos(radian_angle), sin(radian_angle)],
-                                   [- sin(radian_angle), cos(radian_angle)]])
-    
-        # get cannon offsets for cannons to be fired based on current fire mode and cannon index
-        cannon_indices = self._original_laser_fire_modes[self._fire_mode][self._cannon_index]
-        
-        # update cannon_index
-        if self._cannon_index == len(self._original_laser_fire_modes[self._fire_mode]) - 1:
-            # last cannon (cluster) in current fire mode reached, loop from beginning
-            self._cannon_index = 0
-        else:
-            self._cannon_index += 1
-            
-        print(self._fire_mode)
-        print(self._cannon_index)
-        
-        # rotate relative gun tip positions around center of ShipSprite's surface
-        cannon_indices = self._original_laser_fire_modes[self._fire_mode][self._cannon_index]
-        print(cannon_indices)
-        cannon_offsets = self._original_laser_cannon_offsets[cannon_indices].reshape(-1,2)
-        print(cannon_offsets)
-        rotated_gun_muzzle_offsets = np.dot(rotation_matrix,
-                                            cannon_offsets.T).T
-        
-        # calculate pixel positions of gun muzzles w.r.t main screen's coordinate system
-        rotated_gun_muzzle_positions = self._center + rotated_gun_muzzle_offsets
-        
-        return rotated_gun_muzzle_positions, cannon_indices
-    
 
     def fire(self):
         '''Creates a MissileSprite objects at SpriteShip's specified locations
