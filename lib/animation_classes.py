@@ -230,4 +230,4 @@ class TrackingAnimation(BasicAnimation):
         rotated_offset = np.dot(rotation_matrix,
                                 self._original_offset.T).T
                                 
-        return rotated_offset
+        return rotated_offset.reshape(2,)

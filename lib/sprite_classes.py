@@ -79,7 +79,7 @@ class ShipSprite(BasicSprite):
             laser_speed_in_seconds: this value will be added to personal _speed attribute value at time
                     of firing cannon. The sum of those values will be passed to the MissileSprite as initial
                     _speed value.
-            laser_rate_in_seconds: number of lasers that the ShipSprite can fire per seconds (i.e. rate of fire)
+            laser_rate_in_seconds: number of lasers that the ShipSprite can fire per second (i.e. rate of fire)
             explosion_group: pygame Group object. When ShipSprite is terminated, an explosion animation will be created
                     and added to this group.
             explosion_sound: pygame.mixer.Sound object. Will be played for the explosion animation
@@ -116,21 +116,25 @@ class ShipSprite(BasicSprite):
                              is_transparent=is_transparent,
                              transparent_color=transparent_color)
         
+        # set laser fire meta data attributes            
+        self._original_laser_fire_modes = laser_fire_modes
+        self._laser_sound = laser_sound
         
         # intialize and attach laser weapons
         self._laser_cannons = []
         
-        for laser_cannon_offset in laser_cannon_offsets * sel.f._size_factor:
+        for laser_cannon_offset in laser_cannon_offsets * self._size_factor:
             # for each weapon offset in the ship skin's meta data, we create and 
             # attach a LaserCannon object
-            self._laser_cannons.append(LaserCannon(ship_sprite=None,
+            self._laser_cannons.append(LaserCannon(ship_sprite=self,
                                                      cannon_offset=laser_cannon_offset,
-                                                     cannon_projectile_group=laser_group
+                                                     cannon_fire_rate=laser_rate_in_seconds,
+                                                     cannon_range_in_seconds=laser_range_in_seconds,
+                                                     cannon_projectile_speed_in_seconds=laser_speed_in_seconds,
+                                                     cannon_projectile_group=laser_group,
                                                      original_laser_beam_images=original_laser_beam_images,
-                                                     original_muzzle_flash_images=original_muzzle_flash_images))
-            
-        self._original_laser_fire_modes = laser_fire_modes
-        self._laser_sound = laser_sound
+                                                     original_muzzle_flash_images=original_muzzle_flash_images,
+                                                     muzzle_flash_animation_spi=muzzle_flash_seconds_per_image))
 
 
         # attach animations group to sprite
@@ -152,7 +156,7 @@ class ShipSprite(BasicSprite):
         self._max_speed_pixel_per_frame = max_speed_pixel_per_second / self._fps
         
         # set initial fire mode to coupled cannons, set cannon index to 0
-        self._fire_mode = 'coupled'
+        self._fire_mode_index = 1
         self._cannon_index = 0
         
         # create engine flame animation(s)
@@ -165,51 +169,17 @@ class ShipSprite(BasicSprite):
         '''Util function that takes an integer and uses it to set one of the at least
         2 different laser fire modes ('single' or 'coupled').'''
         
-        # get number of cannons
-        n_cannons = (self._original_laser_cannon_offsets).shape[0]
-        
-        # get fire base rate
-        if self._fire_mode == 'coupled':
-            # curent rate is half the base rate -> multiply by two
-            fire_base_rate = self._laser_rate_in_seconds * 2
-        elif self._fire_mode == 'single':
-            # current rate is the base rate -> take unchanged
-            fire_base_rate = self._laser_rate_in_seconds
-        elif self._fire_mode == 'all':
-            # only applies to ships with > 2 guns; change current fire rate appropriately
-            fire_base_rate = self._laser_rate_in_seconds * n_cannons
-        
-        # get sorted fire modes
-        sorted_fire_mode_keys = sorted(self._original_laser_fire_modes.keys())
+        print('Fire mode toggled!')
                                      
-        # get index of current fire mode
-        current_fire_mode_index = sorted_fire_mode_keys.index(self._fire_mode)
+        # switch to next fire mode
+        self._fire_mode_index = (self._fire_mode_index + 1) % len(self._original_laser_fire_modes)
         
-        # update fire mode index
-        if current_fire_mode_index == len(sorted_fire_mode_keys) - 1:
-            current_fire_mode_index = 0 # if reached last fire mode, loop back to first
-        else:
-            current_fire_mode_index += 1 # if not reach last fire mode, take next one
-            
-        # set fire mode to updated status
-        self._fire_mode = sorted_fire_mode_keys[current_fire_mode_index]
+        # set cannon index back to zero to avoid out of bounds indices when downsampling fire mode
+        self._cannon_index = 0  
         
-        # set cannon index back to zero to avoid out of bounds indices when changing
-        # from 'single' to 'coupled'/'all'
-        self._cannon_index = 0
-        
-        print('Changed fire mode to:',self._fire_mode)
-        
-        # update fire rate accordingly
-        if self._fire_mode == 'coupled':
-            # curent rate should be half the base rate -> divide by two
-            self._laser_rate_in_seconds = fire_base_rate / 2
-        elif self._fire_mode == 'single':
-            # current rate is the base rate -> take unchanged
-            self._laser_rate_in_seconds = fire_base_rate 
-        elif self._fire_mode == 'all':
-            # only applies to ships with > 2 guns; change current fire rate appropriately
-            self._laser_rate_in_seconds = fire_base_rate / n_cannons
+        print('fire mode index:',self._fire_mode_index)
+        print('cannon settings in this mode:', len(self._original_laser_fire_modes[self._fire_mode_index]))
+        print('cannon index:', self._cannon_index)
         
     def _create_engine_animations(self):
         '''Util method to create engine animations.'''
@@ -231,50 +201,52 @@ class ShipSprite(BasicSprite):
         or an AI gunner and return a non-trivial boolean.'''
         
         return False
+    
+    def _get_next_cannons(self):
+        '''Util function that returns a list of laser cannons next in line to be fired.'''
+        
+        # get index set for cannons lined up to fir enext
+        laser_cannon_index_set = self._original_laser_fire_modes[self._fire_mode_index][self._cannon_index]
+        
+        print('laser cannon index set:',laser_cannon_index_set)
+        
+        return [self._laser_cannons[i] for i in laser_cannon_index_set]
+    
+    def _pause_next_cannons(self):
+        '''Util function that makes the set of cannons which are next in line
+        to fire wait an appropriate amount of time to guarantee evenly spaced fire.'''
+        
+        # get number of salves per cycle for current firing mode
+        n_salves = len(self._original_laser_fire_modes[self._fire_mode_index])
+        
+        for next_cannon in self._get_next_cannons():
+            now = pg.time.get_ticks()
+            mil_seconds_per_shot = 1000 / next_cannon._rate_of_fire
+            next_cannon._time_of_last_shot = now - (n_salves - 1) / n_salves * mil_seconds_per_shot
 
     def fire(self):
         '''Creates a MissileSprite objects at SpriteShip's specified locations
         of gun muzzles.'''
         
-        # get locations of gun muzzles
-        gun_muzzle_positions, gun_indices = self._get_rotated_gun_muzzle_positions()
-        
         # play laser sound
         self._laser_sound.play()
         
-        # for each gun, create a laser at specified location
-        for gun_muzzle_position, gun_muzzle_offset in zip(gun_muzzle_positions,
-                                                          self._original_laser_cannon_offsets[gun_indices]):
-            # draw muzzle flash for this gun muzzle
-            TrackingAnimation(self._fps,
-                              self._screen,
-                              self._muzzle_flash_original_images,
-                              self._muzzle_flash_seconds_per_image,
-                              self,
-                              gun_muzzle_offset,
-                              self._animation_group)
-                        
-            # create laser beam shooting from this gun muzzle
-            MissileSprite(self._fps,
-                          self._screen,
-                         self._laser_original_images,
-                         self._laser_range_in_seconds,
-                         self._laser_group,
-                         center = gun_muzzle_position,
-                         angle = self._angle,
-                         speed = self._speed * self._fps + self._laser_speed_in_seconds)
-            
-        # (re)set last_shot_fired attribute
-        self._time_of_last_shot = pg.time.get_ticks()
-            
-            
-    def update(self):
-        '''Base class update plus additional ShipSprite specific updates.'''
+        print('fire mode index:',self._fire_mode_index)
+        print('cannon settings in this mode:', len(self._original_laser_fire_modes[self._fire_mode_index]))
+        print('cannon index:', self._cannon_index)
         
-        # call base class update method
-        BasicSprite.update(self)
+        # fire cannons
+        [laser_cannon.fire() for laser_cannon in self._get_next_cannons()]
         
-        # delete/recreate engine animation based on current speed
+        # update cannon index within current fire mode
+        self._cannon_index = (self._cannon_index + 1) % len(self._original_laser_fire_modes[self._fire_mode_index])
+        
+        # update cannons next in line so they wait as approrpiate
+        self._pause_next_cannons()
+        
+    def _handle_engine_animation(self):
+        '''Util function that handles engine animation w.r.t speed changes.'''
+        
         if not self._speed and len(self._engine_animations):
             # removes sprite's engine flames animations from all groups
             [engine_flame.kill() for engine_flame in self._engine_animations]  
@@ -286,12 +258,22 @@ class ShipSprite(BasicSprite):
             # create new engine animations
             self._create_engine_animations()
         
-        # get command to fire from custom method
-        fire = self.get_gunner_commands()
+    def update(self):
+        '''Base class update plus additional ShipSprite specific updates.'''
         
-        if fire and self._is_cannon_ready():
-            # fire the cannon
+        # call base class update method
+        BasicSprite.update(self)
+        
+        # get command to fire from custom method
+        command_to_fire = self.get_gunner_commands()
+        
+        # if command to fire was given, check if cannons are ready; if so, fire
+        if command_to_fire and np.mean([cannon.is_ready() for cannon in self._get_next_cannons()]):
+            # fire the cannon(s)
             self.fire()
+            
+        # delete/recreate engine animation based on current speed
+        self._handle_engine_animation()
 
             
     def kill(self):
@@ -308,13 +290,13 @@ class ShipSprite(BasicSprite):
         
         # create explosion animation
         BasicAnimation(self._fps,
-                          self._screen,
-                          self._original_explosion_images,
-                          self._explosion_seconds_per_image,
-                          self._animation_group,
-                          center = self._center,
-                          angle = self._angle,
-                          speed = self._speed * self._fps) # animation expects pixel/second speed unit
+                      self._screen,
+                      self._original_explosion_images,
+                      self._explosion_seconds_per_image,
+                      self._animation_group,
+                      center = self._center,
+                      angle = self._angle,
+                      speed = self._speed * self._fps) # animation expects pixel/second speed unit
         
 class PlayerShipSprite(ShipSprite):
     '''Class representing the player's sprite. Based on general ShipSprite class.
@@ -373,11 +355,11 @@ class EnemyShipSprite(ShipSprite):
                  fps,
                  screen,
                  original_images,
-                 original_laser_cannon_offsets,
+                 laser_cannon_offsets,
                  laser_fire_modes,
                  laser_group,
                  laser_sound,
-                 laser_original_images,
+                 original_laser_beam_images,
                  laser_range_in_seconds,
                  laser_speed_in_seconds,
                  laser_rate_in_seconds,
@@ -415,25 +397,25 @@ class EnemyShipSprite(ShipSprite):
                                 
         ShipSprite.__init__(self,
                             fps,
-                             screen,
-                             original_images,
-                             original_laser_cannon_offsets,
-                             laser_fire_modes,
-                             laser_group,
-                             laser_sound,
-                             laser_original_images,
-                             laser_range_in_seconds,
-                             laser_speed_in_seconds,
-                             laser_rate_in_seconds,
-                             original_muzzle_flash_images,
-                             muzzle_flash_seconds_per_image,
-                             explosion_sound,
-                             original_explosion_images,
-                             explosion_seconds_per_image,
-                             engine_flame_offsets,
-                             original_engine_flame_images,
-                             engine_flame_seconds_per_image,
-                             animation_group,
+                            screen,
+                            original_images,
+                            laser_cannon_offsets,
+                            laser_fire_modes,
+                            laser_group,
+                            laser_sound,
+                            original_laser_beam_images,
+                            laser_range_in_seconds,
+                            laser_speed_in_seconds,
+                            laser_rate_in_seconds,
+                            original_muzzle_flash_images,
+                            muzzle_flash_seconds_per_image,
+                            explosion_sound,
+                            original_explosion_images,
+                            explosion_seconds_per_image,
+                            engine_flame_offsets,
+                            original_engine_flame_images,
+                            engine_flame_seconds_per_image,
+                            animation_group,
                              *groups,
                              center = center,
                              angle = angle,
@@ -444,7 +426,7 @@ class EnemyShipSprite(ShipSprite):
                              is_transparent = is_transparent,
                              transparent_color = transparent_color)
         
-        # attach the player's sprite object
+                # attach the player's sprite object
         self._player_sprite = player_ship_sprite
         
         # attach the AI cone sines

@@ -49,7 +49,7 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        player_ship, player_laser = 'xwing', 'red'
+        player_ship, player_laser = 'awing', 'red'
         enemy_ship, enemy_laser = 'tiefighter', 'green'
         
         # set game attributes from meta data for player
@@ -204,36 +204,35 @@ class Game(object):
                     d_speed_pixel_per_second = 10,
                     max_speed_pixel_per_second = 300):
         
-        '''Creates a new PlayerShipSprite object and adds it to the game.'''
-        
+        '''Creates a new PlayerShipSprite object and adds it to the game.'''        
         
         player = PlayerShipSprite(self.fps,
-                 self.screen,
-                 self.player_images,
-                 self.player_gun_offsets,
-                 self.player_fire_modes,
-                 self.player_laser_sprites,
-                 self.player_laser_sound,
-                 self.player_laser_images,
-                 1.2 , # laser range in seconds
-                 150, # laser speed in pixel per second
-                 2, # laser rate of fire in seconds
-                 self.player_muzzle_images,
-                 self.player_muzzle_spi, # seconds per image for muzzle flash
-                 self.explosion_sound, # sound of explosion animation
-                 self.explosion_images,
-                 self.explosion_spi, # seconds per image for explosions animation at death
-                 self.player_engine_offsets,
-                 self.engine_images,
-                 self.engine_spi,
-                 self.animations,
-                 (self.player_sprite,self.all_sprites), # groups that player will be added to
-                 center = center,
-                 angle = angle,
-                 speed = speed,
-                 d_angle_degrees_per_second = d_angle_degrees_per_second,
-                 d_speed_pixel_per_second = d_speed_pixel_per_second,
-                 max_speed_pixel_per_second = max_speed_pixel_per_second)
+                                  self.screen,
+                                  self.player_images,
+                                  self.player_gun_offsets,
+                                  self.player_fire_modes,
+                                  self.player_laser_sprites,
+                                  self.player_laser_sound,
+                                  self.player_laser_images,
+                                  1.2, # laser range in seconds
+                                  150, # laser speed in pixel per second
+                                  2, # laser rate of fire in seconds
+                                  self.player_muzzle_images,
+                                  self.player_muzzle_spi, # seconds per image for muzzle flash
+                                  self.explosion_sound, # sound of explosion animation
+                                  self.explosion_images,
+                                  self.explosion_spi, # seconds per image for explosions animation at death
+                                  self.player_engine_offsets,
+                                  self.engine_images,
+                                  self.engine_spi,
+                                  self.animations,
+                                  (self.player_sprite,self.all_sprites),
+                                  center = center,
+                                  angle = angle,
+                                  speed = speed,
+                                  d_angle_degrees_per_second = d_angle_degrees_per_second,
+                                  d_speed_pixel_per_second = d_speed_pixel_per_second,
+                                  max_speed_pixel_per_second = max_speed_pixel_per_second)
         
         return player
     
@@ -247,7 +246,6 @@ class Game(object):
                     max_speed_pixel_per_second = 200):
         
         '''Creates a new EnemyShipSprite and adds it to the game.'''
-        
         
         EnemyShipSprite(self.fps,
                         self.screen, # main screen

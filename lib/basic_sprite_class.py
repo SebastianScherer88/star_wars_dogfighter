@@ -80,6 +80,7 @@ class BasicSprite(Sprite):
         
         # update object type attributes: positional rectangle
         self.rect = self.image.get_rect()
+        
         self.rect.center = self._center
         
     def update_positional_attributes(self,
