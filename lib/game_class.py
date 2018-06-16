@@ -246,9 +246,19 @@ class Game(object):
         attributes with the keyboard state. This is to avoid weird movement 
         when arrow keys are pressed while player is spawned.'''
         
-        for pressed_key in pg.key.get_pressed():
-            # sync players angle rate of change
-            if pressed._key
+        pressed_keys = pg.key.get_pressed()
+        
+        # sync player angle attributes
+        if pressed_keys[pg.K_LEFT]:
+            player_sprite._d_angle += player_sprite._d_angle_degrees_per_frame
+        if pressed_keys[pg.K_RIGHT]:
+            player_sprite._d_angle -= player_sprite._d_angle_degrees_per_frame
+            
+        # sync player speed attributes
+        if pressed_keys[pg.K_UP]:
+            player_sprite._d_speed += player_sprite._d_speed_pixel_per_frame
+        if pressed_keys[pg.K_DOWN]:
+            player_sprite._d_speed -= player_sprite._d_speed_pixel_per_frame
         
     def spawn_player(self,
                      center = np.array([900,300]),
@@ -287,6 +297,8 @@ class Game(object):
                           d_angle_degrees_per_second = d_angle_degrees_per_second,
                           d_speed_pixel_per_second = d_speed_pixel_per_second,
                           max_speed_pixel_per_second = max_speed_pixel_per_second)
+        
+        self._sync_player_(player)
 
         return player
     
