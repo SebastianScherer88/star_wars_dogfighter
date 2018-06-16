@@ -14,7 +14,7 @@ import pygame as pg
 import numpy as np
 
 from pygame.sprite import Group, collide_mask, groupcollide
-from sprite_classes import ShipSprite, EnemyShipSprite
+from sprite_classes import ShipSprite, AIShipSprite
 
 class Game(object):
     
@@ -313,7 +313,7 @@ class Game(object):
         
         '''Creates a new EnemyShipSprite and adds it to the game.'''
         
-        EnemyShipSprite(self.fps,
+        AIShipSprite(self.fps,
                         self.screen, # main screen
                         self.enemy_images, # sequence with ShipSprite's skin
                         self.enemy_gun_offsets,

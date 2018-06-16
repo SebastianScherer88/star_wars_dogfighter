@@ -305,7 +305,7 @@ class ShipSprite(BasicSprite):
                       angle = self._angle,
                       speed = self._speed * self._fps) # animation expects pixel/second speed unit
         
-class EnemyShipSprite(ShipSprite):
+class AIShipSprite(ShipSprite):
     '''Based on ShipSprite class. Represents an enemy ship during game.'''
     
     def __init__(self,
