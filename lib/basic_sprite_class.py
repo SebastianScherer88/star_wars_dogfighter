@@ -65,6 +65,10 @@ class BasicSprite(Sprite):
         self._angle = angle
         self._speed = speed / fps # convert to pixel per frame
         
+        # set rate of change of positional attributes
+        self._d_angle = 0
+        self._speed = 0
+        
         # set sprite up
         # set image and rect - these will be called by Group object methods; get mask
         self._image_index = 0 # always start with first image in original_images
@@ -83,17 +87,15 @@ class BasicSprite(Sprite):
         
         self.rect.center = self._center
         
-    def update_positional_attributes(self,
-                                     d_angle=0,
-                                     d_speed=0):
+    def update_positional_attributes(self):
         '''Updates the sprites positional attributes '_angle' and '_speed'.
         Does not update the 'image','rect' or 'mask' attributes.'''
         
         # update angle argument
-        self._angle += d_angle
+        self._angle += self._d_angle
         
         # update speed argument
-        self._speed += d_speed
+        self._speed += self._d_speed
         
         # update center argument
         self._center += self.get_velocity_vector()
@@ -128,25 +130,22 @@ class BasicSprite(Sprite):
         
         return velocity.reshape(2)
     
-    def get_pilot_commands(self):
-        '''Calculates scalar floats d_angle and d_speed which can be 
-        picked up by the self.update_positional_Attributes method called from within
-        the update() method. For this base class, it returns trivial changes 0 for both
-        arguments, but can be edited in more sophisticated classes to effectively
-        implement player controls input or an AI pilot.'''
+    def set_pilot_commands(self):
+        '''Calculates and sets the scalar float values for attributes  _d_angle
+        and _d_speed. For this base class, it does nothing, but can be edited
+        in more sophisticated classes to effectively implement an AI pilot.'''
         
-        return 0, 0
+        return
     
     def update(self):
         '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 
         updated numerical positional attributes'self._angle','self._speed' and self_center'.'''
         
         # get directional changes
-        d_angle, d_speed = self.get_pilot_commands()
+        self.set_pilot_commands()
         
         # update numerical positional attributes
-        self.update_positional_attributes(d_angle,
-                                          d_speed)
+        self.update_positional_attributes()
         
         # update object type attributes: surface
         self.image = pg.transform.rotozoom(self._original_images[self._image_index],

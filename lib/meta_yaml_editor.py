@@ -55,8 +55,8 @@ skins_meta_data = {}
 skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing.bmp'],
                'gun_offsets':[[9,-15],
                               [9,15]],
-               'engine_offsets':[[-20,-8],
-                                 [-20,8]],
+               'engine_offsets':[[-20,-7],
+                                 [-20,7]],
                 'fire_modes':[[[0,1]], # coupled
                               [[0], #singe
                                [1]]]}
@@ -67,8 +67,8 @@ skins_meta_data['xwing'] = {'image_paths':['./graphics/sprite_skins/xwing.bmp'],
                               [9,18],
                               [10,-16],
                               [10,16]],
-               'engine_offsets':[[-20,-8],
-                                 [-20,8]],
+               'engine_offsets':[[-20,-6],
+                                 [-20,6]],
                 'fire_modes':[[[0,1,2,3]],
                               [[0,1],
                                [2,3]], # coupled

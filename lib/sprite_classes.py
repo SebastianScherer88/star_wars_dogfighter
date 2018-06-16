@@ -55,6 +55,7 @@ class ShipSprite(BasicSprite):
                  d_angle_degrees_per_second = 20,
                  d_speed_pixel_per_second = 10,
                  max_speed_pixel_per_second = 20,
+                 min_speed_pixel_per_second = 10,
                  is_transparent = True,
                  transparent_color = (255,255,255)):
     
@@ -202,8 +203,6 @@ class ShipSprite(BasicSprite):
         # get index set for cannons lined up to fir enext
         laser_cannon_index_set = self._original_laser_fire_modes[self._fire_mode_index][self._cannon_index]
         
-        print('laser cannon index set:',laser_cannon_index_set)
-        
         return [self._laser_cannons[i] for i in laser_cannon_index_set]
     
     def _pause_next_cannons(self):
@@ -247,6 +246,23 @@ class ShipSprite(BasicSprite):
         elif self._speed and not len(self._engine_animations):
             # create new engine animations
             self._create_engine_animations()
+            
+    def _control_speed(self):
+        '''Util function that gets called from within set_pilot_commands for all
+        ShipSprite (based) classes to enforce ship's min & max speed limits.'''
+        
+        #d_speed_pixel_per_second
+        #max_speed_pixel_per_second
+                   
+        # if told to speed up make sure not to exceed max speed
+        if self._d_speed > 0:
+            self._d_speed = min(self._d_speed_pixel_per_frame,
+                                self._max_speed_pixel_per_frame - self._speed)
+            
+        # if told to slow down, make sure not to fall below min speed
+        if self._d_speed < 0:
+            self._d_speed = -min(-self._d_speed_pixel_per_frame,
+                                 self._speed - self._min_speed_pixel_per_frame)
         
     def update(self):
         '''Base class update plus additional ShipSprite specific updates.'''
@@ -295,40 +311,13 @@ class PlayerShipSprite(ShipSprite):
     please see the documentation of the base class (ShipSprite).'''
     
     
-    def get_pilot_commands(self):
-        '''Handles directional player controls, i. e. steering and accelerating.
-        Returns a tuple of scalar floats (d_angle,d_speed), giving the change in
-        degrees (counter-clockwise) per frame and the change in speed in pixels/frame^2,
-        respectively.'''
+    def set_pilot_commands(self):
+        '''Player sprite's version of the steering attribute method. Since the 
+        updating of these attributes happens via the event queue handler outside
+        the PlayerSprite class, this method merely double-checks these changes.'''
         
-        # get all keys currently down
-        pressed_keys = pg.key.get_pressed()
-            
-        # get angle differential
-        if pressed_keys[pg.K_LEFT] and not pressed_keys[pg.K_RIGHT]:
-            # turn left
-            d_angle = self._d_angle_degrees_per_frame
-        elif pressed_keys[pg.K_RIGHT] and not pressed_keys[pg.K_LEFT]:
-            # turn right            
-            d_angle = -self._d_angle_degrees_per_frame
-        else:
-            # dont turn            
-            d_angle = 0
-            
-        # get speed differential
-        if pressed_keys[pg.K_UP] and not pressed_keys[pg.K_DOWN]:
-            # dont accelerate above sprite's max speed
-            d_speed = min(self._d_speed_pixel_per_frame,
-                          self._max_speed_pixel_per_frame - self._speed)
-        elif pressed_keys[pg.K_DOWN] and not pressed_keys[pg.K_UP]:
-            # dont decelarate to going backwards
-            d_speed = -min(self._d_speed_pixel_per_frame,
-                           self._speed)
-        else:
-            # dont change speed
-            d_speed = 0
-            
-        return d_angle, d_speed
+        # control the changes that where made via the event queue handler
+        self._control_speed()
     
     def get_gunner_commands(self):
         '''Handles shooting player controls, i.e. firing lasers.
@@ -452,7 +441,7 @@ class EnemyShipSprite(ShipSprite):
         
         return projection_on_ortnorm
     
-    def get_pilot_commands(self):
+    def set_pilot_commands(self):
         '''See parent FighterSprite class doc for this method.'''
         
         # have a look at the radar to see where player sprite is
@@ -461,18 +450,17 @@ class EnemyShipSprite(ShipSprite):
         # turn towards player, whichever way is more aligned with current direction of movement        
         if projection_on_ortnorm > self._piloting_cone_sine:
             # turn left
-            d_angle = self._d_angle_degrees_per_frame
+            self._d_angle = self._d_angle_degrees_per_frame
         elif projection_on_ortnorm < -self._piloting_cone_sine:
             # turn right
-            d_angle = - self._d_angle_degrees_per_frame
+            self._d_angle = - self._d_angle_degrees_per_frame
         else:
             # continue straight on
-            d_angle = 0
+            self._d_angle = 0
             
-        # currently no logic to control AI acceleration
-        d_speed = 0
+        # currently no logic to control AI acceleration, but control anyway
+        self._control_speed()
         
-        return d_angle, d_speed
         
     def get_gunner_commands(self):
         '''See parent FighterSprite class doc for this method.'''

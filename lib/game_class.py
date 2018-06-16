@@ -70,7 +70,7 @@ class Game(object):
         # set game attributes from meta data for enemies
         
         # behavioural
-        self.enemy_piloting_cone_sine = 0.05
+        self.enemy_piloting_cone_sine = 0.1
         self.enemy_gunning_cone_sine = 0.1
         
         # skin specific
@@ -114,15 +114,20 @@ class Game(object):
         player = self.spawn_player(center=np.array([1000,300]),
                                    angle=180,
                                    speed=250,
-                                   max_speed_pixel_per_second=300)
+                                   d_angle_degrees_per_second = 150,
+                                   max_speed_pixel_per_second=360)
         
         # create three enemies
         self.spawn_enemy(player,
                          center=np.array([40,50]),
-                         speed=200)# enemy #1
-        #self.spawn_enemy(player,
-        #                 center=np.array([40,250]),
-        #                speed=200) # enemy #2
+                         speed=300,
+                         d_angle_degrees_per_second = 150,
+                         max_speed_pixel_per_second=300)# enemy #1
+        self.spawn_enemy(player,
+                         center=np.array([40,450]),
+                         speed=300,
+                         d_angle_degrees_per_second = 150,
+                         max_speed_pixel_per_second=300)# enemy #1
         #self.spawn_enemy(player,
         #                 center=np.array([40,450]),
         #                speed=200) # enemy #3
@@ -137,24 +142,56 @@ class Game(object):
             # check for exit events
             for event in pg.event.get():
                 if event.type == pg.QUIT:
+                    
+                    # quit pygame
                     pg.quit()
                     sys.exit()
                 elif event.type == pg.KEYDOWN:
+                    
+                    # control player fire mode
                     if event.key == pg.K_f:
                         player._toggle_fire_mode()
+                        
+                    # control player acceleration
+                    if event.key == pg.K_UP:
+                        player._d_speed += player._d_speed_pixel_per_frame
+                    if event.key == pg.K_DOWN:
+                        player._d_speed -= player._d_speed_pixel_per_frame
+                        
+                    # control player steering
+                    if event.key == pg.K_RIGHT:
+                        player._d_angle += player._d_angle_degrees_per_frame
+                    if event.key == pg.K_LEFT:
+                        player._d_angle -= player._d_angle_degrees_per_frame
+                        
+                elif event.type == pg.KEYUP:
                     
+                    # control player acceleration
+                    if event.key == pg.K_UP:
+                        player._d_speed -= player._d_speed_pixel_per_frame
+                    if event.key == pg.K_DOWN:
+                        player._d_speed += player._d_speed_pixel_per_frame
+                        
+                    # control player steering
+                    if event.key == pg.K_RIGHT:
+                        player._d_angle -= player._d_angle_degrees_per_frame
+                    if event.key == pg.K_LEFT:
+                        player._d_angle += player._d_angle_degrees_per_frame
+                        
             # spawn enemies if needed
             if enemy_down:
                 # create first two enemy sprites and add to relevant groups / provide with relevant groups
                 self.spawn_enemy(player,
-                                 speed=200,
-                                 max_speed_pixel_per_second=200) # enemy #1
+                                 speed=300,
+                                 d_angle_degrees_per_second = 150,
+                                 max_speed_pixel_per_second=300) # enemy #1
 
                 
             if player_down:
                 # reanimate player
                 player = self.spawn_player(speed=300,
-                                           max_speed_pixel_per_second=300)
+                                           d_angle_degrees_per_second = 150,
+                                           max_speed_pixel_per_second=360)
                 
                 # update enemies target computers
                 for enemy in self.enemy_sprites:
@@ -200,9 +237,9 @@ class Game(object):
                      center = np.array([900,300]),
                     angle=0,
                     speed=200,
-                    d_angle_degrees_per_second = 100,
+                    d_angle_degrees_per_second = 150,
                     d_speed_pixel_per_second = 10,
-                    max_speed_pixel_per_second = 300):
+                    max_speed_pixel_per_second = 400):
         
         '''Creates a new PlayerShipSprite object and adds it to the game.'''        
         
@@ -241,9 +278,9 @@ class Game(object):
                     center = np.array([1200,50]),
                     angle=0,
                     speed=200,
-                    d_angle_degrees_per_second = 100,
+                    d_angle_degrees_per_second = 150,
                     d_speed_pixel_per_second = 10,
-                    max_speed_pixel_per_second = 200):
+                    max_speed_pixel_per_second = 350):
         
         '''Creates a new EnemyShipSprite and adds it to the game.'''
         
