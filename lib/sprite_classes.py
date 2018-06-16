@@ -168,18 +168,12 @@ class ShipSprite(BasicSprite):
     def _toggle_fire_mode(self):
         '''Util function that takes an integer and uses it to set one of the at least
         2 different laser fire modes ('single' or 'coupled').'''
-        
-        print('Fire mode toggled!')
                                      
         # switch to next fire mode
         self._fire_mode_index = (self._fire_mode_index + 1) % len(self._original_laser_fire_modes)
         
         # set cannon index back to zero to avoid out of bounds indices when downsampling fire mode
         self._cannon_index = 0  
-        
-        print('fire mode index:',self._fire_mode_index)
-        print('cannon settings in this mode:', len(self._original_laser_fire_modes[self._fire_mode_index]))
-        print('cannon index:', self._cannon_index)
         
     def _create_engine_animations(self):
         '''Util method to create engine animations.'''
@@ -230,10 +224,6 @@ class ShipSprite(BasicSprite):
         
         # play laser sound
         self._laser_sound.play()
-        
-        print('fire mode index:',self._fire_mode_index)
-        print('cannon settings in this mode:', len(self._original_laser_fire_modes[self._fire_mode_index]))
-        print('cannon index:', self._cannon_index)
         
         # fire cannons
         [laser_cannon.fire() for laser_cannon in self._get_next_cannons()]
