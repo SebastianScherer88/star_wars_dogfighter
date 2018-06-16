@@ -67,7 +67,7 @@ class BasicSprite(Sprite):
         
         # set rate of change of positional attributes
         self._d_angle = 0
-        self._speed = 0
+        self._d_speed = 0
         
         # set sprite up
         # set image and rect - these will be called by Group object methods; get mask
@@ -96,6 +96,9 @@ class BasicSprite(Sprite):
         
         # update speed argument
         self._speed += self._d_speed
+        
+        # control speed
+        self._control_speed()
         
         # update center argument
         self._center += self.get_velocity_vector()
@@ -136,6 +139,13 @@ class BasicSprite(Sprite):
         in more sophisticated classes to effectively implement an AI pilot.'''
         
         return
+    
+    def _control_speed(self):
+        '''Util function that ensures sprite respects its speed constraints.
+        Only used at ShipSprite (and upwards) level.'''
+        
+        return
+        
     
     def update(self):
         '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 

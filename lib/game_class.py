@@ -118,16 +118,16 @@ class Game(object):
                                    max_speed_pixel_per_second=360)
         
         # create three enemies
-        self.spawn_enemy(player,
-                         center=np.array([40,50]),
-                         speed=300,
-                         d_angle_degrees_per_second = 150,
-                         max_speed_pixel_per_second=300)# enemy #1
-        self.spawn_enemy(player,
-                         center=np.array([40,450]),
-                         speed=300,
-                         d_angle_degrees_per_second = 150,
-                         max_speed_pixel_per_second=300)# enemy #1
+        #self.spawn_enemy(player,
+        #                 center=np.array([40,50]),
+        #                 speed=300,
+        #                 d_angle_degrees_per_second = 150,
+        #                 max_speed_pixel_per_second=300)# enemy #1
+        #self.spawn_enemy(player,
+        #                 center=np.array([40,450]),
+        #                 speed=300,
+        #                 d_angle_degrees_per_second = 150,
+        #                 max_speed_pixel_per_second=300)# enemy #1
         #self.spawn_enemy(player,
         #                 center=np.array([40,450]),
         #                speed=200) # enemy #3
@@ -160,9 +160,9 @@ class Game(object):
                         
                     # control player steering
                     if event.key == pg.K_RIGHT:
-                        player._d_angle += player._d_angle_degrees_per_frame
-                    if event.key == pg.K_LEFT:
                         player._d_angle -= player._d_angle_degrees_per_frame
+                    if event.key == pg.K_LEFT:
+                        player._d_angle += player._d_angle_degrees_per_frame
                         
                 elif event.type == pg.KEYUP:
                     
@@ -174,9 +174,9 @@ class Game(object):
                         
                     # control player steering
                     if event.key == pg.K_RIGHT:
-                        player._d_angle -= player._d_angle_degrees_per_frame
-                    if event.key == pg.K_LEFT:
                         player._d_angle += player._d_angle_degrees_per_frame
+                    if event.key == pg.K_LEFT:
+                        player._d_angle -= player._d_angle_degrees_per_frame
                         
             # spawn enemies if needed
             if enemy_down:

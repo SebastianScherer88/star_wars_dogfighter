@@ -155,6 +155,7 @@ class ShipSprite(BasicSprite):
         self._d_angle_degrees_per_frame = d_angle_degrees_per_second / self._fps
         self._d_speed_pixel_per_frame = d_speed_pixel_per_second / self._fps
         self._max_speed_pixel_per_frame = max_speed_pixel_per_second / self._fps
+        self._min_speed_pixel_per_frame = min_speed_pixel_per_second / self._fps
         
         # set initial fire mode to coupled cannons, set cannon index to 0
         self._fire_mode_index = 1
@@ -255,14 +256,12 @@ class ShipSprite(BasicSprite):
         #max_speed_pixel_per_second
                    
         # if told to speed up make sure not to exceed max speed
-        if self._d_speed > 0:
-            self._d_speed = min(self._d_speed_pixel_per_frame,
-                                self._max_speed_pixel_per_frame - self._speed)
+        self._speed = min(self._speed,
+                          self._max_speed_pixel_per_frame)
             
         # if told to slow down, make sure not to fall below min speed
-        if self._d_speed < 0:
-            self._d_speed = -min(-self._d_speed_pixel_per_frame,
-                                 self._speed - self._min_speed_pixel_per_frame)
+        self._speed = max(self._speed,
+                          self._min_speed_pixel_per_frame)
         
     def update(self):
         '''Base class update plus additional ShipSprite specific updates.'''
@@ -316,8 +315,6 @@ class PlayerShipSprite(ShipSprite):
         updating of these attributes happens via the event queue handler outside
         the PlayerSprite class, this method merely double-checks these changes.'''
         
-        # control the changes that where made via the event queue handler
-        self._control_speed()
     
     def get_gunner_commands(self):
         '''Handles shooting player controls, i.e. firing lasers.
@@ -457,9 +454,6 @@ class EnemyShipSprite(ShipSprite):
         else:
             # continue straight on
             self._d_angle = 0
-            
-        # currently no logic to control AI acceleration, but control anyway
-        self._control_speed()
         
         
     def get_gunner_commands(self):
