@@ -166,10 +166,6 @@ class TrackingAnimation(BasicAnimation):
                     Used to maintain relative position constant when tracked sprite rotates.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
-            angle: initial orientation of sprite in degrees. Angle is taken counter-clockwise, with
-                    an angle of zero meaning no rotation of the original surface.
-            speed: initial speed of sprite (pixels per second). scaler of float type.
-                    Default is 0.
             is_transparent: transparency flag. If set, pixels colored in the 'transparent_color'
                     color argument in the surfaces contained in 'original_images' will be made transparent.
                     Default is True
@@ -178,15 +174,14 @@ class TrackingAnimation(BasicAnimation):
             *groups: tuple of pygame Group objects. The sprite will add itself to each of these
                     when initialized.'''
         
+        # Note that speed and angle attributes inherited from BasicSprite
+        # defualt to 0 if not passed to initializer
         BasicAnimation.__init__(self,
                                 fps,
                                  screen,
                                  original_images,
                                  seconds_per_image,
                                  *groups,
-                                 center = center,
-                                 angle = angle,
-                                 speed = speed,
                                  looping = looping,
                                  is_transparent = is_transparent,
                                  transparent_color = transparent_color)
@@ -212,9 +207,6 @@ class TrackingAnimation(BasicAnimation):
         # before you call this, make sure:
         # self._speed == 0
         BasicAnimation.update(self) 
-        
-        # 
-        
         
     def _get_rotated_offset(self):
         '''Rotate and return the original offset.'''

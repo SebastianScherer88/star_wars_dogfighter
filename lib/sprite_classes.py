@@ -157,6 +157,9 @@ class ShipSprite(BasicSprite):
         self._max_speed_pixel_per_frame = max_speed_pixel_per_second / self._fps
         self._min_speed_pixel_per_frame = min_speed_pixel_per_second / self._fps
         
+        # set firing controll attributes
+        self._command_to_fire = False
+        
         # set initial fire mode to coupled cannons, set cannon index to 0
         self._fire_mode_index = 1
         self._cannon_index = 0
@@ -190,13 +193,11 @@ class ShipSprite(BasicSprite):
                                                              self._animation_group,
                                                              looping = True))
         
-    def get_gunner_commands(self):
-        '''Returns True if ShipSprite should fire, or False otherwise.
-        For the ShipSprite base class trivially always returns False.
-        For more sophisticated classes, this method will handle player input
-        or an AI gunner and return a non-trivial boolean.'''
+    def set_gunner_commands(self):
+        '''Dummy placeholder method to set the command_to_fire attribute. Used 
+        for AI controlled sprites only.'''
         
-        return False
+        return
     
     def _get_next_cannons(self):
         '''Util function that returns a list of laser cannons next in line to be fired.'''
@@ -268,17 +269,18 @@ class ShipSprite(BasicSprite):
         
         # call base class update method
         BasicSprite.update(self)
-        
-        # get command to fire from custom method
-        command_to_fire = self.get_gunner_commands()
-        
-        # if command to fire was given, check if cannons are ready; if so, fire
-        if command_to_fire and np.mean([cannon.is_ready() for cannon in self._get_next_cannons()]):
-            # fire the cannon(s)
-            self.fire()
-            
+
         # delete/recreate engine animation based on current speed
         self._handle_engine_animation()
+        
+        # get command to fire from custom method
+        self.set_gunner_commands()
+        
+        # if command to fire was given, check if cannons are ready; if so, fire
+        if self._command_to_fire and np.mean([cannon.is_ready() for cannon in self._get_next_cannons()]):
+            # fire the cannon(s)
+            self.fire()
+
 
             
     def kill(self):
@@ -302,27 +304,6 @@ class ShipSprite(BasicSprite):
                       center = self._center,
                       angle = self._angle,
                       speed = self._speed * self._fps) # animation expects pixel/second speed unit
-        
-class PlayerShipSprite(ShipSprite):
-    '''Class representing the player's sprite. Based on general ShipSprite class.
-    
-    For a description of the arguments of the PlayerShipSprite's __init__ method,
-    please see the documentation of the base class (ShipSprite).'''
-    
-    
-    def set_pilot_commands(self):
-        '''Player sprite's version of the steering attribute method. Since the 
-        updating of these attributes happens via the event queue handler outside
-        the PlayerSprite class, this method merely double-checks these changes.'''
-        
-    
-    def get_gunner_commands(self):
-        '''Handles shooting player controls, i.e. firing lasers.
-        Returns True if player has the space bar pressed, and False
-        otherwise'''
-        
-        # space bar is pressed, fire command is given
-        return pg.key.get_pressed()[pg.K_SPACE]
         
 class EnemyShipSprite(ShipSprite):
     '''Based on ShipSprite class. Represents an enemy ship during game.'''
@@ -456,7 +437,7 @@ class EnemyShipSprite(ShipSprite):
             self._d_angle = 0
         
         
-    def get_gunner_commands(self):
+    def set_gunner_commands(self):
         '''See parent FighterSprite class doc for this method.'''
         
         # have a look at the radar to see where player sprite is
@@ -464,4 +445,4 @@ class EnemyShipSprite(ShipSprite):
         
         # if player within 'cone of reasonable accuracy', attempt to fire cannon.
         # Otherwise, dont attempt to fire cannon
-        return -self._gunning_cone_sine < projection_on_ortnorm < self._gunning_cone_sine
+        self._command_to_fire = -self._gunning_cone_sine < projection_on_ortnorm < self._gunning_cone_sine
