@@ -248,6 +248,7 @@ class Game(object):
         
         for pressed_key in pg.key.get_pressed():
             # sync players angle rate of change
+            if pressed._key
         
     def spawn_player(self,
                      center = np.array([900,300]),
