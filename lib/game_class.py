@@ -118,8 +118,7 @@ class Game(object):
                                    max_speed_pixel_per_second=360)
         
         # create three enemies
-        self.spawn_enemy(player,
-                         center=np.array([40,50]),
+        self.spawn_enemy(center=np.array([40,50]),
                          speed=300,
                          d_angle_degrees_per_second = 150,
                          max_speed_pixel_per_second=300)# enemy #1
@@ -189,10 +188,10 @@ class Game(object):
             # spawn enemies if needed
             if enemy_down:
                 # create first two enemy sprites and add to relevant groups / provide with relevant groups
-                self.spawn_enemy(player,
-                                 speed=300,
-                                 d_angle_degrees_per_second = 150,
-                                 max_speed_pixel_per_second=300) # enemy #1
+                self.spawn_enemy(center=np.array([40,50]),
+                         speed=300,
+                         d_angle_degrees_per_second = 150,
+                         max_speed_pixel_per_second=300)# enemy #1
 
                 
             if player_down:
@@ -303,7 +302,6 @@ class Game(object):
         return player
     
     def spawn_enemy(self,
-                    player,
                     center = np.array([1200,50]),
                     angle=0,
                     speed=200,
@@ -333,10 +331,11 @@ class Game(object):
                         self.engine_images,
                         self.engine_spi,
                         self.animations,
-                        player,
+                        #player,
                         self.enemy_piloting_cone_sine,
                         self.enemy_gunning_cone_sine,
                         (self.enemy_sprites, self.all_sprites),
+                        hostile_ships_group = self.player_sprite, # group of hostile ships sprites
                         center = center,
                         angle=angle,
                         speed=speed,

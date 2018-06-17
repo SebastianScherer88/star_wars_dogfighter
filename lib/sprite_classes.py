@@ -16,6 +16,7 @@ from basic_sprite_class import BasicSprite
 from animation_classes import BasicAnimation, TrackingAnimation
 from weapons_classes import LaserCannon
 from math import cos, sin, pi
+from pygame.sprite import Group
 
 import pygame as pg
 import numpy as np
@@ -49,6 +50,7 @@ class ShipSprite(BasicSprite):
                  engine_flame_seconds_per_image,
                  animation_group,
                  *groups,
+                 hostile_ships_group = None,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
@@ -137,7 +139,13 @@ class ShipSprite(BasicSprite):
                                                      original_muzzle_flash_images=original_muzzle_flash_images,
                                                      muzzle_flash_animation_spi=muzzle_flash_seconds_per_image))
 
-
+        # attach hostile ships and current target group
+        self._hostile_ships_group = hostile_ships_group
+        self._current_target = Group() # this needs to be a group even though its just one sprite at a time
+        
+        # acquire target if possible
+        self._acquire_target()
+        
         # attach animations group to sprite
         self._animation_group = animation_group
         
@@ -264,8 +272,17 @@ class ShipSprite(BasicSprite):
         self._speed = max(self._speed,
                           self._min_speed_pixel_per_frame)
         
+    def _acquire_target(self):
+        '''Util function that assigns adds a ShipSprite from the hostile_ships
+        group to the current_target group, if feasible. Dummy method at ShipSprite
+        level, to be used for AIShipSprite class.'''
+        
     def update(self):
         '''Base class update plus additional ShipSprite specific updates.'''
+        
+        # if no target has been aquired, get it
+        if not self._current_target:
+            self._acquire_target()
         
         # call base class update method
         BasicSprite.update(self)
@@ -329,10 +346,11 @@ class AIShipSprite(ShipSprite):
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
                  animation_group,
-                 player_ship_sprite,
+                 #player_ship_sprite,
                  piloting_cone_sine,
                  gunning_cone_sine,
                  *groups,
+                 hostile_ships_group,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
@@ -374,6 +392,7 @@ class AIShipSprite(ShipSprite):
                             engine_flame_seconds_per_image,
                             animation_group,
                              *groups,
+                             hostile_ships_group = hostile_ships_group,
                              center = center,
                              angle = angle,
                              speed = speed,
@@ -383,19 +402,36 @@ class AIShipSprite(ShipSprite):
                              is_transparent = is_transparent,
                              transparent_color = transparent_color)
         
-                # attach the player's sprite object
-        self._player_sprite = player_ship_sprite
+        # attach the player's sprite object
+        #self._player_sprite = player_ship_sprite
+        
+        print(self._current_target)
         
         # attach the AI cone sines
         self._piloting_cone_sine = piloting_cone_sine
         self._gunning_cone_sine = gunning_cone_sine
         
+    def _acquire_target(self):
+        '''Util function to select and add to current_target group.'''
+        
+        print('aquiring target...')
+        print(self._hostile_ships_group)
+        
+        # if there are hostile ships, target the first one on the list
+        if self._hostile_ships_group:
+            self._current_target.add(self._hostile_ships_group.sprites()[0])
+            print('target acquired!')
+        
     def use_radar(self):
-        '''Util method used by piloting and gunning methods. Yields player position
-        relative to the enemy sprite by calculating the projection of the 
+        '''Util method used by piloting and gunning methods. Yields current target's 
+        position relative to the enemy sprite by calculating the projection of the 
         enemy -> player connecting line on the vector orthogonal to the enemy's
         current direction of flight. This allows the enemy to see whether to turn
-        left or right to get closer to the player.'''
+        left or right to get closer to the current target. Only called when 
+        a current target is selected.'''
+        
+        # get hostile ship sprite
+        current_target = self._current_target.sprites()[0]
         
         # get own directional unit vector
         # convert angle to radian
@@ -410,19 +446,23 @@ class AIShipSprite(ShipSprite):
                                                 -unit_direction[0]])
         
         # get clockwise rotated orthogonal to unit vector pointing towards player position
-        towards_player_vector = (self._player_sprite._center - self._center)
-        unit_towards_player_vector = towards_player_vector / np.linalg.norm(towards_player_vector)
+        towards_target_vector = (current_target._center - self._center)
+        unit_towards_target_vector = towards_target_vector / np.linalg.norm(towards_target_vector)
         
         # turn towards player, whichever way is more aligned with current direction of movement
         projection_on_ortnorm = np.dot(clockwise_ortnorm_direction,
-                                       unit_towards_player_vector)
+                                       unit_towards_target_vector)
         
         return projection_on_ortnorm
     
     def set_pilot_commands(self):
         '''See parent FighterSprite class doc for this method.'''
         
-        # have a look at the radar to see where player sprite is
+        # only make piloting decisions if there is a current target
+        if not self._current_target:
+            return
+        
+        # have a look at the radar to see where target is
         projection_on_ortnorm = self.use_radar()
 
         # turn towards player, whichever way is more aligned with current direction of movement        
@@ -439,6 +479,10 @@ class AIShipSprite(ShipSprite):
         
     def set_gunner_commands(self):
         '''See parent FighterSprite class doc for this method.'''
+        
+                # only make piloting decisions if there is a current target
+        if not self._current_target:
+            return
         
         # have a look at the radar to see where player sprite is
         projection_on_ortnorm = self.use_radar()
