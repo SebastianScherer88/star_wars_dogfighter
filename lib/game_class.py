@@ -49,7 +49,7 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'awing', 'red'
+        allied_ship, allied_laser = 'xwing', 'red'
         hostile_ship, hostile_laser = 'tiefighter', 'green'
         
         # set game attributes from meta data for player
@@ -119,23 +119,33 @@ class Game(object):
         
         # create two wingmen
         self.spawn_ai_squadron('allied',
-                               centers=[np.array([1400,100])],
-                                angles=[0],
-                                speeds=[300],
-                                d_angle_degrees_per_seconds = [150],
-                                max_speed_pixel_per_seconds=[300])
-        
-        # create three enemies
-        self.spawn_ai_squadron('hostile',
-                               centers=[np.array([50,100]),
-                                        np.array([50,700])],
-                                angles=[180,
-                                        180],
+                               centers=[np.array([1400,100]),
+                                        np.array([1400,700])],
+                                angles=[0,
+                                        0],
                                 speeds=[300,
                                         300],
                                 d_angle_degrees_per_seconds = [150,
                                                                150],
                                 max_speed_pixel_per_seconds=[300,
+                                                             300])
+        
+        # create three enemies
+        self.spawn_ai_squadron('hostile',
+                               centers=[np.array([50,100]),
+                                        np.array([350,100]),
+                                        np.array([50,700])],
+                                angles=[180,
+                                        180,
+                                        180],
+                                speeds=[300,
+                                        300,
+                                        300],
+                                d_angle_degrees_per_seconds = [150,
+                                                               150,
+                                                               150],
+                                max_speed_pixel_per_seconds=[300,
+                                                             300,
                                                              300])
                                         
                         
@@ -429,32 +439,40 @@ class Game(object):
         hostile_down = False
 
         # check for enemy kills
-        downed_allies = groupcollide(self.allied_ships,
+        hit_allies = groupcollide(self.allied_ships,
                                       self.hostile_laser_beams,
-                                      True,
+                                      False,
                                       True,
                                       collide_mask)
         
-        for downed_ally in downed_allies:
-            # terminate player sprite
-            downed_ally.kill()
+        for hit_ally in hit_allies:
+            # update hit ship's hit points attribute
+            hit_ally._hit_points -= 1
+            print('ally hit!')
+            print('ally hit points left:',hit_ally._hit_points)
             
-            # set player down flag
-            ally_down = True
+            # if ship has no more hit points left, destroy and set flag
+            if not hit_ally._hit_points:
+                hit_ally.kill()
+                ally_down = True
         
         # check for player kills
-        downed_hostiles = groupcollide(self.hostile_ships,
+        hit_hostiles = groupcollide(self.hostile_ships,
                                       self.allied_laser_beams,
-                                      True,
+                                      False,
                                       True,
                                       collide_mask)
         
-        for downed_hostile in downed_hostiles:
-            # terminate enemy psrite that was shot down
-            downed_hostile.kill()
+        for hit_hostile in hit_hostiles:
+            # update hit ship's hit points attribute
+            hit_hostile._hit_points -= 1
+            print('hostile hit!')
+            print('hostile hit points left:',hit_hostile._hit_points)
             
-            # set enemy down flag
-            hostile_down = True
+            # if ship has no more hit points left, destroy and flag
+            if not hit_hostile._hit_points:
+                hit_hostile.kill()
+                hostile_down = True
             
         return hostile_down, ally_down
             

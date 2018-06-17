@@ -52,6 +52,7 @@ class ShipSprite(BasicSprite):
                  animation_group,
                  *groups,
                  hostile_ships_group = None,
+                 hit_points = 30,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
@@ -150,6 +151,9 @@ class ShipSprite(BasicSprite):
         # attach animations group to sprite
         self._animation_group = animation_group
         
+        # set hit points attribute
+        self._hit_points = hit_points
+        
         # set attributes for explosion animation at death
         self._explosion_sound = explosion_sound
         self._original_explosion_images = original_explosion_images
@@ -166,7 +170,7 @@ class ShipSprite(BasicSprite):
         self._max_speed_pixel_per_frame = max_speed_pixel_per_second / self._fps
         self._min_speed_pixel_per_frame = min_speed_pixel_per_second / self._fps
         
-        # set firing controll attributes
+        # set firing control attributes
         self._command_to_fire = False
         
         # set initial fire mode to coupled cannons, set cannon index to 0
