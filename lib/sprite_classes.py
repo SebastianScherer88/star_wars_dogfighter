@@ -17,6 +17,7 @@ from animation_classes import BasicAnimation, TrackingAnimation
 from weapons_classes import LaserCannon
 from math import cos, sin, pi
 from pygame.sprite import Group
+from random import randint
 
 import pygame as pg
 import numpy as np
@@ -413,14 +414,11 @@ class AIShipSprite(ShipSprite):
         
     def _acquire_target(self):
         '''Util function to select and add to current_target group.'''
-        
-        print('aquiring target...')
-        print(self._hostile_ships_group)
-        
-        # if there are hostile ships, target the first one on the list
+                
+        # if there are hostile ships, randomly select one
         if self._hostile_ships_group:
-            self._current_target.add(self._hostile_ships_group.sprites()[0])
-            print('target acquired!')
+            target_index = randint(0,len(self._hostile_ships_group)-1)
+            self._current_target.add(self._hostile_ships_group.sprites()[target_index])
         
     def use_radar(self):
         '''Util method used by piloting and gunning methods. Yields current target's 
