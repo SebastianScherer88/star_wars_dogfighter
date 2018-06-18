@@ -49,8 +49,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'xwing', 'red'
-        hostile_ship, hostile_laser = 'tiefighter', 'green'
+        allied_ship, allied_laser = 'hornet', 'red'
+        hostile_ship, hostile_laser = 'f35', 'green'
         
         # set game attributes from meta data for player
         
@@ -121,8 +121,8 @@ class Game(object):
         self.spawn_ai_squadron('allied',
                                centers=[np.array([1400,100]),
                                         np.array([1400,700])],
-                                angles=[0,
-                                        0],
+                                angles=[180,
+                                        180],
                                 speeds=[300,
                                         300],
                                 d_angle_degrees_per_seconds = [150,
@@ -133,11 +133,11 @@ class Game(object):
         # create three enemies
         self.spawn_ai_squadron('hostile',
                                centers=[np.array([50,100]),
-                                        np.array([350,100]),
+                                        np.array([50,350]),
                                         np.array([50,700])],
-                                angles=[180,
-                                        180,
-                                        180],
+                                angles=[0,
+                                        0,
+                                        0],
                                 speeds=[300,
                                         300,
                                         300],
@@ -153,6 +153,9 @@ class Game(object):
         hostile_down = False
         ally_down = False
         
+        # initialize pause state variable
+        paused = False
+        
         # start main game loop
         while True:
             # check for exit events
@@ -163,6 +166,10 @@ class Game(object):
                     pg.quit()
                     sys.exit()
                 elif event.type == pg.KEYDOWN:
+                    
+                    # toggle pause state if needed
+                    if event.key == pg.K_ESCAPE:
+                        paused = not paused
                     
                     # control player fire mode
                     if event.key == pg.K_f:
@@ -219,14 +226,16 @@ class Game(object):
                                 d_angle_degrees_per_second = 150,
                                 max_speed_pixel_per_second=300)
                 
-            # update game state
-            self.update_game_state()
+            if not paused:
             
-            # draw update game state to screen
-            self.draw_game_state()
-            
-            # check and handle collisions
-            hostile_down, ally_down = self.handle_collisions()
+                # update game state
+                self.update_game_state()
+                
+                # draw update game state to screen
+                self.draw_game_state()
+                
+                # check and handle collisions
+                hostile_down, ally_down = self.handle_collisions()
                         
             # control pace
             self.clock.tick(fps)
@@ -294,7 +303,7 @@ class Game(object):
                           self.allied_laser_images,
                           1.2, # laser range in seconds
                           150, # laser speed in pixel per second
-                          2, # laser rate of fire in seconds
+                          1.5, # laser rate of fire in seconds
                           self.allied_muzzle_images,
                           self.allied_muzzle_spi, # seconds per image for muzzle flash
                           self.explosion_sound, # sound of explosion animation
@@ -335,7 +344,7 @@ class Game(object):
                         self.allied_laser_images, # sequence with laser beam skin
                         1.2,
                         150,
-                        2, # laser rate of fire in shots/second
+                        1.5, # laser rate of fire in shots/second
                         self.allied_muzzle_images, # sequence of images for muzzle flash animation
                         self.allied_muzzle_spi, # seconds per image for muzzle flash animation
                         self.explosion_sound,
@@ -378,7 +387,7 @@ class Game(object):
                         self.hostile_laser_images, # sequence with laser beam skin
                         1.2,
                         150,
-                        2, # laser rate of fire in shots/second
+                        1.5, # laser rate of fire in shots/second
                         self.hostile_muzzle_images, # sequence of images for muzzle flash animation
                         self.hostile_muzzle_spi, # seconds per image for muzzle flash animation
                         self.explosion_sound,
@@ -448,13 +457,11 @@ class Game(object):
         for hit_ally in hit_allies:
             # update hit ship's hit points attribute
             hit_ally._hit_points -= 1
-            print('ally hit!')
-            print('ally hit points left:',hit_ally._hit_points)
             
             # if ship has no more hit points left, destroy and set flag
             if not hit_ally._hit_points:
                 hit_ally.kill()
-                ally_down = True
+                #ally_down = True
         
         # check for player kills
         hit_hostiles = groupcollide(self.hostile_ships,
@@ -466,13 +473,11 @@ class Game(object):
         for hit_hostile in hit_hostiles:
             # update hit ship's hit points attribute
             hit_hostile._hit_points -= 1
-            print('hostile hit!')
-            print('hostile hit points left:',hit_hostile._hit_points)
             
             # if ship has no more hit points left, destroy and flag
             if not hit_hostile._hit_points:
                 hit_hostile.kill()
-                hostile_down = True
+                #hostile_down = True
             
         return hostile_down, ally_down
             
