@@ -22,8 +22,7 @@ class Game(object):
                  screen_width=1500,
                  screen_height=700,
                  fps=60,
-                 background_image = None,
-                enemy_down_time_in_seconds = 2):
+                 background_image = None):
         '''Initializes the game object and also the game'''
         
         # initialize pygame (handles pretty much eveything)
@@ -34,7 +33,6 @@ class Game(object):
         
         self.background_image = pg.image.load('./graphics/star_wars_background_24bit.bmp')
         self.fps = fps
-        self.enemy_down_time_in_seconds = enemy_down_time_in_seconds
         
         # initialize main screen
         size = screen_width, screen_height # set screen size
@@ -49,8 +47,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'hornet', 'red'
-        hostile_ship, hostile_laser = 'f35', 'green'
+        allied_ship, allied_laser = 'awing', 'red'
+        hostile_ship, hostile_laser = 'tiefighter', 'green'
         
         # set game attributes from meta data for player
         
