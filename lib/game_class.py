@@ -38,6 +38,7 @@ class Game(object):
         # initialize main screen
         size = screen_width, screen_height # set screen size
         self.screen = pg.display.set_mode(size)
+        pg.display.set_caption("STAR WARS DOGFIGHTER")
         
         # load meta data
         with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
@@ -373,7 +374,7 @@ class Game(object):
                           ship_id_images,
                           10000,
                           player,
-                          np.array([15,25]).astype('float'),
+                          np.array([15,28]).astype('float'),
                          self.ship_stats,
                          looping = True,
                          dynamic_angle = False)
@@ -443,7 +444,7 @@ class Game(object):
                           ship_id_images,
                           10000,
                           ally,
-                          np.array([15,15]).astype('float'),
+                          np.array([15,28]).astype('float'),
                          self.ship_stats,
                          looping = True,
                          dynamic_angle = False)
@@ -513,7 +514,7 @@ class Game(object):
                           ship_id_images,
                           10000,
                           hostile,
-                          np.array([20,20]).astype('float'),
+                          np.array([15,28]).astype('float'),
                          self.ship_stats,
                          looping = True,
                          dynamic_angle = False)
