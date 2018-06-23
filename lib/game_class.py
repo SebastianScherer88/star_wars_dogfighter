@@ -116,17 +116,6 @@ class Game(object):
                                    d_angle_degrees_per_second = 150,
                                    max_speed_pixel_per_second=360)
         
-        # draw frame around player's ship
-        self._frame = TrackingAnimation(self.fps,
-                 self.screen,
-                 [pg.image.load("./graphics/misc/ship_frame.bmp")],
-                 10000,
-                 player,
-                 np.array([0,0]).astype('float'),
-                 self.all_ships,
-                 looping = True,
-                 dynamic_angle = False)
-        
         # create two wingmen
         self.spawn_ai_squadron('allied',
                                centers=[np.array([1400,100]),
@@ -314,6 +303,7 @@ class Game(object):
         
         '''Creates a new PlayerShipSprite object and adds it to the game.'''        
         
+        # create ship sprite object
         player = ShipSprite(self.fps,
                           self.screen,
                           self.allied_images,
@@ -342,7 +332,19 @@ class Game(object):
                           d_speed_pixel_per_second = d_speed_pixel_per_second,
                           max_speed_pixel_per_second = max_speed_pixel_per_second)
         
+        # sync player controls with keyboard state
         self._sync_player_(player)
+        
+        # draw frame around player ship
+        TrackingAnimation(self.fps,
+                         self.screen,
+                         [pg.image.load("./graphics/misc/player_frame.bmp")],
+                         10000,
+                         player,
+                         np.array([0,0]).astype('float'),
+                         self.all_ships,
+                         looping = True,
+                         dynamic_angle = False)
 
         return player
     
@@ -355,7 +357,8 @@ class Game(object):
                     max_speed_pixel_per_second = 350):
         '''Creates a new allied AIShipSprite and adds it to the game.'''
         
-        AIShipSprite(self.fps,
+        # spawn AI controlled allied ship sprite
+        ally = AIShipSprite(self.fps,
                         self.screen, # main screen
                         self.allied_images, # sequence with ShipSprite's skin
                         self.allied_gun_offsets,
@@ -386,6 +389,17 @@ class Game(object):
                         d_angle_degrees_per_second = d_angle_degrees_per_second,
                         d_speed_pixel_per_second = d_speed_pixel_per_second,
                         max_speed_pixel_per_second = max_speed_pixel_per_second)
+        
+        # draw frame around ally ship
+        TrackingAnimation(self.fps,
+                         self.screen,
+                         [pg.image.load("./graphics/misc/ally_frame.bmp")],
+                         10000,
+                         ally,
+                         np.array([0,0]).astype('float'),
+                         self.all_ships,
+                         looping = True,
+                         dynamic_angle = False)
                     
     
     def spawn_hostile(self,
@@ -398,7 +412,8 @@ class Game(object):
         
         '''Creates a new hostile AIShipSprite and adds it to the game.'''
         
-        AIShipSprite(self.fps,
+        # spawn hostile AI controlled ship sprite
+        hostile = AIShipSprite(self.fps,
                         self.screen, # main screen
                         self.hostile_images, # sequence with ShipSprite's skin
                         self.hostile_gun_offsets,
@@ -429,6 +444,17 @@ class Game(object):
                         d_angle_degrees_per_second = d_angle_degrees_per_second,
                         d_speed_pixel_per_second = d_speed_pixel_per_second,
                         max_speed_pixel_per_second = max_speed_pixel_per_second)
+        
+        # draw frame around hostile ship
+        TrackingAnimation(self.fps,
+                         self.screen,
+                         [pg.image.load("./graphics/misc/hostile_frame.bmp")],
+                         10000,
+                         hostile,
+                         np.array([0,0]).astype('float'),
+                         self.all_ships,
+                         looping = True,
+                         dynamic_angle = False)
         
     def spawn_ai_squadron(self,
                        side,

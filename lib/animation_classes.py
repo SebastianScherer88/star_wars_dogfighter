@@ -202,6 +202,10 @@ class TrackingAnimation(BasicAnimation):
         Then updates animation's rect and image attributes accordingly through the base
         class update().'''
         
+        # first check if tracked ship is still alive; if not, kill self
+        if not self._tracked_sprite._alive:
+            self.kill()
+        
         # get ._angle form tracked sprite if dynamic angle is toggled
         if self._dynamic_angle:
             self._angle = self._tracked_sprite._angle
