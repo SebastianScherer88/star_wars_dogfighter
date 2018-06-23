@@ -148,6 +148,7 @@ class TrackingAnimation(BasicAnimation):
                  angle = 0,
                  speed = 0,
                  looping = False,
+                 dynamic_angle = True,
                  is_transparent = True,
                  transparent_color = (255,255,255)):
     
@@ -186,6 +187,9 @@ class TrackingAnimation(BasicAnimation):
                                  is_transparent = is_transparent,
                                  transparent_color = transparent_color)
         
+        # attach dynamic angle attribute
+        self._dynamic_angle = dynamic_angle
+        
         # attach tracked sprite
         self._tracked_sprite = tracked_sprite
         
@@ -198,8 +202,9 @@ class TrackingAnimation(BasicAnimation):
         Then updates animation's rect and image attributes accordingly through the base
         class update().'''
         
-        # get ._angle form tracked sprite
-        self._angle = self._tracked_sprite._angle
+        # get ._angle form tracked sprite if dynamic angle is toggled
+        if self._dynamic_angle:
+            self._angle = self._tracked_sprite._angle
         
         # get .center and offsets from tracked sprite
         self._center = self._tracked_sprite._center + self._get_rotated_offset()

@@ -15,6 +15,7 @@ import numpy as np
 
 from pygame.sprite import Group, collide_mask, groupcollide
 from sprite_classes import ShipSprite, AIShipSprite
+from animation_classes import TrackingAnimation
 
 class Game(object):
     
@@ -31,7 +32,7 @@ class Game(object):
         # create clock    
         self.clock = pg.time.Clock()
         
-        self.background_image = pg.image.load('./graphics/star_wars_background_24bit.bmp')
+        self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
         self.fps = fps
         
         # initialize main screen
@@ -114,6 +115,17 @@ class Game(object):
                                    speed=250,
                                    d_angle_degrees_per_second = 150,
                                    max_speed_pixel_per_second=360)
+        
+        # draw frame around player's ship
+        self._frame = TrackingAnimation(self.fps,
+                 self.screen,
+                 [pg.image.load("./graphics/misc/ship_frame.bmp")],
+                 10000,
+                 player,
+                 np.array([0,0]).astype('float'),
+                 self.all_ships,
+                 looping = True,
+                 dynamic_angle = False)
         
         # create two wingmen
         self.spawn_ai_squadron('allied',

@@ -59,10 +59,10 @@ tieinterceptor:
     - [2]
     - [3]
   gun_offsets:
-  - [20, -17]
-  - [20, 17]
-  - [20, -13]
-  - [20, 13]
+  - [22, -17]
+  - [22, 17]
+  - [22, -13]
+  - [22, 13]
   image_paths: [./graphics/sprite_skins/tieinterceptor.bmp]
 xwing:
   engine_offsets:
@@ -77,8 +77,8 @@ xwing:
     - [2]
     - [3]
   gun_offsets:
-  - [11, -18]
-  - [11, 18]
-  - [12, -16]
-  - [12, 16]
+  - [13, -18]
+  - [13, 18]
+  - [14, -16]
+  - [14, 16]
   image_paths: [./graphics/sprite_skins/xwing.bmp]
