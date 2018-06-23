@@ -63,12 +63,12 @@ skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing.bmp'],
 
 # create meta data for xwing skin
 skins_meta_data['xwing'] = {'image_paths':['./graphics/sprite_skins/xwing.bmp'],
-               'gun_offsets':[[9,-18],
-                              [9,18],
-                              [10,-16],
-                              [10,16]],
-               'engine_offsets':[[-20,-6],
-                                 [-20,6]],
+               'gun_offsets':[[11,-18],
+                              [11,18],
+                              [12,-16],
+                              [12,16]],
+               'engine_offsets':[[-25,-6],
+                                 [-25,6]],
                 'fire_modes':[[[0,1,2,3]],
                               [[0,1],
                                [2,3]], # coupled
@@ -85,6 +85,22 @@ skins_meta_data['tiefighter'] = {'image_paths':['./graphics/sprite_skins/tiefigh
                 'fire_modes':[[[0,1]], # coupled
                               [[0], #singe
                                [1]]]}
+
+# create meta data for the tie interceptor skin                
+skins_meta_data['tieinterceptor'] = {'image_paths':['./graphics/sprite_skins/tieinterceptor.bmp'],
+               'gun_offsets':[[20,-17],
+                              [20,17],
+                              [20,-13],
+                              [20,13]],
+               'engine_offsets':[[-18,0]],
+                'fire_modes':[[[0,1,2,3]], # all
+                              [[0,1],
+                               [2,3]], # coupled
+                              [[0], #singe
+                               [1],
+                               [2],
+                               [3]]]}
+
 
 # create meta data for hornet skin
 skins_meta_data['hornet'] = {'image_paths':['./graphics/sprite_skins/hornet.bmp'],

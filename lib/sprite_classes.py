@@ -109,6 +109,9 @@ class ShipSprite(BasicSprite):
             transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
                     is set to true. Default to (255,255,255), which corresponds to the color white.'''
                     
+        # set sound toggle variable to default False
+        self._sound = False
+                    
         # initialize and add to groups if sensible
         BasicSprite.__init__(self,
                              fps,
@@ -236,8 +239,10 @@ class ShipSprite(BasicSprite):
         '''Creates a MissileSprite objects at SpriteShip's specified locations
         of gun muzzles.'''
         
-        # play laser sound
-        self._laser_sound.play()
+        
+        # play laser sound if sound is on
+        if self._sound:
+            self._laser_sound.play()
         
         # fire cannons
         [laser_cannon.fire() for laser_cannon in self._get_next_cannons()]
@@ -308,8 +313,9 @@ class ShipSprite(BasicSprite):
     def kill(self):
         '''Base class kill method plus moving explosion animation.'''
         
-        # play sound of explosion
-        self._explosion_sound.play()
+        # play sound of explosion if sound on
+        if self._sound:
+            self._explosion_sound.play()
         
         # remove self from all groups
         BasicSprite.kill(self)
