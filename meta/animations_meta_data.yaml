@@ -8,16 +8,16 @@ explosion:
     ./graphics/explosion/explosion6.bmp, ./graphics/explosion/explosion7.bmp, ./graphics/explosion/explosion8.bmp,
     ./graphics/explosion/explosion9.bmp]
   sound: ./sounds/explosion.wav
-  spi: 0.08
+  spi: 0.1
 green:
   image_paths: [./graphics/green_muzzle_flash/green_muzzle_flash1.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash2.bmp,
     ./graphics/green_muzzle_flash/green_muzzle_flash3.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash4.bmp,
     ./graphics/green_muzzle_flash/green_muzzle_flash5.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash6.bmp]
   sound: ./sounds/missile.wav
-  spi: 0.03
+  spi: 0.02
 red:
   image_paths: [./graphics/red_muzzle_flash/red_muzzle_flash1.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash2.bmp,
     ./graphics/red_muzzle_flash/red_muzzle_flash3.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash4.bmp,
     ./graphics/red_muzzle_flash/red_muzzle_flash5.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash6.bmp]
   sound: ./sounds/missile.wav
-  spi: 0.03
+  spi: 0.02
