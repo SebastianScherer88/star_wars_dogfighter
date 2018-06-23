@@ -154,6 +154,9 @@ class Game(object):
         # initialize pause state variable
         paused = False
         
+        # initiazlie sound toggle variable
+        sound = False
+        
         # start main game loop
         while True:
             # check for exit events
@@ -168,6 +171,14 @@ class Game(object):
                     # toggle pause state if needed
                     if event.key == pg.K_ESCAPE:
                         paused = not paused
+                        
+                    # toggle sound if needed
+                    if event.key == pg.K_s:
+                        sound = not sound
+                        
+                        # update sprites if needed
+                        for ship in self.all_ships.sprites():
+                            ship._sound = sound
                     
                     # control player fire mode
                     if event.key == pg.K_f:
