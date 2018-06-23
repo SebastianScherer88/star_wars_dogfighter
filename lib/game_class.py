@@ -49,8 +49,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'tieinterceptor', 'green'
-        hostile_ship, hostile_laser = 'xwing', 'red'
+        allied_ship, allied_laser = 'tiefighter', 'green'
+        hostile_ship, hostile_laser = 'awing', 'red'
         
         # set game attributes from meta data for player
         
@@ -530,7 +530,7 @@ class Game(object):
         used at beginning of game.'''
         
         ship_id_counter = 1 # counter
-        ship_id_tail = side[0].upper() # initial of side
+        ship_id_head = side[0].upper() # initial of side
         
         for center, angle, speed, d_angle, max_speed in zip(centers,
                                                             angles,
@@ -538,7 +538,7 @@ class Game(object):
                                                             d_angle_degrees_per_seconds,
                                                             max_speed_pixel_per_seconds):
             
-            ship_id = str(ship_id_counter) + ship_id_tail
+            ship_id = ship_id_head + str(ship_id_counter)
             
             if side == 'allied':
                 self.spawn_ally(ship_id,
