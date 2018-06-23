@@ -47,8 +47,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'awing', 'red'
-        hostile_ship, hostile_laser = 'tiefighter', 'green'
+        allied_ship, allied_laser = 'xwing', 'red'
+        hostile_ship, hostile_laser = 'tieinterceptor', 'green'
         
         # set game attributes from meta data for player
         
