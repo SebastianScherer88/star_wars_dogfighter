@@ -33,9 +33,11 @@ create a pygame window and immediately start the game.
 Alternativly, you could run the "./lib/game_classes.py" script from the command line. If you do this, just make sure you are in the
 repo's parent directory.
 
-## Controls
+## Playing the demo
 
-### Game settings/options
+The player's ship is starting out on the right side, marked a yellow frame around it. The
+aim is to shoot down all hostile ships (marked with red frames), with the support of your
+wing-men (marked by green frames).
 
 To toggle sound on/off, press the "S" key.
 
@@ -52,5 +54,3 @@ To turn left/right, press the "ARROW LEFT"/"ARROW RIGHT" keys.
 To fire laser cannons, press the SPACEBAR.
 
 To toggle between single/dual/all laser fire modes, press the "F" key.
-
-The 
