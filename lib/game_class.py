@@ -48,8 +48,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'xwing', 'red'
-        hostile_ship, hostile_laser = 'tieinterceptor', 'green'
+        allied_ship, allied_laser = 'tieinterceptor', 'green'
+        hostile_ship, hostile_laser = 'xwing', 'red'
         
         # set game attributes from meta data for player
         
@@ -107,7 +107,10 @@ class Game(object):
         self.hostile_laser_beams = Group()
         
         # animation group
-        self.animations = Group()        
+        self.animations = Group()
+        
+        # information displays
+        self.ship_stats = Group()
         
         # create player sprite and add to relevant groups / provide with relevant groups
         player = self.spawn_player(center=np.array([1400,350]),
@@ -257,6 +260,7 @@ class Game(object):
         self.allied_laser_beams.update()
         self.hostile_laser_beams.update()
         self.animations.update()
+        self.ship_stats.update()
         
     def draw_game_state(self):
         '''Draws updated game state by wiping the game's main surface,
@@ -270,6 +274,7 @@ class Game(object):
         self.allied_laser_beams.draw(self.screen) # draw player lasers
         self.hostile_laser_beams.draw(self.screen) # draw enemy lasers
         self.animations.draw(self.screen) # draw animations
+        self.ship_stats.draw(self.screen) # draw frames and ship ids
                    
         # flip canvas
         pg.display.flip()
@@ -292,8 +297,20 @@ class Game(object):
             player_sprite._d_speed += player_sprite._d_speed_pixel_per_frame
         if pressed_keys[pg.K_DOWN]:
             player_sprite._d_speed -= player_sprite._d_speed_pixel_per_frame
+            
+    def _get_id_image(self,
+                      ship_id,
+                      size=(50,50)):
+        '''Takes the ship_id and makes and returns a pygame surface with that 
+        ID in the bottom right corner.'''
+        
+        largeText = pg.font.Font('freesansbold.ttf',12)
+        textSurface = largeText.render(ship_id, True, (254,254,254))
+        
+        return [textSurface]
         
     def spawn_player(self,
+                     ship_id = "P",
                      center = np.array([900,300]),
                     angle=0,
                     speed=200,
@@ -342,13 +359,29 @@ class Game(object):
                          10000,
                          player,
                          np.array([0,0]).astype('float'),
-                         self.all_ships,
+                         self.ship_stats,
+                         looping = True,
+                         dynamic_angle = False)
+        
+                # get ship_id display surface
+        ship_id_images = self._get_id_image(ship_id,
+                                            (50,50))
+        
+        # draw ship id for hostile ship
+        TrackingAnimation(self.fps,
+                          self.screen,
+                          ship_id_images,
+                          10000,
+                          player,
+                          np.array([15,25]).astype('float'),
+                         self.ship_stats,
                          looping = True,
                          dynamic_angle = False)
 
         return player
     
     def spawn_ally(self,
+                   ship_id,
                    center = np.array([1200,500]),
                    angle = 180,
                    speed = 200,
@@ -396,13 +429,28 @@ class Game(object):
                          [pg.image.load("./graphics/misc/ally_frame.bmp")],
                          10000,
                          ally,
-                         np.array([0,0]).astype('float'),
-                         self.all_ships,
+                          np.array([0,0]).astype('float'),
+                         self.ship_stats,
+                         looping = True,
+                         dynamic_angle = False)
+        
+        # get ship_id display surface
+        ship_id_images = self._get_id_image(ship_id)
+        
+        # draw ship id for hostile ship
+        TrackingAnimation(self.fps,
+                          self.screen,
+                          ship_id_images,
+                          10000,
+                          ally,
+                          np.array([15,15]).astype('float'),
+                         self.ship_stats,
                          looping = True,
                          dynamic_angle = False)
                     
     
     def spawn_hostile(self,
+                      ship_id,
                     center = np.array([1200,50]),
                     angle=0,
                     speed=200,
@@ -451,8 +499,22 @@ class Game(object):
                          [pg.image.load("./graphics/misc/hostile_frame.bmp")],
                          10000,
                          hostile,
-                         np.array([0,0]).astype('float'),
-                         self.all_ships,
+                          np.array([0,0]).astype('float'),
+                         self.ship_stats,
+                         looping = True,
+                         dynamic_angle = False)
+        
+        # get ship_id display surface
+        ship_id_images = self._get_id_image(ship_id)
+        
+        # draw ship id for hostile ship
+        TrackingAnimation(self.fps,
+                          self.screen,
+                          ship_id_images,
+                          10000,
+                          hostile,
+                          np.array([20,20]).astype('float'),
+                         self.ship_stats,
                          looping = True,
                          dynamic_angle = False)
         
@@ -466,24 +528,34 @@ class Game(object):
         '''Util function to spawn a group of allied or hostile ships. Usually
         used at beginning of game.'''
         
+        ship_id_counter = 1 # counter
+        ship_id_tail = side[0].upper() # initial of side
+        
         for center, angle, speed, d_angle, max_speed in zip(centers,
                                                             angles,
                                                             speeds,
                                                             d_angle_degrees_per_seconds,
                                                             max_speed_pixel_per_seconds):
+            
+            ship_id = str(ship_id_counter) + ship_id_tail
+            
             if side == 'allied':
-                self.spawn_ally(center=center,
+                self.spawn_ally(ship_id,
+                                center=center,
                                 angle=angle,
                                 speed=speed,
                                 d_angle_degrees_per_second=d_angle,
                                 max_speed_pixel_per_second=max_speed)
                 
             elif side == 'hostile':
-                self.spawn_hostile(center=center,
-                                angle=angle,
-                                speed=speed,
-                                d_angle_degrees_per_second=d_angle,
-                                max_speed_pixel_per_second=max_speed)
+                self.spawn_hostile(ship_id,
+                                   center=center,
+                                    angle=angle,
+                                    speed=speed,
+                                    d_angle_degrees_per_second=d_angle,
+                                    max_speed_pixel_per_second=max_speed)
+                
+            ship_id_counter += 1
         
         
     def handle_collisions(self):
