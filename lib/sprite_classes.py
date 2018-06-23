@@ -124,6 +124,9 @@ class ShipSprite(BasicSprite):
                              is_transparent=is_transparent,
                              transparent_color=transparent_color)
         
+        # set active state variable to communicate to tracking animations
+        self._alive = True
+        
         # set laser fire meta data attributes            
         self._original_laser_fire_modes = laser_fire_modes
         self._laser_sound = laser_sound
@@ -252,20 +255,6 @@ class ShipSprite(BasicSprite):
         
         # update cannons next in line so they wait as approrpiate
         self._pause_next_cannons()
-        
-    def _handle_engine_animation(self):
-        '''Util function that handles engine animation w.r.t speed changes.'''
-        
-        if not self._speed and len(self._engine_animations):
-            # removes sprite's engine flames animations from all groups
-            [engine_flame.kill() for engine_flame in self._engine_animations]  
-            
-            # empty engine animations list
-            self._engine_animations = []
-            
-        elif self._speed and not len(self._engine_animations):
-            # create new engine animations
-            self._create_engine_animations()
             
     def _control_speed(self):
         '''Util function that gets called from within set_pilot_commands for all
@@ -298,7 +287,7 @@ class ShipSprite(BasicSprite):
         BasicSprite.update(self)
 
         # delete/recreate engine animation based on current speed
-        self._handle_engine_animation()
+        #self._handle_engine_animation()
         
         # get command to fire from custom method
         self.set_gunner_commands()
@@ -307,8 +296,6 @@ class ShipSprite(BasicSprite):
         if self._command_to_fire and np.mean([cannon.is_ready() for cannon in self._get_next_cannons()]):
             # fire the cannon(s)
             self.fire()
-
-
             
     def kill(self):
         '''Base class kill method plus moving explosion animation.'''
@@ -320,8 +307,8 @@ class ShipSprite(BasicSprite):
         # remove self from all groups
         BasicSprite.kill(self)
         
-        # removes sprite's engine flames animations from all groups
-        [engine_flame.kill() for engine_flame in self._engine_animations]
+        # update live state variable
+        self._alive = False
         
         # create explosion animation
         BasicAnimation(self._fps,
@@ -412,11 +399,6 @@ class AIShipSprite(ShipSprite):
                              max_speed_pixel_per_second = max_speed_pixel_per_second,
                              is_transparent = is_transparent,
                              transparent_color = transparent_color)
-        
-        # attach the player's sprite object
-        #self._player_sprite = player_ship_sprite
-        
-        print(self._current_target)
         
         # attach the AI cone sines
         self._piloting_cone_sine = piloting_cone_sine

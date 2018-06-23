@@ -46,6 +46,7 @@ class BasicSprite(Sprite):
             transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
                     is set to true. Default to (255,255,255), which corresponds to the color white.'''
                     
+                    
         # call Sprite base class init - add self to all groups specified
         Sprite.__init__(self,*groups)
         
@@ -145,7 +146,6 @@ class BasicSprite(Sprite):
         Only used at ShipSprite (and upwards) level.'''
         
         return
-        
     
     def update(self):
         '''Updates the sprite's object type attributes 'image','rect' and 'mask' based on 
