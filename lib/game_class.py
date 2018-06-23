@@ -482,7 +482,7 @@ class Game(object):
             
 def main():
     # make sure directory is repo head
-    os.chdir('C:/Users/bettmensch/GitReps/star_wars_dogfighter')
+    os.chdir('..')
     
     
     Game()
