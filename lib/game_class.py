@@ -360,7 +360,7 @@ class Game(object):
                          10000,
                          player,
                          np.array([0,0]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -375,7 +375,7 @@ class Game(object):
                           10000,
                           player,
                           np.array([15,28]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
 
@@ -412,7 +412,6 @@ class Game(object):
                         self.engine_images,
                         self.engine_spi,
                         self.animations,
-                        #player,
                         self.piloting_cone_sine,
                         self.gunning_cone_sine,
                         (self.allied_ships, self.all_ships),
@@ -431,7 +430,7 @@ class Game(object):
                          10000,
                          ally,
                           np.array([0,0]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -445,7 +444,7 @@ class Game(object):
                           10000,
                           ally,
                           np.array([15,28]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
                     
@@ -501,7 +500,7 @@ class Game(object):
                          10000,
                          hostile,
                           np.array([0,0]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -515,7 +514,7 @@ class Game(object):
                           10000,
                           hostile,
                           np.array([15,28]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
