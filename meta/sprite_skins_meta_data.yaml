@@ -64,6 +64,18 @@ tieinterceptor:
   - [20, -13]
   - [20, 13]
   image_paths: [./graphics/sprite_skins/tieinterceptor.bmp]
+tievader:
+  engine_offsets:
+  - [-18, -3]
+  - [-18, 3]
+  fire_modes:
+  - - [0, 1]
+  - - [0]
+    - [1]
+  gun_offsets:
+  - [18, -9]
+  - [18, 9]
+  image_paths: [./graphics/sprite_skins/tievader.bmp]
 xwing:
   engine_offsets:
   - [-25, -6]

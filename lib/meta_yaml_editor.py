@@ -101,6 +101,15 @@ skins_meta_data['tieinterceptor'] = {'image_paths':['./graphics/sprite_skins/tie
                                [2],
                                [3]]]}
 
+# create meta data for vader's tie fighter
+skins_meta_data['tievader'] = {'image_paths':['./graphics/sprite_skins/tievader.bmp'],
+               'gun_offsets':[[18,-9],
+                              [18,9]],
+               'engine_offsets':[[-18,-3],
+                                 [-18,3]],
+                'fire_modes':[[[0,1]], # coupled
+                              [[0], #singe
+                               [1]]]}
 
 # create meta data for hornet skin
 skins_meta_data['hornet'] = {'image_paths':['./graphics/sprite_skins/hornet.bmp'],

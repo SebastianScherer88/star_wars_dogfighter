@@ -49,8 +49,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'tiefighter', 'green'
-        hostile_ship, hostile_laser = 'awing', 'red'
+        allied_ship, allied_laser = 'xwing', 'red'
+        hostile_ship, hostile_laser = 'tieinterceptor', 'green'
         
         # set game attributes from meta data for player
         
@@ -311,7 +311,7 @@ class Game(object):
         return [textSurface]
         
     def spawn_player(self,
-                     ship_id = "P",
+                     ship_id = "Player",
                      center = np.array([900,300]),
                     angle=0,
                     speed=200,
@@ -529,8 +529,11 @@ class Game(object):
         '''Util function to spawn a group of allied or hostile ships. Usually
         used at beginning of game.'''
         
+        # create ship id
+        id_dict = {'allied':'Ally',
+                   'hostile':'Hostile'}
         ship_id_counter = 1 # counter
-        ship_id_head = side[0].upper() # initial of side
+        ship_id_head = id_dict[side] # initial of side
         
         for center, angle, speed, d_angle, max_speed in zip(centers,
                                                             angles,
