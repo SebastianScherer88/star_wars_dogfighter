@@ -38,6 +38,7 @@ class Game(object):
         # initialize main screen
         size = screen_width, screen_height # set screen size
         self.screen = pg.display.set_mode(size)
+        pg.display.set_caption("STAR WARS DOGFIGHTER")
         
         # load meta data
         with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
@@ -48,8 +49,8 @@ class Game(object):
         
         
         # set player and enemy ship and laser types
-        allied_ship, allied_laser = 'tieinterceptor', 'green'
-        hostile_ship, hostile_laser = 'xwing', 'red'
+        allied_ship, allied_laser = 'xwing', 'red'
+        hostile_ship, hostile_laser = 'tieinterceptor', 'green'
         
         # set game attributes from meta data for player
         
@@ -310,7 +311,7 @@ class Game(object):
         return [textSurface]
         
     def spawn_player(self,
-                     ship_id = "P",
+                     ship_id = "Player",
                      center = np.array([900,300]),
                     angle=0,
                     speed=200,
@@ -359,7 +360,7 @@ class Game(object):
                          10000,
                          player,
                          np.array([0,0]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -373,8 +374,8 @@ class Game(object):
                           ship_id_images,
                           10000,
                           player,
-                          np.array([15,25]).astype('float'),
-                         self.ship_stats,
+                          np.array([15,28]).astype('float'),
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
 
@@ -411,7 +412,6 @@ class Game(object):
                         self.engine_images,
                         self.engine_spi,
                         self.animations,
-                        #player,
                         self.piloting_cone_sine,
                         self.gunning_cone_sine,
                         (self.allied_ships, self.all_ships),
@@ -430,7 +430,7 @@ class Game(object):
                          10000,
                          ally,
                           np.array([0,0]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -443,8 +443,8 @@ class Game(object):
                           ship_id_images,
                           10000,
                           ally,
-                          np.array([15,15]).astype('float'),
-                         self.ship_stats,
+                          np.array([15,28]).astype('float'),
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
                     
@@ -500,7 +500,7 @@ class Game(object):
                          10000,
                          hostile,
                           np.array([0,0]).astype('float'),
-                         self.ship_stats,
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -513,8 +513,8 @@ class Game(object):
                           ship_id_images,
                           10000,
                           hostile,
-                          np.array([20,20]).astype('float'),
-                         self.ship_stats,
+                          np.array([15,28]).astype('float'),
+                         [self.ship_stats],
                          looping = True,
                          dynamic_angle = False)
         
@@ -528,8 +528,11 @@ class Game(object):
         '''Util function to spawn a group of allied or hostile ships. Usually
         used at beginning of game.'''
         
+        # create ship id
+        id_dict = {'allied':'Ally',
+                   'hostile':'Hostile'}
         ship_id_counter = 1 # counter
-        ship_id_tail = side[0].upper() # initial of side
+        ship_id_head = id_dict[side] # initial of side
         
         for center, angle, speed, d_angle, max_speed in zip(centers,
                                                             angles,
@@ -537,7 +540,7 @@ class Game(object):
                                                             d_angle_degrees_per_seconds,
                                                             max_speed_pixel_per_seconds):
             
-            ship_id = str(ship_id_counter) + ship_id_tail
+            ship_id = ship_id_head + str(ship_id_counter)
             
             if side == 'allied':
                 self.spawn_ally(ship_id,

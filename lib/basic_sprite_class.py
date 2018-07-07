@@ -18,7 +18,7 @@ class BasicSprite(Sprite):
                  fps,
                  screen,
                  original_images,
-                 *groups,
+                 groups,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
@@ -32,7 +32,7 @@ class BasicSprite(Sprite):
                     Needed to 'wrap' sprites around edges to produce 'donut topology'.
             original_images: list of surface objects that will be used to display the sprite.
                     By default, the first list element will be used.
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+            groups: tuple of pygame Group objects. The sprite will add itself to each of these
                     when initialized.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
@@ -49,6 +49,8 @@ class BasicSprite(Sprite):
                     
         # call Sprite base class init - add self to all groups specified
         Sprite.__init__(self,*groups)
+        
+        #print(groups)
         
         # set surrounding pygame variables as attributes
         self._screen = screen

@@ -24,7 +24,7 @@ class ProjectileSprite(BasicSprite):
                  screen,
                  original_images,
                  lifetime_in_seconds,
-                 *groups,
+                 groups,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
@@ -39,7 +39,7 @@ class ProjectileSprite(BasicSprite):
             original_images: list of surface objects that will be used to display the sprite.
                     By default, the first list element will be used.
             lifetime: lifetime pf sprite (in seconds).
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+            groups: tuple of pygame Group objects. The sprite will add itself to each of these
                     when initialized.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
@@ -58,7 +58,7 @@ class ProjectileSprite(BasicSprite):
                              fps,
                              screen,
                              original_images,
-                             *groups,
+                             groups,
                              center=center,
                              angle=angle,
                              speed=speed,
@@ -183,14 +183,14 @@ class LaserCannon(object):
                           self._muzzle_flash_spi,
                           self._ship,
                           self._offset,
-                          self._laser_beam_group)
+                          [self._laser_beam_group])
         
         # create laser beam
         ProjectileSprite(self._ship._fps,
                       self._ship._screen,
                      self._original_laser_beam_images,
                      self._range_in_seconds,
-                     self._laser_beam_group,
+                     [self._laser_beam_group],
                      center = laser_beam_position,
                      angle = self._ship._angle,
                      speed = self._ship._speed * self._ship._fps + self._projectile_speed_in_seconds)

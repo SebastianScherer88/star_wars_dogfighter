@@ -50,7 +50,7 @@ class ShipSprite(BasicSprite):
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
                  animation_group,
-                 *groups,
+                 groups,
                  hostile_ships_group = None,
                  hit_points = 30,
                  center = np.zeros(2),
@@ -92,7 +92,7 @@ class ShipSprite(BasicSprite):
                     at time of ShipSprite's death.
             explosion_seconds_per_image: seconds_per_image value that will be passed to the 
                     explosion animation at time of ShipSprite's death
-            *groups: tuple of pygame Group objects. The sprite will add itself to each of these
+            groups: tuple of pygame Group objects. The sprite will add itself to each of these
                     when initialized.
             center: initial position of center of sprite's rectangle (numpy float-type array of shape (2,)).
                     Sets the sprite's initial position on the 'screen' surface.
@@ -117,7 +117,7 @@ class ShipSprite(BasicSprite):
                              fps,
                              screen,
                              original_images,
-                             *groups,
+                             groups,
                              center=center,
                              angle=angle,
                              speed=speed,
@@ -209,7 +209,7 @@ class ShipSprite(BasicSprite):
                                                              self._engine_flame_seconds_per_image,
                                                              self,
                                                              engine_flame_offset * self._size_factor,
-                                                             self._animation_group,
+                                                             [self._animation_group],
                                                              looping = True))
         
     def set_gunner_commands(self):
@@ -259,9 +259,6 @@ class ShipSprite(BasicSprite):
     def _control_speed(self):
         '''Util function that gets called from within set_pilot_commands for all
         ShipSprite (based) classes to enforce ship's min & max speed limits.'''
-        
-        #d_speed_pixel_per_second
-        #max_speed_pixel_per_second
                    
         # if told to speed up make sure not to exceed max speed
         self._speed = min(self._speed,
@@ -285,9 +282,6 @@ class ShipSprite(BasicSprite):
         
         # call base class update method
         BasicSprite.update(self)
-
-        # delete/recreate engine animation based on current speed
-        #self._handle_engine_animation()
         
         # get command to fire from custom method
         self.set_gunner_commands()
@@ -315,7 +309,7 @@ class ShipSprite(BasicSprite):
                       self._screen,
                       self._original_explosion_images,
                       self._explosion_seconds_per_image,
-                      self._animation_group,
+                      [self._animation_group],
                       center = self._center,
                       angle = self._angle,
                       speed = self._speed * self._fps) # animation expects pixel/second speed unit
@@ -344,10 +338,9 @@ class AIShipSprite(ShipSprite):
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
                  animation_group,
-                 #player_ship_sprite,
                  piloting_cone_sine,
                  gunning_cone_sine,
-                 *groups,
+                 groups,
                  hostile_ships_group,
                  center = np.zeros(2),
                  angle = 0,
@@ -389,7 +382,7 @@ class AIShipSprite(ShipSprite):
                             original_engine_flame_images,
                             engine_flame_seconds_per_image,
                             animation_group,
-                             *groups,
+                             groups,
                              hostile_ships_group = hostile_ships_group,
                              center = center,
                              angle = angle,
