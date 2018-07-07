@@ -22,7 +22,7 @@ class Game(object):
     def __init__(self,
                  screen_width=1500,
                  screen_height=700,
-                 fps=20,
+                 fps=30,
                  background_image = None):
         '''Initializes the game object and also the game'''
         
