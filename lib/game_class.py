@@ -46,8 +46,7 @@ class Game(object):
         
         with open('./meta/animations_meta_data.yaml','r') as animations_meta_file:
             animations_meta_data = yaml.load(animations_meta_file)
-        
-        
+            
         # set player, ally and hostile ship and laser types
         player_ship, player_laser = 'xwing' ,'red'
         ally_ship, ally_laser = 'xwing', 'red'
