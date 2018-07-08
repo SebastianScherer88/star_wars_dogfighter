@@ -329,7 +329,6 @@ class Game(object):
                 
             # check if level done
             level_status = self._get_level_status(level_sprite_groups)
-            print(level_status)
             
             # if level is either fail or success, quit game loop and return
             if level_status != 'ongoing':
