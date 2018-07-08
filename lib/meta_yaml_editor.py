@@ -137,3 +137,60 @@ skins_meta_data['green'] = {'image_paths':['./graphics/sprite_skins/greenlaser.b
 
 with open('sprite_skins_meta_data.yaml','w') as skins_meta_data_file:
     yaml.dump(skins_meta_data,skins_meta_data_file)
+
+
+#----------------------------------------------
+# [3] Create and save the per-level meta data
+#----------------------------------------------
+    
+level_template_meta_data = {}
+    
+level_template_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
+                                                          'angle':180,
+                                                          'speed':200,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250},
+                                        'ship':'awing',
+                                        'laser':'red'}
+
+level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
+                                                                    (1400,700)],
+                                                        'angle':[180,
+                                                                180],
+                                                        'speed':[250,
+                                                                250],
+                                                        'd_angle_degrees_per_second':[100,
+                                                                                       100],
+                                                        'd_speed_pixel_per_second':[20,
+                                                                                     20],
+                                                        'max_speed_pixel_per_second':[250,
+                                                                                     250]},
+                                    'ship':'awing',
+                                    'laser':'red'}
+
+level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
+                                                                       (50,350),
+                                                                       (50,700)),
+                                                            'angle':[0,
+                                                                      0,
+                                                                      0],
+                                                            'speed':[250,
+                                                                      250,
+                                                                      250],
+                                                            'd_angle_degrees_per_second':[100,
+                                                                                           100,
+                                                                                           100],
+                                                            'd_speed_pixel_per_second':[20,
+                                                                                         20,
+                                                                                         20],
+                                                            'max_speed_pixel_per_second':[250,
+                                                                                           250,
+                                                                                           250]},
+                                        'ship':'tiefighter',
+                                        'laser':'green'}
+
+game_level_meta_data = [level_template_meta_data ] * 5
+
+with open('game_level_meta_data.yaml','w') as game_level_data_file:
+    yaml.dump(game_level_meta_data,game_level_data_file)

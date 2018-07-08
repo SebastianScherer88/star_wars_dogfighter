@@ -47,12 +47,36 @@ class Game(object):
         with open('./meta/animations_meta_data.yaml','r') as animations_meta_file:
             self.animations_meta_data = yaml.load(animations_meta_file)
             
+        with open ('./meta/game_level_meta_data.yaml','r') as level_meta_file:
+            self.level_meta_data = yaml.load(level_meta_file)
+            
+        # start levels
+        for level_no in range(5):
+            # get level specs for i-th level
+            level_specs = self.level_meta_data[level_no]
+            
+            # get meta data for i-th level
+            level_meta_data = self._collect_meta_data_for_level(level_no,
+                                                                level_specs)
+            
+            # start level and receive level outcome
+            level_outcome = self.start_level(level_meta_data)
+            
+            if level_outcome == 'fail':
+                break 
+            elif level_outcome == 'success':
+                pass
+            
+        # quit (py)game
+        pg.quit()
+        sys.exit()
         # set player, ally and hostile ship and laser types
-        player_ship, player_laser = 'xwing' ,'red'
-        ally_ship, ally_laser = 'awing', 'red'
-        hostile_ship, hostile_laser = 'tiefighter', 'green'
+        #player_ship, player_laser = 'xwing' ,'red'
+        #ally_ship, ally_laser = 'awing', 'red'
+        #hostile_ship, hostile_laser = 'tiefighter', 'green'
         
     def _collect_meta_data_for_level(self,
+                                     level_number,
                                      level_specs):
         '''Util function that collects all the sprite related meta data for player,
         allies and hostiles for current level.
@@ -132,7 +156,7 @@ class Game(object):
                           'piloting_cone_sine':0.1,
                           'gunning_cone_sine':0.1,
                           'ship_init_kwargs':ship_init_kwargs,
-                          'level_number':level_specs['level_number']}
+                          'level_number':level_number}
         
         return level_meta_data
     
@@ -219,11 +243,17 @@ class Game(object):
         player = self._spawn_ships_for_level(level_meta_data,
                                              level_sprite_groups)
         
+        # sync player controls with current keyboard status before entering event loop
+        self._sync_player_(player)
+        
         # initialize pause state variable
         paused = False
         
         # initiazlie sound toggle variable
         sound = False
+        
+        # initialize level done variable
+        level_status = 'ongoing'
         
         # start main game loop
         while True:
@@ -296,9 +326,19 @@ class Game(object):
                 
                 # check and handle collisions
                 self.handle_collisions(level_sprite_groups)
+                
+            # check if level done
+            level_status = self._get_level_status(level_sprite_groups)
+            print(level_status)
+            
+            # if level is either fail or success, quit game loop and return
+            if level_status != 'ongoing':
+                break
                         
             # control pace
             self.clock.tick(self.fps)
+            
+        return level_status
             
     def update_game_state(self,
                           sprite_groups):
@@ -325,6 +365,60 @@ class Game(object):
                    
         # flip canvas
         pg.display.flip()
+        
+    def handle_collisions(self,
+                          sprite_groups):
+        '''Checks for collisions between player sprite and enemy lasers, as well
+        as enemy sprites and player lasers. Terminates any sprites that were
+        shot down. Records the time of the kill.'''
+
+        # check for enemy kills
+        hit_allies = groupcollide(sprite_groups['ships']['ally'],
+                                  sprite_groups['lasers']['hostile'],
+                                      False,
+                                      True,
+                                      collide_mask)
+        
+        for hit_ally in hit_allies:
+            # update hit ship's hit points attribute
+            hit_ally._hit_points -= 1
+            
+            # if ship has no more hit points left, destroy and set flag
+            if not hit_ally._hit_points:
+                hit_ally.kill()
+        
+        # check for player kills
+        hit_hostiles = groupcollide(sprite_groups['ships']['hostile'],
+                                  sprite_groups['lasers']['ally'],
+                                      False,
+                                      True,
+                                      collide_mask)
+        
+        for hit_hostile in hit_hostiles:
+            # update hit ship's hit points attribute
+            hit_hostile._hit_points -= 1
+            
+            # if ship has no more hit points left, destroy and flag
+            if not hit_hostile._hit_points:
+                hit_hostile.kill()
+                
+    def _get_level_status(self,
+                          sprite_group):
+        '''Util function that checks sprite_groups to see if player is dead or all enemies are dead.
+        Returns one of three level statuses: fail, success or ongoing.'''
+        
+        # are any allies (including player) left?
+        are_allies_dead = not len(sprite_group['ships']['ally'].sprites())
+        
+        # are any hostiles (including player) left?
+        are_hostiles_dead = not len(sprite_group['ships']['hostile'].sprites())
+        
+        if are_allies_dead:
+            return 'fail'
+        elif are_hostiles_dead:
+            return 'success'
+        else:
+            return 'ongoing'
         
     def _sync_player_(self,player_sprite):
         '''Takes a ShipSprite class object and syncs its _d_speed and _d_angle
@@ -424,7 +518,11 @@ class Game(object):
         if side == 'player':
             ship_init_kwargs = level_meta_data['ship_init_kwargs'][side]
         elif side in ['ally','hostile']:
-            ship_init_kwargs = level_meta_data['ship_init_kwargs'][side][ship_no]
+            ships_init_kwargs = level_meta_data['ship_init_kwargs'][side]
+            
+            ship_init_kwargs = dict([(init_type,init_value[ship_no]) for (init_type,init_value) in ships_init_kwargs.items()])
+            
+        print(ship_init_kwargs)
             
         ship_init_kwargs['hostile_ships_group'] = groups['ships'][other_side] # only neede for AIShipSPrite
         
@@ -467,7 +565,8 @@ class Game(object):
         
     def _attach_visual_frame(self,
                              ship,
-                             frame_image):
+                             frame_image,
+                             sprite_groups):
         
         '''Util function to attach a ship frame with ship id label to a given
         ShipSprite object as a tracking animation.'''
@@ -478,7 +577,7 @@ class Game(object):
                       10000,
                       ship,
                       np.array([0,0]).astype('float'),
-                     [self.sprite_groups['non_colliders']['any']],
+                     [sprite_groups['non_colliders']['any']],
                      looping = True,
                      dynamic_angle = False)
             
@@ -515,7 +614,8 @@ class Game(object):
                                                   ship_id)
         
         self._attach_visual_frame(new_ship,
-                                  tracking_image)
+                                  tracking_image,
+                                  level_sprite_groups)
         
         # if player sprite was created, return the created sprite object
         if side == 'player':
@@ -529,49 +629,13 @@ class Game(object):
         side, with specified initial values.'''
         
         # iterate over all ships in squadron and spawn
-        for ship_index in range(level_meta_data['ship_init_kwargs'][side]['centers']):
+        for ship_index in range(len(level_meta_data['ship_init_kwargs'][side]['center'])):
             
             # spawn inidivual ship
             self.spawn_ship(side,
                             ship_index,
                             level_meta_data,
                             level_sprite_groups)
-        
-    def handle_collisions(self,
-                          sprite_groups):
-        '''Checks for collisions between player sprite and enemy lasers, as well
-        as enemy sprites and player lasers. Terminates any sprites that were
-        shot down. Records the time of the kill.'''
-
-        # check for enemy kills
-        hit_allies = groupcollide(sprite_groups['ships']['ally'],
-                                  sprite_groups['lasers']['hostile'],
-                                      False,
-                                      True,
-                                      collide_mask)
-        
-        for hit_ally in hit_allies:
-            # update hit ship's hit points attribute
-            hit_ally._hit_points -= 1
-            
-            # if ship has no more hit points left, destroy and set flag
-            if not hit_ally._hit_points:
-                hit_ally.kill()
-        
-        # check for player kills
-        hit_hostiles = groupcollide(sprite_groups['ships']['hostile'],
-                                  sprite_groups['lasers']['ally'],
-                                      False,
-                                      True,
-                                      collide_mask)
-        
-        for hit_hostile in hit_hostiles:
-            # update hit ship's hit points attribute
-            hit_hostile._hit_points -= 1
-            
-            # if ship has no more hit points left, destroy and flag
-            if not hit_hostile._hit_points:
-                hit_hostile.kill()        
             
 def main():
     # make sure directory is repo head
