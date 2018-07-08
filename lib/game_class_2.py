@@ -42,23 +42,32 @@ class Game(object):
         
         # load meta data
         with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
-            skins_meta_data = yaml.load(skins_meta_file)
+            self.skins_meta_data = yaml.load(skins_meta_file)
         
         with open('./meta/animations_meta_data.yaml','r') as animations_meta_file:
-            animations_meta_data = yaml.load(animations_meta_file)
+            self.animations_meta_data = yaml.load(animations_meta_file)
             
         # set player, ally and hostile ship and laser types
         player_ship, player_laser = 'xwing' ,'red'
         ally_ship, ally_laser = 'awing', 'red'
         hostile_ship, hostile_laser = 'tiefighter', 'green'
         
-        # get meta data for player, ally and hostile ships and attach to game
+        
+        
+    def _collect_meta_data_for_level(self,
+                                     *ship_laser_data_pairs):
+        '''Util function that collects all the sprite related meta data for player,
+        allies and hostiles for current level.'''
+        
+        # get ship and laser specs for player, allies and hostiles for this level
+        player_ship, player_laser = ship_laser_data_pairs[0:2]
+        ally_ship, ally_laser = ship_laser_data_pairs[2:4]
+        hostile_ship, hostile_laser = ship_laser_data_pairs[4:]
         
         # ship skins
         ship_images = {'player':[pg.image.load(image_path) for image_path in skins_meta_data[player_ship]['image_paths']],
                             'ally':[pg.image.load(image_path) for image_path in skins_meta_data[ally_ship]['image_paths']],
                             'hostile':[pg.image.load(image_path) for image_path in skins_meta_data[hostile_ship]['image_paths']]}
-#        self.allied_images = 
         
         # gun offsets
         gun_offsets = {'player':np.array(skins_meta_data[player_ship]['gun_offsets']).astype('float'),
@@ -95,7 +104,7 @@ class Game(object):
                              'ally':animations_meta_data[ally_laser]['spi'],
                              'hostile':animations_meta_data[hostile_laser]['spi']}
         
-        self.meta_data = {'ship_images':ship_images,
+        level_meta_data = {'ship_images':ship_images,
                           'gun_offsets':gun_offsets,
                           'engine_offsets':engine_offsets,
                           'fire_modes':fire_modes,
@@ -110,70 +119,104 @@ class Game(object):
                           'engine_spi':animations_meta_data['engine']['spi'],
                           'piloting_cone_sine':0.1,
                           'gunning_cone_sine':0.1}
-                        
-        # set game attributes from meta data for enemies
         
-        # initialize empty sprite groups
+        return level_meta_data
+    
+    def _collect_sprite_groups_for_level(self):
+        '''Util function that initializes and returns sprite groups for current level.'''
+        
+        # ship sprites will be added to these group
         ship_groups = {'any':Group(),
                        'ally':Group(),
                        'hostile':Group()}
         ship_groups['player'] = ship_groups['ally'] # allies are on player's side; only one ship group needed
         
+        # projectile sprites/lasers will be added to these groups
         laser_beams_groups = {'ally':Group(),
                               'hostile':Group()}
         laser_beams_groups['player'] = laser_beams_groups['ally'] # allies are on player's side; only one laser group needed
         
+        # animations and other non-collidable sprites will be added to this group
         non_collidables_group = {'any':Group()}
         
-        self.sprite_groups = {'ships':ship_groups,
+        level_sprite_groups = {'ships':ship_groups,
                               'lasers':laser_beams_groups,
                               'non_colliders':non_collidables_group}
+        
+        return level_sprite_groups
+        
+    def start_level(self,
+                    skins_meta_data,
+                    animations_meta_data,
+                    level_number,
+                    player_data,
+                    ally_data,
+                    hostile_data):
+        
+        '''Kick starts a level with:
+            - level_number: interger. Specifies the level number, i.e. "Level 10"
+            - player_data: dictionary. Contains the following keys/information:
+                "ship": player ship type; specifies player ship sprite skin, i.e. "xwing"
+                "laser": player laser type; either "red" or "green"
+                "center":  numpy array, specifying the initial starting position of player
+                "angle": integer, specifying the initial orientation of player; 
+                        angle is counted-clockwise, where 0 degrees points along positive x-axis
+                "speed": integer, specifying initial speed of player (in pixel per second)
+                "d_angle_degrees_per_second": float, specifying the turning rate of the player (in degrees persecond)
+                "d_speed_pixel_per_second": float, specifying the accelration of player (in pixel per second squared)
+                "max_speed_pixel_per_second":  float, specifying the player's top speed (in pixel per seconds)
+            - ally_data: dictionary. Contains the following keys/information:
+                "ship": ally ship type; specifies ally ships sprite skin, i.e. "xwing"
+                "laser": ally laser type; either "red" or "green"
+                "centers": a list containing one numpy array, specifying the initial starting position of allies
+                "angles": a list containing integers, specifying the initial orientation of allies; 
+                        angle is counted-clockwise, where 0 degrees points along positive x-axis
+                "speeds": a list containing integers, specifying initial speeds of allies (in pixel per second)
+                "d_angle_degrees_per_seconds": a list containing floats, specifying the turning rate of the allies (in degrees persecond)
+                "d_speed_pixel_per_seconds": a list containing floats, specifying the accelration of allies (in pixel per second squared)
+                "max_speed_pixel_per_seconds": a list containing floats, specifying the allies's top speed (in pixel per seconds)
+            - hostile_data: dictionary. See "ally_data" above.
+        '''
+        
+        player_ship, player_laser = player_data['ship'], player_data['laser']
+        ally_ship, ally_laser = ally_data['ship'], ally_data['laser']
+        hostile_ship, hostile_laser = hostile_data['ship'], hostile_data['laser']
+
+        # get meta data for player, ally and hostile ships for this level
+        level_meta_data = self._collect_meta_data_for_level(player_ship,
+                                                            player_laser,
+                                                            ally_ship,
+                                                            ally_laser,
+                                                            hostile_ship,
+                                                            hostile_laser)
+                        
+        # set game attributes from meta data for enemies
+        
+        # get sprite groups for this level
+        level_sprite_groups = self._collect_sprite_groups_for_level()
         
         # create player sprite and add to relevant groups / provide with relevant groups
         player = self.spawn_ship('player',
                                  0,
-                                 center=np.array([1400,350]),
-                                 angle=180,
-                                 speed=200,
-                                 d_angle_degrees_per_second = 150,
-                                 d_speed_pixel_per_second = 20,
-                                 max_speed_pixel_per_second=250)
+                                 **player_data)
         
-        # create two wingmen
+        # create allies for this level and blit to screen
         self.spawn_squadron('ally',
-                            centers=[np.array([1400,100]),
-                                        np.array([1400,700])],
-                                angles=[180,
-                                        180],
-                                speeds=[250,
-                                        250],
-                                d_angle_degrees_per_seconds = [100,
-                                                               100],
-                                d_speed_pixel_per_seconds = [20,
-                                                             20],
-                                max_speed_pixel_per_seconds=[250,
-                                                             250])
+                            centers=ally_data['centers'],
+                            angles=ally_data['angles'],
+                            speeds=ally_data['speeds'],
+                            d_angle_degrees_per_seconds = ally_data['d_angle_degrees_per_seconds'],
+                            d_speed_pixel_per_seconds = ally_data['d_speed_pixel_per_seconds'],
+                            max_speed_pixel_per_seconds=ally_data['max_speed_pixel_per_seconds'])
         
-        # create three enemies
+        # create hostiles for this level and blit to screen
         self.spawn_squadron('hostile',
-                               centers=[np.array([50,100]),
-                                        np.array([50,350]),
-                                        np.array([50,700])],
-                                angles=[0,
-                                        0,
-                                        0],
-                                speeds=[250,
-                                        250,
-                                        250],
-                                d_angle_degrees_per_seconds = [100,
-                                                               100,
-                                                               100],
-                                d_speed_pixel_per_seconds = [20,
-                                                             20,
-                                                             20],
-                                max_speed_pixel_per_seconds=[250,
-                                                             250,
-                                                             250])
+                            centers=hostile_data['centers'],
+                            angles=hostile_data['angles'],
+                            speeds=hostile_data['speeds'],
+                            d_angle_degrees_per_seconds = hostile_data['d_angle_degrees_per_seconds'],
+                            d_speed_pixel_per_seconds = hostile_data['d_speed_pixel_per_seconds'],
+                            max_speed_pixel_per_seconds=hostile_data['max_speed_pixel_per_seconds'])
                         
         # initialize enemy down time so that 2 enemies are spawned at beginning of game
         hostile_down = False
@@ -359,12 +402,7 @@ class Game(object):
     
     def _get_ship_init_args(self,
                             side,
-                            center,
-                           angle,
-                           speed,
-                           d_angle_degrees_per_second,
-                           d_speed_pixel_per_second,
-                           max_speed_pixel_per_second):
+                            **ship_init_kwargs):
         '''Util function that collects the positional and keyword arguments for the appropriate
         Ship sprite class initializer.'''
         
@@ -399,13 +437,7 @@ class Game(object):
                           data['gunning_cone_sine'], # only neede for AIShipSPrite
                           (groups['ships'][side],groups['ships']['any'])]#(self.allied_ships,self.all_ships),]
                           
-        ship_init_kwargs = {'hostile_ships_group':groups['ships'][other_side], # only neede for AIShipSPrite
-                            'center':center,
-                            'angle':angle,
-                            'speed':speed,
-                            'd_angle_degrees_per_second':d_angle_degrees_per_second,
-                            'd_speed_pixel_per_second':d_speed_pixel_per_second,
-                            'max_speed_pixel_per_second':max_speed_pixel_per_second}
+        ship_init_kwargs['hostile_ships_group'] = groups['ships'][other_side] # only neede for AIShipSPrite
         
         # adjust args and kwargs if a ShipSprite (and no AIShipSprite) will be initialized
         if side == 'player':
@@ -464,12 +496,7 @@ class Game(object):
     def spawn_ship(self,
                    side,
                    id_no,
-                   center,
-                   angle,
-                   speed,
-                   d_angle_degrees_per_second,
-                   d_speed_pixel_per_second,
-                   max_speed_pixel_per_second):
+                   **ship_init_kwargs):
         
         '''Initializes an AIShipSprite or a ShipSprite class object with the 
         specified initial values.'''
@@ -485,12 +512,7 @@ class Game(object):
         
         # collect arguments for the ship sprite initializer
         ship_args, ship_kwargs = self._get_ship_init_args(side,
-                                                           center,
-                                                           angle,
-                                                           speed,
-                                                           d_angle_degrees_per_second,
-                                                           d_speed_pixel_per_second,
-                                                           max_speed_pixel_per_second)
+                                                          **ship_init_kwargs)
 
         # create new ship sprite            
         new_ship = Ship(*ship_args,
@@ -509,103 +531,19 @@ class Game(object):
         
     def spawn_squadron(self,
                        side,
-                       centers,
-                       angles,
-                       speeds,
-                       d_angle_degrees_per_seconds,
-                       d_speed_pixel_per_seconds,
-                       max_speed_pixel_per_seconds):
+                       **squad_init_kwargs):
         '''Util function that spawns a group of AIShipSprites for specified
         side, with specified initial values.'''
         
-        for id_no, (center, angle, speed, d_angle, d_speed, max_speed) in enumerate(zip(centers,
-                                                            angles,
-                                                            speeds,
-                                                            d_angle_degrees_per_seconds,
-                                                            d_speed_pixel_per_seconds,
-                                                            max_speed_pixel_per_seconds)):
-            
+        for id_no in enumerate(squad_init_kwargs['centers']):
+            # get init kwargs for current ship
+            ship_init_kwargs = {(init_arg_type,init_arg_value[id_no]) for (init_arg_type,init_arg_value) in squad_init_kwargs.items()}
+                  
             id_no += 1 # displayed counters should start at 1
             
+            # spawn inidivual ship
             self.spawn_ship(side,
-                           id_no,
-                           center,
-                           angle,
-                           speed,
-                           d_angle,
-                           d_speed,
-                           max_speed)
-        
-    def spawn_player(self,
-                     ship_id = "Player",
-                     center = np.array([900,300]),
-                    angle=0,
-                    speed=200,
-                    d_angle_degrees_per_second = 150,
-                    d_speed_pixel_per_second = 10,
-                    max_speed_pixel_per_second = 400):
-        
-        '''Creates a new PlayerShipSprite object and adds it to the game.'''        
-        
-        # create ship sprite object
-        player = ShipSprite(self.fps,
-                          self.screen,
-                          self.allied_images,
-                          self.allied_gun_offsets,
-                          self.allied_fire_modes,
-                          self.allied_laser_beams,
-                          self.allied_laser_sound,
-                          self.allied_laser_images,
-                          1.2, # laser range in seconds
-                          150, # laser speed in pixel per second
-                          1.5, # laser rate of fire in seconds
-                          self.allied_muzzle_images,
-                          self.allied_muzzle_spi, # seconds per image for muzzle flash
-                          self.explosion_sound, # sound of explosion animation
-                          self.explosion_images,
-                          self.explosion_spi, # seconds per image for explosions animation at death
-                          self.allied_engine_offsets,
-                          self.engine_images,
-                          self.engine_spi,
-                          self.animations,
-                          (self.allied_ships,self.all_ships),
-                          center = center,
-                          angle = angle,
-                          speed = speed,
-                          d_angle_degrees_per_second = d_angle_degrees_per_second,
-                          d_speed_pixel_per_second = d_speed_pixel_per_second,
-                          max_speed_pixel_per_second = max_speed_pixel_per_second)
-        
-        # sync player controls with keyboard state
-        self._sync_player_(player)
-        
-        # draw frame around player ship
-        TrackingAnimation(self.fps,
-                         self.screen,
-                         [pg.image.load("./graphics/misc/player_frame.bmp")],
-                         10000,
-                         player,
-                         np.array([0,0]).astype('float'),
-                         [self.ship_stats],
-                         looping = True,
-                         dynamic_angle = False)
-        
-                # get ship_id display surface
-        ship_id_images = self._get_id_image(ship_id,
-                                            (50,50))
-        
-        # draw ship id for hostile ship
-        TrackingAnimation(self.fps,
-                          self.screen,
-                          ship_id_images,
-                          10000,
-                          player,
-                          np.array([15,28]).astype('float'),
-                         [self.ship_stats],
-                         looping = True,
-                         dynamic_angle = False)
-
-        return player
+                            **ship_init_kwargs)
         
     def handle_collisions(self):
         '''Checks for collisions between player sprite and enemy lasers, as well

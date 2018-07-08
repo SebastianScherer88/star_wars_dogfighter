@@ -61,7 +61,8 @@ class ShipSprite(BasicSprite):
                  max_speed_pixel_per_second = 20,
                  min_speed_pixel_per_second = 10,
                  is_transparent = True,
-                 transparent_color = (255,255,255)):
+                 transparent_color = (255,255,255),
+                 **trash_can):
     
         '''Arguments:
             
@@ -107,7 +108,9 @@ class ShipSprite(BasicSprite):
                     color argument in the surfaces contained in 'original_images' will be made transparent.
                     Default is True
             transparent_color: tuple specifiying the color key considered as transparent if 'is_transparent'
-                    is set to true. Default to (255,255,255), which corresponds to the color white.'''
+                    is set to true. Default to (255,255,255), which corresponds to the color white.
+            **trash_can: collects all unknown key word arguments provided to the initializer at call-time.
+                    Allows for dictionary style argument plumbing further upstream.'''
                     
         # set sound toggle variable to default False
         self._sound = False
@@ -349,7 +352,8 @@ class AIShipSprite(ShipSprite):
                  d_speed_pixel_per_second = 10,
                  max_speed_pixel_per_second = 20,
                  is_transparent = True,
-                 transparent_color = (255,255,255)):
+                 transparent_color = (255,255,255),
+                 **trash_can):
     
         '''Arguments: All as in base class's (ShipSprite) __init__ method, except
         for 
@@ -359,7 +363,9 @@ class AIShipSprite(ShipSprite):
                 If pilot can not see the PlayerShipSprite, he will turn to get him back into
                 view.
             gunning_cone_sine: Sine of half of the cone representing the enemy gunner's target sight.
-                If PlayerShipSprite is within this cone, gunner will attempt to fire cannon.'''
+                If PlayerShipSprite is within this cone, gunner will attempt to fire cannon.
+            **trash_can: collects all unknown key word arguments provided to the initializer at call-time.
+                    Allows for dictionary style argument plumbing further upstream.'''
                                 
         ShipSprite.__init__(self,
                             fps,
