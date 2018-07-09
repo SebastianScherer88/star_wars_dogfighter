@@ -50,13 +50,18 @@ class Game(object):
         with open ('./meta/game_level_meta_data.yaml','r') as level_meta_file:
             self.level_meta_data = yaml.load(level_meta_file)
             
+        # display game title
+        self._display_title("STAR WARS DOGFIGHTER",
+                            subtitle='A Game By Sebastian Scherer',
+                            wait_seconds=4)
+            
         # start levels
-        for level_no in range(5):
+        for level_index in range(5):
             # get level specs for i-th level
-            level_specs = self.level_meta_data[level_no]
+            level_specs = self.level_meta_data[level_index]
             
             # get meta data for i-th level
-            level_meta_data = self._collect_meta_data_for_level(level_no,
+            level_meta_data = self._collect_meta_data_for_level(level_index,
                                                                 level_specs)
             
             # start level and receive level outcome
@@ -70,19 +75,15 @@ class Game(object):
         # quit (py)game
         pg.quit()
         sys.exit()
-        # set player, ally and hostile ship and laser types
-        #player_ship, player_laser = 'xwing' ,'red'
-        #ally_ship, ally_laser = 'awing', 'red'
-        #hostile_ship, hostile_laser = 'tiefighter', 'green'
         
     def _collect_meta_data_for_level(self,
-                                     level_number,
+                                     level_index,
                                      level_specs):
         '''Util function that collects all the sprite related meta data for player,
         allies and hostiles for current level.
         Input argument is
         - level_specs: dictionary. Contains the keys
-            - 'level_number': integer
+            - 'level_index': integer
             - 'player': dictionary
             - 'ally': dictionary
             - 'hostile': dictionary
@@ -156,7 +157,7 @@ class Game(object):
                           'piloting_cone_sine':0.1,
                           'gunning_cone_sine':0.1,
                           'ship_init_kwargs':ship_init_kwargs,
-                          'level_number':level_number}
+                          'level_number':level_index+1}
         
         return level_meta_data
     
@@ -205,7 +206,69 @@ class Game(object):
                             level_sprite_groups)
         
         return player
+    
+    def _display_title(self,
+                       title,
+                       subtitle = None,
+                       wait_seconds=2,
+                       blackout = True):
+        '''Util function that prints a centered title to a blacked out
+        main screen, then waits a few seconds.'''
         
+        # make screen black if needed
+        if blackout:
+            self.screen.fill((0,0,0))
+        
+        # blit title to main display surface
+        title_rect = self._blit_text(title)
+        
+        # blit subtitle to main display surface
+        self._blit_text(subtitle,
+                        size=20,
+                        top=title_rect.bottom)
+        
+        # flip surface
+        pg.display.flip()
+        
+        # wait if needed seconds
+        pg.time.wait(wait_seconds * 1000)
+        
+    def _blit_text(self,
+                   text,
+                   text_color=(255,0,0), # default is red
+                   font='freesansbold.ttf',
+                   size=40, # default size is 20
+                   left=None,
+                   top=None,
+                   anti_alias = True):  # no default position specified
+        '''Util function that takes a string and some formatting specs and blits
+        the message to the main game screen.'''
+        
+        # get font object
+        font_object = pg.font.Font(font, size)
+        
+        # get text surface
+        text_surface = font_object.render(text,anti_alias,text_color)
+        
+        # get text surface rectangle
+        text_rect = text_surface.get_rect()
+        
+        # if left not given, center along x axis on main game screen
+        if not left:
+            text_rect.centerx = self.screen.get_rect().centerx
+        else:
+            text_rect.left = left
+            
+        #if top not given, center along y axis on main game scree
+        if not top:
+            text_rect.centery = self.screen.get_rect().centery
+        else:
+            text_rect.top = top
+            
+        # blit text to main game surface
+        self.screen.blit(text_surface,text_rect)  
+        
+        return text_rect
         
     def start_level(self,
                     level_meta_data):
@@ -239,6 +302,11 @@ class Game(object):
         # get sprite groups for this level
         level_sprite_groups = self._collect_sprite_groups_for_level()
         
+        # print level title to screen
+        level_title = "LEVEL " + str(level_meta_data['level_number'])
+        self._display_title(level_title,
+                            wait_seconds=3)
+        
         # spawn ships for this level
         player = self._spawn_ships_for_level(level_meta_data,
                                              level_sprite_groups)
@@ -270,12 +338,18 @@ class Game(object):
                     if event.key == pg.K_ESCAPE:
                         paused = not paused
                         
+                        if paused:
+                            self._display_title("PAUSED",
+                                                subtitle="Press ESCAPE to continue",
+                                                wait_seconds=0,
+                                                blackout=False)
+                        
                     # toggle sound if needed
                     if event.key == pg.K_s:
                         sound = not sound
                         
                         # update sprites if needed
-                        for ship in self.all_ships.sprites():
+                        for ship in level_sprite_groups['ships']['any'].sprites():
                             ship._sound = sound
                     
                     # control player fire mode
@@ -520,8 +594,6 @@ class Game(object):
             ships_init_kwargs = level_meta_data['ship_init_kwargs'][side]
             
             ship_init_kwargs = dict([(init_type,init_value[ship_no]) for (init_type,init_value) in ships_init_kwargs.items()])
-            
-        print(ship_init_kwargs)
             
         ship_init_kwargs['hostile_ships_group'] = groups['ships'][other_side] # only neede for AIShipSPrite
         
