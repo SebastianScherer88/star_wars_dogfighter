@@ -12,7 +12,7 @@ The FighterSprite class serves as a sub-base class for the spaceship/fighter pla
 sprites (either player or pc controlled) \'PlayerSprite\' and \'EnemySprite\'.
 The \'LaserSprite\' class is based directly on the MaskedSprite class.'''
 
-from basic_sprite_class import BasicSprite
+from basic_sprite_classes import BasicSprite
 from animation_classes import BasicAnimation, TrackingAnimation
 from weapons_classes import LaserCannon
 from math import cos, sin, pi

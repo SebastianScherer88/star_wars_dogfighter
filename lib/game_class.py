@@ -9,6 +9,7 @@ Created on Sun May 27 22:09:47 2018
 import sys
 import os
 import yaml
+import time
 
 import pygame as pg
 import numpy as np
@@ -53,10 +54,12 @@ class Game(object):
         # display game title
         self._display_title("STAR WARS DOGFIGHTER",
                             subtitle='A Game By Sebastian Scherer',
-                            wait_seconds=4)
+                            wait_seconds=2)
             
         # start levels
-        for level_index in range(5):
+        level_index = 0
+        
+        while level_index < 5:
             # get level specs for i-th level
             level_specs = self.level_meta_data[level_index]
             
@@ -67,10 +70,19 @@ class Game(object):
             # start level and receive level outcome
             level_outcome = self.start_level(level_meta_data)
             
-            if level_outcome == 'fail':
+            if level_outcome == 'quit_game':
                 break 
-            elif level_outcome == 'success':
+            elif level_outcome == 'retry':
+                # repeat level = repeat loop with unchanged index
                 pass
+            elif level_outcome == 'pass':
+                # increase level index by one
+                level_index += 1
+            
+        # display game over message
+        self._display_title("GAME OVER",
+                            subtitle='Thanks For Playing!',
+                            wait_seconds=1.5)
             
         # quit (py)game
         pg.quit()
@@ -220,7 +232,7 @@ class Game(object):
             self.screen.fill((0,0,0))
         
         # blit title to main display surface
-        title_rect = self._blit_text(title)
+        _, title_rect = self._blit_text(title)
         
         # blit subtitle to main display surface
         self._blit_text(subtitle,
@@ -268,7 +280,7 @@ class Game(object):
         # blit text to main game surface
         self.screen.blit(text_surface,text_rect)  
         
-        return text_rect
+        return text_surface, text_rect
         
     def start_level(self,
                     level_meta_data):
@@ -305,7 +317,7 @@ class Game(object):
         # print level title to screen
         level_title = "LEVEL " + str(level_meta_data['level_number'])
         self._display_title(level_title,
-                            wait_seconds=3)
+                            wait_seconds=2)
         
         # spawn ships for this level
         player = self._spawn_ships_for_level(level_meta_data,
@@ -323,33 +335,40 @@ class Game(object):
         # initialize level done variable
         level_status = 'ongoing'
         
+        # initialize time of passing the level
+        t_pass = False
+        
         # start main game loop
         while True:
             # check for exit events
             for event in pg.event.get():
-                if event.type == pg.QUIT:
+                if event.type == pg.QUIT:                    
+                    # quit this level
+                    level_status = 'quit_game'
                     
-                    # quit pygame
-                    pg.quit()
-                    sys.exit()
                 elif event.type == pg.KEYDOWN:
                     
                     # toggle pause state if needed
                     if event.key == pg.K_ESCAPE:
-                        paused = not paused
-                        
-                        if paused:
-                            self._display_title("PAUSED",
-                                                subtitle="Press [Esc]ape to continue, [Q] to quit",
-                                                wait_seconds=0,
-                                                blackout=False)
+                        if level_status == 'ongoing':
+                            paused = not paused
                             
-                    # quit game if in pause mode                            
+                            if paused:
+                                self._display_title("PAUSED",
+                                                    subtitle="Press [Esc]ape to continue, [Q] to quit",
+                                                    wait_seconds=0,
+                                                    blackout=False)
+                            
+                    # quit game if in pause mode or level has failed
                     if event.key == pg.K_q:
-                        if paused:
-                            # quit pygame
-                            pg.quit()
-                            sys.exit()
+                        if paused or level_status == 'fail':
+                            # quit this level
+                            level_status = 'quit_game'
+                            
+                    # return to main game to retry level if level has failed
+                    if event.key == pg.K_r:
+                        if level_status == 'fail':
+                            level_status = 'retry'
                         
                     # toggle sound if needed
                     if event.key == pg.K_s:
@@ -407,14 +426,42 @@ class Game(object):
                 
                 # check and handle collisions
                 self.handle_collisions(level_sprite_groups)
-                
-            # check if level done
-            level_status = self._get_level_status(level_sprite_groups)
             
             # if level is either fail or success, quit game loop and return
-            if level_status != 'ongoing':
+            #if level_status != 'ongoing':
+            #    break
+            
+            # check if level done based on key events; if 'quit_game', quit level,
+            # return to main game and quit
+            if level_status in ['quit_game','retry']:
                 break
-                        
+
+            # check if level done based on game state
+            level_status = self._get_level_status(level_sprite_groups)
+            
+            # check if player and all allies have been destroyed
+            if level_status == 'fail':
+                # print mission fail message and offer retry option
+                self._display_title("Mission failed",
+                                    subtitle="Press [Q] to quit, [R] to retry",
+                                    blackout=False,
+                                    wait_seconds=0)
+                
+            # check if all hostiles have been destroyed
+            if level_status == 'pass':
+                # print mission success message, wait a bit and return to main
+                # game for next level
+                self._display_title("Mission success",
+                                    blackout=False,
+                                    wait_seconds=0)
+                
+                # start countdown (but only once!)
+                if t_pass == False:
+                    t_pass = time.time()
+                else:
+                    if time.time() - t_pass > 3:
+                        break
+
             # control pace
             self.clock.tick(self.fps)
             
@@ -496,7 +543,7 @@ class Game(object):
         if are_allies_dead:
             return 'fail'
         elif are_hostiles_dead:
-            return 'success'
+            return 'pass'
         else:
             return 'ongoing'
         

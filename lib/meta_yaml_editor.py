@@ -166,7 +166,7 @@ level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                                      20],
                                                         'max_speed_pixel_per_second':[250,
                                                                                      250]},
-                                    'ship':'awing',
+                                    'ship':'xwing',
                                     'laser':'red'}
 
 level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),

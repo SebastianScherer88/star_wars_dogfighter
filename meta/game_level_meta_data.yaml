@@ -1,7 +1,7 @@
 - &id001
   ally:
     laser: red
-    ship: awing
+    ship: xwing
     ship_init_kwargs:
       angle: [180, 180]
       center:

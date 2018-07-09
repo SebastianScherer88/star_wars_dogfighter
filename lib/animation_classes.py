@@ -14,7 +14,7 @@ Created on Sat Jun  2 14:00:12 2018
  sprite through time (like gun flashes, missile propulsion, engine fire etc.)'''
  
 #from pygame.sprite import Sprite, Group
-from basic_sprite_class import BasicSprite
+from basic_sprite_classes import BasicSprite
 from math import pi, sin, cos
  
 import numpy as np

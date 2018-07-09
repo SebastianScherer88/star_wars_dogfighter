@@ -10,7 +10,7 @@ For now it only contains the experimental LaserWeapon class and the ProjectileSp
 representing laser beams (and possibly other projectiles in the future).'''
 
 from animation_classes import TrackingAnimation
-from basic_sprite_class import BasicSprite
+from basic_sprite_classes import BasicSprite
 from math import sin,cos,pi
 
 import pygame as pg

@@ -11,6 +11,28 @@ from math import cos, sin, pi
 import pygame as pg
 import numpy as np
 
+class TextSprite(Sprite):
+    '''Sprite class for text displayed during animations, i.e. text that needs
+    to be reblitted every frame as part of a dynamic environment.'''
+    
+    def __init(self,
+               image,
+               rect,
+               *groups):
+        '''Initializer. Needed arguments are:
+            - image: a pygame surface (for example the return of a pygame
+            font.Font's render() method)
+            - rect: a pygame rectangle. Used for positioning text.'''
+        
+        Sprite.__init__(self,*groups)
+        
+        # attach text surface
+        self.image = image
+        
+        # attach positional rectangle
+        self.rect = rect
+        
+
 class BasicSprite(Sprite):
     '''Base class for all masked sprites that appear in the game.'''
     
