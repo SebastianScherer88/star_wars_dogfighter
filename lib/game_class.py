@@ -340,9 +340,16 @@ class Game(object):
                         
                         if paused:
                             self._display_title("PAUSED",
-                                                subtitle="Press ESCAPE to continue",
+                                                subtitle="Press [Esc]ape to continue, [Q] to quit",
                                                 wait_seconds=0,
                                                 blackout=False)
+                            
+                    # quit game if in pause mode                            
+                    if event.key == pg.K_q:
+                        if paused:
+                            # quit pygame
+                            pg.quit()
+                            sys.exit()
                         
                     # toggle sound if needed
                     if event.key == pg.K_s:
