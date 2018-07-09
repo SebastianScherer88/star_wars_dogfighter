@@ -243,7 +243,7 @@ class Game(object):
         pg.display.flip()
         
         # wait if needed seconds
-        pg.time.wait(wait_seconds * 1000)
+        pg.time.wait(int(wait_seconds * 1000))
         
     def _blit_text(self,
                    text,
