@@ -68,11 +68,11 @@ class Game(object):
                                                                 level_specs)
             
             # start level and receive level outcome
-            level_outcome = self.start_level(level_meta_data)
+            player_feedback, level_outcome = self.start_level(level_meta_data)
             
-            if level_outcome == 'quit_game':
+            if player_feedback == 'quit_game':
                 break 
-            elif level_outcome == 'retry':
+            elif player_feedback == 'retry':
                 # repeat level = repeat loop with unchanged index
                 pass
             elif level_outcome == 'pass':
@@ -281,7 +281,138 @@ class Game(object):
         self.screen.blit(text_surface,text_rect)  
         
         return text_surface, text_rect
+    
+    def _toggle_pause(self,
+                      level_status,
+                      paused):
+        '''Util function that toggles the pause mode during the game.'''
         
+        # only pause and display pause message if level is ongoing
+        if level_status == 'ongoing':
+            # invert pause state
+            paused = not paused
+                            
+            if paused:
+                # display pause message on screen
+                self._display_title("PAUSED",
+                                    subtitle="Press [Esc]ape to continue, [Q] to quit or [R] to retry level",
+                                    wait_seconds=0,
+                                    blackout=False)
+                
+        return paused
+        
+    def _toggle_sound(self,
+                      level_sprite_groups,
+                      sound):
+        '''Util function that toggles the sound mode during the game.'''
+        
+        # invert sound state
+        sound = not sound
+                        
+        # update sprites if needed
+        for ship in level_sprite_groups['ships']['any'].sprites():
+            ship._sound = sound
+            
+        return sound
+    
+    def handle_events_queue(self,
+                            player_input,
+                            level_status,
+                            level_sprite_groups,
+                            paused,
+                            sound,
+                            player):
+        '''Handles the events in the pygame event queue. Changes game state
+        variables as needed and returns their updated versions.'''
+        
+        for event in pg.event.get():
+            if event.type == pg.QUIT:                    
+                # quit this level
+                player_input = 'quit_game'
+                
+            elif event.type == pg.KEYDOWN:
+                
+                # toggle pause state if needed
+                if event.key == pg.K_ESCAPE:
+                    paused = self._toggle_pause(level_status,
+                                                paused)
+                        
+                # quit game if in pause mode or level has failed
+                if event.key == pg.K_q:
+                    if paused or level_status == 'fail':
+                        # quit this level
+                        player_input = 'quit_game'
+                        
+                # return to main game to retry level if level has failed
+                if event.key == pg.K_r:
+                    if paused or level_status == 'fail':
+                        player_input = 'retry'
+                    
+                # toggle sound if needed
+                if event.key == pg.K_s:
+                    sound = self._toggle_sound(level_sprite_groups,
+                                               sound)
+                
+                # control player fire mode
+                if event.key == pg.K_f:
+                    player._toggle_fire_mode()
+                    
+                # control player fire commands
+                if event.key == pg.K_SPACE:
+                    player._command_to_fire = True
+                    
+                # control player acceleration
+                if event.key == pg.K_UP:
+                    player._d_speed += player._d_speed_pixel_per_frame
+                if event.key == pg.K_DOWN:
+                    player._d_speed -= player._d_speed_pixel_per_frame
+                    
+                # control player steering
+                if event.key == pg.K_RIGHT:
+                    player._d_angle -= player._d_angle_degrees_per_frame
+                if event.key == pg.K_LEFT:
+                    player._d_angle += player._d_angle_degrees_per_frame
+                    
+            elif event.type == pg.KEYUP:
+                
+                # control player fire commands
+                if event.key == pg.K_SPACE:
+                    player._command_to_fire = False
+                
+                # control player acceleration
+                if event.key == pg.K_UP:
+                    player._d_speed -= player._d_speed_pixel_per_frame
+                if event.key == pg.K_DOWN:
+                    player._d_speed += player._d_speed_pixel_per_frame
+                    
+                # control player steering
+                if event.key == pg.K_RIGHT:
+                    player._d_angle += player._d_angle_degrees_per_frame
+                if event.key == pg.K_LEFT:
+                    player._d_angle -= player._d_angle_degrees_per_frame
+                    
+        return player_input, level_status, paused, sound
+        
+    def handle_level_status(self,
+                            level_status): 
+        '''Handle level status states 'pass', 'ongoing' or 'fail'.'''
+        
+        # check if player and all allies have been destroyed
+        if level_status == 'fail':
+            # print mission fail message and offer retry option
+            self._display_title("Mission failed",
+                                subtitle="Press [Q] to quit, [R] to retry",
+                                blackout=False,
+                                wait_seconds=0)
+            
+        # check if all hostiles have been destroyed
+        if level_status == 'pass':
+            # print mission success message, wait a bit and return to main
+            # game for next level
+            self._display_title("Mission success",
+                                blackout=False,
+                                wait_seconds=0)
+    
     def start_level(self,
                     level_meta_data):
         
@@ -326,98 +457,20 @@ class Game(object):
         # sync player controls with current keyboard status before entering event loop
         self._sync_player_(player)
         
-        # initialize pause state variable
-        paused = False
-        
-        # initiazlie sound toggle variable
-        sound = False
-        
-        # initialize level done variable
-        level_status = 'ongoing'
-        
-        # initialize time of passing the level
-        t_pass = False
+        # initialize pause, sound and next level countdown state variables
+        player_input, paused, sound, t_pass, level_status = None, False, False, False, 'ongoing'
         
         # start main game loop
         while True:
-            # check for exit events
-            for event in pg.event.get():
-                if event.type == pg.QUIT:                    
-                    # quit this level
-                    level_status = 'quit_game'
-                    
-                elif event.type == pg.KEYDOWN:
-                    
-                    # toggle pause state if needed
-                    if event.key == pg.K_ESCAPE:
-                        if level_status == 'ongoing':
-                            paused = not paused
-                            
-                            if paused:
-                                self._display_title("PAUSED",
-                                                    subtitle="Press [Esc]ape to continue, [Q] to quit",
-                                                    wait_seconds=0,
-                                                    blackout=False)
-                            
-                    # quit game if in pause mode or level has failed
-                    if event.key == pg.K_q:
-                        if paused or level_status == 'fail':
-                            # quit this level
-                            level_status = 'quit_game'
-                            
-                    # return to main game to retry level if level has failed
-                    if event.key == pg.K_r:
-                        if level_status == 'fail':
-                            level_status = 'retry'
-                        
-                    # toggle sound if needed
-                    if event.key == pg.K_s:
-                        sound = not sound
-                        
-                        # update sprites if needed
-                        for ship in level_sprite_groups['ships']['any'].sprites():
-                            ship._sound = sound
-                    
-                    # control player fire mode
-                    if event.key == pg.K_f:
-                        player._toggle_fire_mode()
-                        
-                    # control player fire commands
-                    if event.key == pg.K_SPACE:
-                        player._command_to_fire = True
-                        
-                    # control player acceleration
-                    if event.key == pg.K_UP:
-                        player._d_speed += player._d_speed_pixel_per_frame
-                    if event.key == pg.K_DOWN:
-                        player._d_speed -= player._d_speed_pixel_per_frame
-                        
-                    # control player steering
-                    if event.key == pg.K_RIGHT:
-                        player._d_angle -= player._d_angle_degrees_per_frame
-                    if event.key == pg.K_LEFT:
-                        player._d_angle += player._d_angle_degrees_per_frame
-                        
-                elif event.type == pg.KEYUP:
-                    
-                    # control player fire commands
-                    if event.key == pg.K_SPACE:
-                        player._command_to_fire = False
-                    
-                    # control player acceleration
-                    if event.key == pg.K_UP:
-                        player._d_speed -= player._d_speed_pixel_per_frame
-                    if event.key == pg.K_DOWN:
-                        player._d_speed += player._d_speed_pixel_per_frame
-                        
-                    # control player steering
-                    if event.key == pg.K_RIGHT:
-                        player._d_angle += player._d_angle_degrees_per_frame
-                    if event.key == pg.K_LEFT:
-                        player._d_angle -= player._d_angle_degrees_per_frame
+            # handle events
+            player_input, level_status, paused, sound = self.handle_events_queue(player_input,
+                                                                                 level_status,
+                                                                                 level_sprite_groups,
+                                                                                 paused,
+                                                                                 sound,
+                                                                                 player)
                 
             if not paused:
-            
                 # update game state
                 self.update_game_state(level_sprite_groups)
                 
@@ -427,45 +480,28 @@ class Game(object):
                 # check and handle collisions
                 self.handle_collisions(level_sprite_groups)
             
-            # if level is either fail or success, quit game loop and return
-            #if level_status != 'ongoing':
-            #    break
-            
             # check if level done based on key events; if 'quit_game', quit level,
             # return to main game and quit
-            if level_status in ['quit_game','retry']:
+            if player_input in ['quit_game','retry']:
                 break
 
             # check if level done based on game state
             level_status = self._get_level_status(level_sprite_groups)
             
-            # check if player and all allies have been destroyed
-            if level_status == 'fail':
-                # print mission fail message and offer retry option
-                self._display_title("Mission failed",
-                                    subtitle="Press [Q] to quit, [R] to retry",
-                                    blackout=False,
-                                    wait_seconds=0)
-                
-            # check if all hostiles have been destroyed
-            if level_status == 'pass':
-                # print mission success message, wait a bit and return to main
-                # game for next level
-                self._display_title("Mission success",
-                                    blackout=False,
-                                    wait_seconds=0)
-                
-                # start countdown (but only once!)
-                if t_pass == False:
-                    t_pass = time.time()
-                else:
-                    if time.time() - t_pass > 3:
-                        break
+            # handle level_status
+            self.handle_level_status(level_status)
+            
+            # start countdown (but only once!) before moving on to next level
+            if level_status == 'pass' and t_pass == False:
+                t_pass = time.time()
+            elif level_status == 'pass':
+                if time.time() - t_pass > 3:
+                    break
 
             # control pace
             self.clock.tick(self.fps)
             
-        return level_status
+        return player_input, level_status
             
     def update_game_state(self,
                           sprite_groups):
