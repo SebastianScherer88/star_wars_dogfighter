@@ -151,7 +151,7 @@ level_template_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
                                                           'd_angle_degrees_per_second':150,
                                                           'd_speed_pixel_per_second':20,
                                                           'max_speed_pixel_per_second':250},
-                                        'ship':'awing',
+                                        'ship':'xwing',
                                         'laser':'red'}
 
 level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
@@ -187,7 +187,7 @@ level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                             'max_speed_pixel_per_second':[250,
                                                                                            250,
                                                                                            250]},
-                                        'ship':'tiefighter',
+                                        'ship':'tieinterceptor',
                                         'laser':'green'}
 
 game_level_meta_data = [level_template_meta_data ] * 5

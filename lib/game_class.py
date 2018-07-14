@@ -34,7 +34,13 @@ class Game(object):
         # create clock    
         self.clock = pg.time.Clock()
         
+        # background
         self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
+        
+        # cockpit frame
+        self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit_test.bmp')
+        self.cockpit_frame.set_colorkey((255,255,255))
+        
         self.fps = fps
         
         # initialize main screen
@@ -611,6 +617,8 @@ class Game(object):
             sprite_groups['level_endings']['pass'].draw(self.screen)
         elif level_status == 'fail':
             sprite_groups['level_endings']['fail'].draw(self.screen)
+            
+        self.screen.blit(self.cockpit_frame,(0,0)) # paint over old cockpit frame
                    
         # flip canvas
         pg.display.flip()

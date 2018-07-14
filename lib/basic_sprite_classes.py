@@ -36,6 +36,8 @@ class TextSprite(Sprite):
 class BasicSprite(Sprite):
     '''Base class for all masked sprites that appear in the game.'''
     
+    COCKPIT_BAR_WIDTH = 280
+    
     def __init__(self,
                  fps,
                  screen,
@@ -131,12 +133,13 @@ class BasicSprite(Sprite):
         # get main screen and current sprite image's dimensions for wrap checks
         screen_w, screen_h= self._screen.get_size()
         image_w, image_h = self.image.get_size()
+        buffer = BasicSprite.COCKPIT_BAR_WIDTH
         
         # wrap horizontaly if needed
-        if self._center[0] < - image_w / 2:
-            self._center[0] = screen_w + image_w / 2
-        elif self._center[0] > screen_w + image_w / 2:
-            self._center[0] = - image_w / 2
+        if self._center[0] < buffer - image_w / 2:
+            self._center[0] = screen_w + image_w / 2 - buffer
+        elif self._center[0] > screen_w - buffer + image_w / 2:
+            self._center[0] = buffer - image_w / 2
                         
         # wrap vertically if needed
         if self._center[1] < - image_h / 2:

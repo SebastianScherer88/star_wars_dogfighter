@@ -13,7 +13,7 @@
       speed: [250, 250]
   hostile:
     laser: green
-    ship: tiefighter
+    ship: tieinterceptor
     ship_init_kwargs:
       angle: [0, 0, 0]
       center: !!python/tuple
@@ -26,7 +26,7 @@
       speed: [250, 250, 250]
   player:
     laser: red
-    ship: awing
+    ship: xwing
     ship_init_kwargs:
       angle: 180
       center: [1400, 350]
