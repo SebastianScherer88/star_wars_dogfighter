@@ -15,8 +15,9 @@ import pygame as pg
 import numpy as np
 
 from pygame.sprite import Group, collide_mask, groupcollide
+from basic_sprite_classes import BasicSprite
 from sprite_classes import ShipSprite, AIShipSprite
-from animation_classes import TrackingAnimation
+from animation_classes import BasicAnimation,TrackingAnimation
 
 class Game(object):
     
@@ -50,44 +51,199 @@ class Game(object):
             
         with open ('./meta/game_level_meta_data.yaml','r') as level_meta_file:
             self.level_meta_data = yaml.load(level_meta_file)
-            
-        # display game title
-        self._display_title("STAR WARS DOGFIGHTER",
-                            subtitle='A Game By Sebastian Scherer',
-                            wait_seconds=2)
-            
-        # start levels
-        level_index = 0
         
-        while level_index < 5:
-            # get level specs for i-th level
-            level_specs = self.level_meta_data[level_index]
+        # start start-up animation and welcome screen
+        player_feedback = self.welcome_screen()
+        
+        # if player hasnt closed the pygame window, process to level 1 of game
+        if player_feedback == 'pass':
             
-            # get meta data for i-th level
-            level_meta_data = self._collect_meta_data_for_level(level_index,
-                                                                level_specs)
+            # start levels
+            level_index = 0
             
-            # start level and receive level outcome
-            player_feedback, level_outcome = self.start_level(level_meta_data)
-            
-            if player_feedback == 'quit_game':
-                break 
-            elif player_feedback == 'retry':
-                # repeat level = repeat loop with unchanged index
-                pass
-            elif level_outcome == 'pass':
-                # increase level index by one
-                level_index += 1
+            while level_index < 5:
+                # get level specs for i-th level
+                level_specs = self.level_meta_data[level_index]
+                
+                # get meta data for i-th level
+                level_meta_data = self._collect_meta_data_for_level(level_index,
+                                                                    level_specs)
+                
+                # start level and receive level outcome
+                player_feedback, level_outcome = self.start_level(level_meta_data)
+                
+                if player_feedback == 'quit_game':
+                    break 
+                elif player_feedback == 'retry':
+                    # repeat level = repeat loop with unchanged index
+                    pass
+                elif level_outcome == 'pass':
+                    # increase level index by one
+                    level_index += 1
             
         # display game over message
-        self._display_title("GAME OVER",
-                            subtitle='Thanks For Playing!',
-                            wait_seconds=1.5)
-            
+        self.goodbye_screen()
+        
         # quit (py)game
         pg.quit()
         sys.exit()
         
+    def handle_startup_events_queue(self,
+                                    player_input):
+        '''Util function that produces returns a break flag when user pressing
+        the escape key. Can be used for events handling during game start up animation
+        in the future and welcome screen display.'''
+        
+        events = pg.event.get()
+        
+        for event in events:
+            # if player wants to quit, record that feedback
+            if event.type == pg.QUIT:                    
+                # quit this level
+                player_input = 'quit_game'
+            # if player wants to skip/continue to game, record that feedback
+            if event.type == pg.KEYDOWN:
+                player_input = 'pass'
+                
+        return player_input
+    
+    def _get_surface_from_text(self,
+                               message = '',
+                               font = 'freesansbold.ttf',
+                               size = 40,
+                               text_color = (255,0,0),
+                               background_color = None):
+        '''Util function that generates a pygame surface (transparent unless 
+        background_color is specified) by rendering the specified
+        text message according to the passed specs.'''
+        
+        # get font from specs
+        font = pg.font.Font(font,size)
+        
+        # render text to get surface
+        text_surface = font.render(message,False,text_color,background_color)
+        
+        return text_surface
+    
+    def blit_message_and_wait(self,
+                             main_message,
+                             sub_message=None,
+                             main_size = 40,
+                             sub_size = 20,
+                             font = 'freesansbold.ttf',
+                             text_color = (255, 0, 0),
+                             background_color = None,
+                             blackout = True,
+                             wait_seconds = 0,
+                             blit_mode=True,
+                             text_groups=None):
+        '''Util message that can be used to blit a message with smaller submessage
+        to the center of the main screen, and wait a bit. If blit_mode is set to True,
+        messages will be blitted straight to the screen. Otherwise, a pair of BasicSprites
+        with rendered text surfaces will be added to the passed sprite_groups list 
+        of groups.'''
+        
+        # black out screen if needed
+        if blackout:
+            self.screen.fill((0,0,0))
+            
+        # get positions for main and sub message
+        center = self.screen.get_rect().center
+        sub_center = center[0], center[1] + main_size
+            
+        # render, position and blit main and sub message
+        for text,pos,size in zip([main_message,sub_message],
+                            [center,sub_center],
+                            [main_size, sub_size]):
+            if text != None:
+                text_surface = self._get_surface_from_text(text,
+                                                           font,
+                                                           size,
+                                                           text_color,
+                                                           background_color)
+                text_rect = text_surface.get_rect()
+                text_rect.center = pos
+                if blit_mode:
+                    self.screen.blit(text_surface,text_rect)
+                else:
+                    BasicSprite(self.fps,
+                                self.screen,
+                                [text_surface],
+                                text_groups,
+                                center = pos,
+                                is_transparent = False)
+                
+        # display drawings if in blit mode
+        if blit_mode:
+            pg.display.flip()
+        
+        # wait if needed
+        if wait_seconds:
+            pg.time.wait(int(wait_seconds * 1000))
+        
+    def welcome_screen(self):
+        '''Util function that start any potential animations when starting up the 
+        game and prints the game name with "Press any key to continue" message.'''
+        
+        player_input = ''
+        
+        # get sprite group for screen messages
+        start_up_sprites = Group()
+        
+        # get clock
+        clock = pg.time.Clock()
+        
+        # add STAR WARS DOGFIGHTER text sprite to group/main screen
+        self.blit_message_and_wait("STAR WARS DOGFIGHTER",
+                                   blackout = False,
+                                   blit_mode=False,
+                                   text_groups=[start_up_sprites])
+                
+        # create "press any key to continue to game" animation
+        continue_surfaces = [self._get_surface_from_text(message,size=20) for message in ("Press any key to continue", "")]
+        
+        # get rectange of main screen for positioning text messages
+        center_x, center_y = self.screen.get_rect().center
+        
+        BasicAnimation(self.fps,
+                       self.screen,
+                       continue_surfaces,
+                       1,
+                       [start_up_sprites],
+                       center = [center_x,center_y+200],
+                       is_transparent = True,
+                       looping = True)
+        
+        # start main game loop
+        while True:
+            # handle player pressing any key
+            player_input = self.handle_startup_events_queue(player_input)
+            
+            # stop this segment if player wants to skip ahead to game
+            if player_input in  ['pass','quit_game']:
+                break
+            
+            # update message sprites
+            start_up_sprites.update()
+            
+            # draw messae sprites
+            self.screen.fill((0,0,0))
+            start_up_sprites.draw(self.screen)
+            pg.display.flip()
+            
+            # control speed up frame updates
+            clock.tick(self.fps)
+            
+        return player_input
+    
+    def goodbye_screen(self):
+        '''Util function that blits some game over type of message to screen,
+        waits a bit and returns.'''
+        
+        self.blit_message_and_wait("GAME OVER",
+                                   sub_message="Thank You For Playing!",
+                                   wait_seconds = 1.5)
+            
     def _collect_meta_data_for_level(self,
                                      level_index,
                                      level_specs):
@@ -190,13 +346,18 @@ class Game(object):
         # animations and other non-collidable sprites will be added to this group
         non_collidables_group = {'any':Group()}
         
+        # end of level messages will be added to this group
+        level_endings = {'pass':Group(),
+                         'fail':Group()}
+        
         level_sprite_groups = {'ships':ship_groups,
                               'lasers':laser_beams_groups,
-                              'non_colliders':non_collidables_group}
+                              'non_colliders':non_collidables_group,
+                              'level_endings':level_endings}
         
         return level_sprite_groups
     
-    def _spawn_ships_for_level(self,
+    def _add_sprites_to_groups_for_level(self,
                                level_meta_data,
                                level_sprite_groups):
         '''Util function that spawns all the ships for current level. Returns the
@@ -207,81 +368,21 @@ class Game(object):
                                  level_meta_data,
                                  level_sprite_groups)
         
-        # create allies for this level and blit to screen
+        # create allies for this level and add to groups
         self.spawn_squadron('ally',
                             level_meta_data,
                             level_sprite_groups)
         
-        # create hostiles for this level and blit to screen
+        # create hostiles for this level and add to groups
         self.spawn_squadron('hostile',
                             level_meta_data,
                             level_sprite_groups)
         
+        # render level ending messages and add to groups
+        self.spawn_level_ending_messages(level_sprite_groups)
+        
         return player
-    
-    def _display_title(self,
-                       title,
-                       subtitle = None,
-                       wait_seconds=2,
-                       blackout = True):
-        '''Util function that prints a centered title to a blacked out
-        main screen, then waits a few seconds.'''
         
-        # make screen black if needed
-        if blackout:
-            self.screen.fill((0,0,0))
-        
-        # blit title to main display surface
-        _, title_rect = self._blit_text(title)
-        
-        # blit subtitle to main display surface
-        self._blit_text(subtitle,
-                        size=20,
-                        top=title_rect.bottom)
-        
-        # flip surface
-        pg.display.flip()
-        
-        # wait if needed seconds
-        pg.time.wait(int(wait_seconds * 1000))
-        
-    def _blit_text(self,
-                   text,
-                   text_color=(255,0,0), # default is red
-                   font='freesansbold.ttf',
-                   size=40, # default size is 20
-                   left=None,
-                   top=None,
-                   anti_alias = True):  # no default position specified
-        '''Util function that takes a string and some formatting specs and blits
-        the message to the main game screen.'''
-        
-        # get font object
-        font_object = pg.font.Font(font, size)
-        
-        # get text surface
-        text_surface = font_object.render(text,anti_alias,text_color)
-        
-        # get text surface rectangle
-        text_rect = text_surface.get_rect()
-        
-        # if left not given, center along x axis on main game screen
-        if not left:
-            text_rect.centerx = self.screen.get_rect().centerx
-        else:
-            text_rect.left = left
-            
-        #if top not given, center along y axis on main game scree
-        if not top:
-            text_rect.centery = self.screen.get_rect().centery
-        else:
-            text_rect.top = top
-            
-        # blit text to main game surface
-        self.screen.blit(text_surface,text_rect)  
-        
-        return text_surface, text_rect
-    
     def _toggle_pause(self,
                       level_status,
                       paused):
@@ -294,10 +395,9 @@ class Game(object):
                             
             if paused:
                 # display pause message on screen
-                self._display_title("PAUSED",
-                                    subtitle="Press [Esc]ape to continue, [Q] to quit or [R] to retry level",
-                                    wait_seconds=0,
-                                    blackout=False)
+                self.blit_message_and_wait("PAUSED",
+                                           sub_message="Press [Esc]ape to continue, [Q] to quit or [R] to retry level",
+                                           blackout = False)
                 
         return paused
         
@@ -315,7 +415,7 @@ class Game(object):
             
         return sound
     
-    def handle_events_queue(self,
+    def handle_level_events_queue(self,
                             player_input,
                             level_status,
                             level_sprite_groups,
@@ -393,26 +493,6 @@ class Game(object):
                     
         return player_input, level_status, paused, sound
         
-    def handle_level_status(self,
-                            level_status): 
-        '''Handle level status states 'pass', 'ongoing' or 'fail'.'''
-        
-        # check if player and all allies have been destroyed
-        if level_status == 'fail':
-            # print mission fail message and offer retry option
-            self._display_title("Mission failed",
-                                subtitle="Press [Q] to quit, [R] to retry",
-                                blackout=False,
-                                wait_seconds=0)
-            
-        # check if all hostiles have been destroyed
-        if level_status == 'pass':
-            # print mission success message, wait a bit and return to main
-            # game for next level
-            self._display_title("Mission success",
-                                blackout=False,
-                                wait_seconds=0)
-    
     def start_level(self,
                     level_meta_data):
         
@@ -447,12 +527,13 @@ class Game(object):
         
         # print level title to screen
         level_title = "LEVEL " + str(level_meta_data['level_number'])
-        self._display_title(level_title,
-                            wait_seconds=2)
+        self.blit_message_and_wait(level_title,
+                                   main_size = 40,
+                                   wait_seconds = 1.5)
         
-        # spawn ships for this level
-        player = self._spawn_ships_for_level(level_meta_data,
-                                             level_sprite_groups)
+        # add sprites to groups for this level
+        player = self._add_sprites_to_groups_for_level(level_meta_data,
+                                                       level_sprite_groups)
         
         # sync player controls with current keyboard status before entering event loop
         self._sync_player_(player)
@@ -463,7 +544,7 @@ class Game(object):
         # start main game loop
         while True:
             # handle events
-            player_input, level_status, paused, sound = self.handle_events_queue(player_input,
+            player_input, level_status, paused, sound = self.handle_level_events_queue(player_input,
                                                                                  level_status,
                                                                                  level_sprite_groups,
                                                                                  paused,
@@ -475,7 +556,8 @@ class Game(object):
                 self.update_game_state(level_sprite_groups)
                 
                 # draw update game state to screen
-                self.draw_game_state(level_sprite_groups)
+                self.draw_game_state(level_sprite_groups,
+                                     level_status)
                 
                 # check and handle collisions
                 self.handle_collisions(level_sprite_groups)
@@ -487,9 +569,6 @@ class Game(object):
 
             # check if level done based on game state
             level_status = self._get_level_status(level_sprite_groups)
-            
-            # handle level_status
-            self.handle_level_status(level_status)
             
             # start countdown (but only once!) before moving on to next level
             if level_status == 'pass' and t_pass == False:
@@ -511,9 +590,11 @@ class Game(object):
         sprite_groups['lasers']['ally'].update()
         sprite_groups['lasers']['hostile'].update()
         sprite_groups['non_colliders']['any'].update()
+        #sprite_groups['level_endings']['any'].update()
         
     def draw_game_state(self,
-                        sprite_groups):
+                        sprite_groups,
+                        level_status):
         '''Draws updated game state by wiping the game's main surface,
         drawing all the game's sprite groups and then flipping the game's main
         surface to display the drawings.'''
@@ -525,6 +606,11 @@ class Game(object):
         sprite_groups['lasers']['ally'].draw(self.screen)
         sprite_groups['lasers']['hostile'].draw(self.screen)
         sprite_groups['non_colliders']['any'].draw(self.screen)
+        
+        if level_status == 'pass':
+            sprite_groups['level_endings']['pass'].draw(self.screen)
+        elif level_status == 'fail':
+            sprite_groups['level_endings']['fail'].draw(self.screen)
                    
         # flip canvas
         pg.display.flip()
@@ -797,6 +883,26 @@ class Game(object):
                             ship_index,
                             level_meta_data,
                             level_sprite_groups)
+            
+    def spawn_level_ending_messages(self,
+                                    level_sprite_groups):
+        '''Util function that renders the level endings messages and adds them
+        to the level's message sprite groups.'''
+        
+        # set up specs for pass and fail messages
+        level_ending_specs = {'pass':{'message':'MISSION COMPLETE',
+                                      'sub_message':None,
+                                      'wait_seconds':1.5},
+            'fail':{'message':'MISSION FAIL',
+                    'sub_message':'Press [Q] to quit, [R] to retry',
+                    'wait_seconds':0}}
+            
+        for level_ending in level_ending_specs.keys():
+            self.blit_message_and_wait(level_ending_specs[level_ending]['message'],
+                                       sub_message=level_ending_specs[level_ending]['sub_message'],
+                                       wait_seconds=level_ending_specs[level_ending]['wait_seconds'],
+                                       blit_mode=False,
+                                       text_groups=[level_sprite_groups['level_endings'][level_ending]])
             
 def main():
     # make sure directory is repo head
