@@ -36,6 +36,18 @@ hornet:
   image_paths: [./graphics/sprite_skins/hornet.bmp]
 red:
   image_paths: [./graphics/sprite_skins/redlaser.bmp]
+snowspeeder:
+  engine_offsets:
+  - [-22, -5]
+  - [-22, 5]
+  fire_modes:
+  - - [0, 1]
+  - - [0]
+    - [1]
+  gun_offsets:
+  - [22, -11]
+  - [22, 11]
+  image_paths: [./graphics/sprite_skins/snowspeeder.bmp]
 tiefighter:
   engine_offsets:
   - [-11, 0]

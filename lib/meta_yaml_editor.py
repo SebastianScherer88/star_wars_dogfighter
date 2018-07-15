@@ -59,6 +59,16 @@ with open('animations_meta_data.yaml','w') as animations_meta_data_file:
 
 skins_meta_data = {}
 
+# create meta data for snowspeeder skin
+skins_meta_data['snowspeeder'] = {'image_paths':['./graphics/sprite_skins/snowspeeder.bmp'],
+               'gun_offsets':[[22,-11],
+                              [22,11]],
+               'engine_offsets':[[-22,-5],
+                                 [-22,5]],
+                'fire_modes':[[[0,1]], # coupled
+                              [[0], #singe
+                               [1]]]}
+
 # create meta data for awing skin
 skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing.bmp'],
                'gun_offsets':[[9,-15],
@@ -159,7 +169,7 @@ level_template_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
                                                           'd_angle_degrees_per_second':150,
                                                           'd_speed_pixel_per_second':20,
                                                           'max_speed_pixel_per_second':250},
-                                        'ship':'xwing',
+                                        'ship':'snowspeeder',
                                         'laser':'red'}
 
 level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
@@ -174,7 +184,7 @@ level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                                      20],
                                                         'max_speed_pixel_per_second':[250,
                                                                                      250]},
-                                    'ship':'xwing',
+                                    'ship':'snowspeeder',
                                     'laser':'red'}
 
 level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
@@ -195,7 +205,7 @@ level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                             'max_speed_pixel_per_second':[250,
                                                                                            250,
                                                                                            250]},
-                                        'ship':'tieinterceptor',
+                                        'ship':'tiefighter',
                                         'laser':'green'}
 
 game_level_meta_data = [level_template_meta_data ] * 5

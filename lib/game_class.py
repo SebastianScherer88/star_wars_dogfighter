@@ -35,7 +35,8 @@ class Game(object):
         self.clock = pg.time.Clock()
         
         # background
-        self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
+        #self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
+        self.background_image = pg.image.load('./graphics/misc/hoth_background.bmp')
         
         # cockpit frame
         self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit2.bmp')
@@ -271,7 +272,7 @@ class Game(object):
         hostile_ship, hostile_laser = level_specs['hostile']['ship'],level_specs['hostile']['laser']
 
         # assign sides to player to get pilot images
-        if player_ship in ['awing','xwing','ywing']:
+        if player_ship in ['awing','xwing','ywing','snowspeeder']:
             player_side = 'rebel'
             hostile_side = 'empire'
         else:
@@ -375,11 +376,15 @@ class Game(object):
         # add group for in-cockpit sprites
         cockpit_group = {'any':Group()}
         
+        # background sprite group
+        background_group = {'any':Group()}
+        
         level_sprite_groups = {'ships':ship_groups,
                               'lasers':laser_beams_groups,
                               'non_colliders':non_collidables_group,
                               'level_endings':level_endings,
-                              'cockpit':cockpit_group}
+                              'cockpit':cockpit_group,
+                              'background':background_group}
         
         return level_sprite_groups
     
@@ -406,6 +411,9 @@ class Game(object):
         
         # render level ending messages and add to groups
         self.spawn_level_ending_messages(level_sprite_groups)
+        
+        # create background sprite
+        self.spawn_background(level_sprite_groups)
         
         return player
         
@@ -612,6 +620,7 @@ class Game(object):
                           sprite_groups):
         '''Updates the game state by updating all the game's sprite groups.'''
         
+        sprite_groups['background']['any'].update()
         sprite_groups['ships']['any'].update()
         sprite_groups['lasers']['ally'].update()
         sprite_groups['lasers']['hostile'].update()
@@ -628,6 +637,7 @@ class Game(object):
         
         # draw new game state    
         self.screen.blit(self.background_image,(0,0)) # paint over old game state
+        #sprite_groups['background']['any'].draw(self.screen)
         
         sprite_groups['ships']['any'].draw(self.screen)
         sprite_groups['lasers']['ally'].draw(self.screen)
@@ -980,6 +990,25 @@ class Game(object):
                                        blit_mode=False,
                                        text_groups=[level_sprite_groups['level_endings'][level_ending]])
             
+    def spawn_background(self,
+                         level_sprite_groups):
+        '''Util function that creates the moving backougrnd sprite.'''
+        
+        # get initial values
+        screen_w, screen_h = self.screen.get_size()
+        center_x, center_y = screen_w / 2, screen_h / 2
+        background_group = level_sprite_groups['background']['any']
+        
+        # create backgroundsprite
+        ##BasicSprite(self.fps,
+        #            self.screen,
+        #            [self.background_image],
+        #            [background_group],
+        #            center = (center_x, center_y),
+        #            angle = 180,
+        ##            speed = 80,
+         #           is_transparent = False)
+        
 def main():
     # make sure directory is repo head
     os.chdir('..')
