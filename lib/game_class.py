@@ -38,7 +38,7 @@ class Game(object):
         self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
         
         # cockpit frame
-        self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit_test.bmp')
+        self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit.bmp')
         self.cockpit_frame.set_colorkey((255,255,255))
         
         self.fps = fps
@@ -738,7 +738,7 @@ class Game(object):
         'player') and its id number into a label displayed on the tracking frame.'''
         
         if side in ['ally','hostile']:
-            ship_id = side[0].upper() + side[1:] + str(id_no)
+            ship_id = side[0].upper() + side[1:] + str(id_no+1)
         elif side == 'player':
             ship_id = side[0].upper() + side[1:]
         
