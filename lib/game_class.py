@@ -882,10 +882,10 @@ class Game(object):
         # create side-> center_x mapping
         center_x = {'player':1360,
                     'ally':1360,
-                    'hostile':100}
+                    'hostile':145}
         
         # get center coordinates for ship stats id card
-        center_pos = (center_x[side],300 + ship_no * 130)
+        center_pos = (center_x[side],125 + ship_no * 130)
         
         # create the ship stats id card
         ShipBio(pilot_images,

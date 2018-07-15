@@ -497,7 +497,7 @@ class ShipBio(Sprite):
                  reference_ship,
                  groups,
                  font = 'freesansbold.ttf',
-                 size = 25,
+                 size = 15,
                  center = np.zeros(2)):
         
         # attach font
@@ -552,7 +552,7 @@ class ShipBio(Sprite):
     
     def _render_text(self,
                      text,
-                     text_color=(0,100,100)):
+                     text_color=(0,200,200)):
         '''Util function that renders a text message to a pygame surface and
         returns the surface.'''
         
@@ -584,7 +584,7 @@ class ShipBio(Sprite):
             id_template.blit(pilot_images[1],(10,10)) # second image in sequence shows dead pilot
             
         # blit stats
-        for (top_left_y, text) in zip([10,35,60,85],
+        for (top_left_y, text) in zip([10,25,45,60],
                                       ["Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
             # render text message
             stat_surface = self._render_text(text)
