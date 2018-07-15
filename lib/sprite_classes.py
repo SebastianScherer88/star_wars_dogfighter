@@ -498,10 +498,24 @@ class ShipBio(Sprite):
                  pilot_images,
                  reference_ship,
                  groups,
+                 font = 'freesansbold.ttf',
+                 size = 25,
                  center = np.zeros(2)):
         
+        # attach font
+        self._font = pg.font.Font(font,size)
+        
         # attach original pilot image
-        self._original_pilot_images = pilot_images
+        self._original_pilot_image = pilot_images
+        
+        # attach reference ship
+        self._source_ship = reference_ship
+        
+        # attach max hp pf reference ship
+        self._source_ship_max_hp = reference_ship._hit_points
+        
+        # initialize stats reference storage for comparison
+        self._previous_stats = self._get_current_stats()
         
         # assemble the "ID card" for given ship using pilot image and ship
         ship_bio_image = self._get_ship_bio_image(pilot_images,
@@ -518,18 +532,76 @@ class ShipBio(Sprite):
         Sprite.__init__(self,
                         *groups)
         
-    def _get_ship_bio_image(self,
-                            pilot_images,
-                            reference_ship):
+    def _get_current_stats(self):
+        '''Util function that gets up to date values of stats to be displayed.'''
+        
+        currently_alive = self._source_ship._alive # currently alive? (boolean)
+        current_hps = self._source_ship._hit_points # curent hps (integer)
+        current_target_id = [ship._ship_id for ship in self._source_ship._current_target.sprites()] # list containing target's id string; may be empty
+        
+        return currently_alive, current_hps, current_target_id
+    
+    def _have_stats_changed(self):
+        '''Util function that checks previous ship stats against current ship stats
+        to check if image update is necessary. Used to reduce the times a new ship id card
+        is rendered.'''
+        
+        return self._previous_stats != self._get_current_stats()
+    
+    def _render_text(self,
+                     text,
+                     text_color=(0,100,100)):
+        '''Util function that renders a text message to a pygame surface and
+        returns the surface.'''
+        
+        # text surface is transparent by default
+        text_surface = self._font.render(text,True,text_color)
+        
+        return text_surface
+        
+    def _get_ship_bio_image(self):
         '''Util function that assembles the pygame surface visually representing
         the current ship status on the cockpit frame.'''
         
+        # get shortcuts to needed attributes
+        pilot_images = self._original_pilot_image
+        
         # get the ship's stats
-        ship_hp = reference_ship._hit_points # hp of reference ship
-        ships_targets_id = [ship._ship_id for ship in reference_ship._current_target.sprites()] # list containing target's id string; may be empty
+        ship_is_alive, ship_hp, ships_target_id = self._get_current_stats()
+        
+        ship_max_hp = self._source_ship_max_hp
         
         # get blank id card canvas surface
         id_template = pg.Surface((250,120))
+        id_template.fill((0,70,70)) # dark blue?
+        
+        # blit appropriate pilot image to id_template
+        if ship_is_alive:
+            id_template.blit(pilot_images[0],(10,10)) # first image in sequence shows alive pilot
+        elif not ship_is_alive:
+            id_template.blit(pilot_images[1],(10,10)) # second image in sequence shows dead pilot
+            
+        # blit stats
+        for (top_left_y, text) in zip([10,35,60,85],
+                                      ["Attacking:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
+            # render text message
+            stat_surface = self._render_text(text)
+            
+            # get top left position of text surface to be blit
+            top_left = (120,top_left_y)
+            
+            # blit stat surface
+            id_template.blit(stat_surface,top_left)
+            
+        return id_template
+            
+    def update(self):
+        '''Updates the sprite's image attribute based on previous/current ship
+        stats.'''
+        
+        # only render an updated surface if really necessary
+        if self._have_stats_changed():
+            self.image = self._get_ship_bio_image()
         
         
         
