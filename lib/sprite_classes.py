@@ -12,6 +12,7 @@ The FighterSprite class serves as a sub-base class for the spaceship/fighter pla
 sprites (either player or pc controlled) \'PlayerSprite\' and \'EnemySprite\'.
 The \'LaserSprite\' class is based directly on the MaskedSprite class.'''
 
+from pygame.sprite import Sprite
 from basic_sprite_classes import BasicSprite
 from animation_classes import BasicAnimation, TrackingAnimation
 from weapons_classes import LaserCannon
@@ -52,6 +53,7 @@ class ShipSprite(BasicSprite):
                  animation_group,
                  groups,
                  hostile_ships_group = None,
+                 ship_id = None,
                  hit_points = 30,
                  center = np.zeros(2),
                  angle = 0,
@@ -114,6 +116,9 @@ class ShipSprite(BasicSprite):
                     
         # set sound toggle variable to default False
         self._sound = False
+        
+        # set ships id
+        self._ship_id = ship_id
                     
         # initialize and add to groups if sensible
         BasicSprite.__init__(self,
@@ -345,6 +350,7 @@ class AIShipSprite(ShipSprite):
                  gunning_cone_sine,
                  groups,
                  hostile_ships_group,
+                 ship_id = None,
                  center = np.zeros(2),
                  angle = 0,
                  speed = 0,
@@ -390,6 +396,7 @@ class AIShipSprite(ShipSprite):
                             animation_group,
                              groups,
                              hostile_ships_group = hostile_ships_group,
+                             ship_id = ship_id,
                              center = center,
                              angle = angle,
                              speed = speed,
@@ -479,3 +486,51 @@ class AIShipSprite(ShipSprite):
         # if player within 'cone of reasonable accuracy', attempt to fire cannon.
         # Otherwise, dont attempt to fire cannon
         self._command_to_fire = -self._gunning_cone_sine < projection_on_ortnorm < self._gunning_cone_sine
+        
+class ShipBio(Sprite):
+    
+    '''Class used to display the ships' stats to the main game screen inside 
+    the appropriate cockpit frame.'''
+    
+    def __init__(self,
+                 fps,
+                 screen,
+                 pilot_images,
+                 reference_ship,
+                 groups,
+                 center = np.zeros(2)):
+        
+        # attach original pilot image
+        self._original_pilot_images = pilot_images
+        
+        # assemble the "ID card" for given ship using pilot image and ship
+        ship_bio_image = self._get_ship_bio_image(pilot_images,
+                                                  reference_ship)
+        
+        # attach current id card to sprite
+        self.image = ship_bio_image
+        
+        # position id card on main screen; this position will not change
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        
+        # add to group(s)
+        Sprite.__init__(self,
+                        *groups)
+        
+    def _get_ship_bio_image(self,
+                            pilot_images,
+                            reference_ship):
+        '''Util function that assembles the pygame surface visually representing
+        the current ship status on the cockpit frame.'''
+        
+        # get the ship's stats
+        ship_hp = reference_ship._hit_points # hp of reference ship
+        ships_targets_id = [ship._ship_id for ship in reference_ship._current_target.sprites()] # list containing target's id string; may be empty
+        
+        # get blank id card canvas surface
+        id_template = pg.Surface((250,120))
+        
+        
+        
+        

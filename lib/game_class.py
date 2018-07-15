@@ -773,21 +773,26 @@ class Game(object):
                           
         # get initial values for ship sprite initializers from level meta data
         if side == 'player':
-            ship_init_kwargs = level_meta_data['ship_init_kwargs'][side]
-        elif side in ['ally','hostile']:
-            ships_init_kwargs = level_meta_data['ship_init_kwargs'][side]
-            
-            ship_init_kwargs = dict([(init_type,init_value[ship_no]) for (init_type,init_value) in ships_init_kwargs.items()])
-            
-        ship_init_kwargs['hostile_ships_group'] = groups['ships'][other_side] # only neede for AIShipSPrite
-        
-        # adjust args and kwargs if a ShipSprite (and no AIShipSprite) will be initialized
-        if side == 'player':
-            # adjsut args
+            # adjsut args for player
             ship_init_args = ship_init_args[:20] + ship_init_args[22:]
             
-            # adjust kwargs
-            del ship_init_kwargs['hostile_ships_group']
+            # get kwargs for player
+            ship_init_kwargs = level_meta_data['ship_init_kwargs'][side]
+            
+        elif side in ['ally','hostile']:
+            # get kwargs meta data for squadron
+            ships_init_kwargs = level_meta_data['ship_init_kwargs'][side]
+            
+            # get kwargs for AI single sAI ship
+            ship_init_kwargs = dict([(init_type,init_value[ship_no]) for (init_type,init_value) in ships_init_kwargs.items()])
+        
+            # manually add hostile ship group to single AI hsip's kwargs        
+            ship_init_kwargs['hostile_ships_group'] = groups['ships'][other_side] # only neede for AIShipSPrite
+
+        # manually add the sip_id to kwargs
+        ship_id = self._get_ship_id(side,
+                                    ship_no)
+        ship_init_kwargs['ship_id'] = ship_id
             
         return ship_init_args, ship_init_kwargs
             
@@ -854,7 +859,7 @@ class Game(object):
         # get ship id
         ship_id = self._get_ship_id(side,ship_no) # not used for now
         
-        # collect arguments for the ship sprite initializer
+        # collect arguments for the ship sprite initializer - from meta data
         ship_args, ship_kwargs = self._get_ship_init_args(side,
                                                           ship_no,
                                                           level_meta_data,
