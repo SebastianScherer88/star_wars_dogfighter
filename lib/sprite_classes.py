@@ -512,6 +512,9 @@ class ShipBio(Sprite):
         # attach max hp pf reference ship
         self._source_ship_max_hp = reference_ship._hit_points
         
+        # attach ship id of reference ship
+        self._source_ship_id = reference_ship._ship_id
+        
         # initialize stats reference storage for comparison
         self._previous_stats = self._get_current_stats()
         
@@ -572,6 +575,7 @@ class ShipBio(Sprite):
         ship_is_alive, ship_hp, ships_target_id = self._get_current_stats()
         
         ship_max_hp = self._source_ship_max_hp
+        ship_id = self._source_ship_id
         
         # get blank id card canvas surface
         id_template = pg.Surface((250,120))
@@ -584,8 +588,8 @@ class ShipBio(Sprite):
             id_template.blit(pilot_images[1],(10,10)) # second image in sequence shows dead pilot
             
         # blit stats
-        for (top_left_y, text) in zip([10,25,45,60],
-                                      ["Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
+        for (top_left_y, text) in zip([10,25,45,60,75,90],
+                                      [ship_id,"","Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
             # render text message
             stat_surface = self._render_text(text)
             

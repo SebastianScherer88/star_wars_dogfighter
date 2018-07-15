@@ -38,7 +38,7 @@ class Game(object):
         self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
         
         # cockpit frame
-        self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit.bmp')
+        self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit2.bmp')
         self.cockpit_frame.set_colorkey((255,255,255))
         
         self.fps = fps
@@ -880,12 +880,12 @@ class Game(object):
         ship_bio_group = level_sprite_groups['cockpit']['any']
         
         # create side-> center_x mapping
-        center_x = {'player':1360,
-                    'ally':1360,
-                    'hostile':145}
+        side_center = {'player':(1360,550),
+                    'ally':(1360,125 + ship_no * 130),
+                    'hostile':(145,125 + ship_no * 130)}
         
         # get center coordinates for ship stats id card
-        center_pos = (center_x[side],125 + ship_no * 130)
+        center_pos = side_center[side]
         
         # create the ship stats id card
         ShipBio(pilot_images,

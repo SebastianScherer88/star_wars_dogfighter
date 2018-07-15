@@ -43,10 +43,12 @@ animations_meta_data['engine'] = {'image_paths':['./graphics/engine_flame/engine
                                     'spi':0.1}
 
 # create meta data for rebel pilot images
-animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_pilot' + str(i+1) + '.bmp' for i in range(2)]}
+animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_pilot1.bmp',
+                                                        './graphics/cockpit/skull.bmp']}
 
 # create meta data for empire pilot images
-animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot' + str(i+1) + '.bmp' for i in range(2)]}
+animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot1.bmp',
+                                                        './graphics/cockpit/skull.bmp']}
 
 with open('animations_meta_data.yaml','w') as animations_meta_data_file:
     yaml.dump(animations_meta_data,animations_meta_data_file)
