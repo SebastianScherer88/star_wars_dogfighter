@@ -493,8 +493,6 @@ class ShipBio(Sprite):
     the appropriate cockpit frame.'''
     
     def __init__(self,
-                 fps,
-                 screen,
                  pilot_images,
                  reference_ship,
                  groups,
@@ -518,8 +516,7 @@ class ShipBio(Sprite):
         self._previous_stats = self._get_current_stats()
         
         # assemble the "ID card" for given ship using pilot image and ship
-        ship_bio_image = self._get_ship_bio_image(pilot_images,
-                                                  reference_ship)
+        ship_bio_image = self._get_ship_bio_image()
         
         # attach current id card to sprite
         self.image = ship_bio_image
@@ -537,7 +534,12 @@ class ShipBio(Sprite):
         
         currently_alive = self._source_ship._alive # currently alive? (boolean)
         current_hps = self._source_ship._hit_points # curent hps (integer)
-        current_target_id = [ship._ship_id for ship in self._source_ship._current_target.sprites()] # list containing target's id string; may be empty
+        current_target_id_list = [ship._ship_id for ship in self._source_ship._current_target.sprites()] # list containing target's id string; may be empty
+        
+        if not current_target_id_list:
+            current_target_id = ""
+        else:
+            current_target_id = current_target_id_list[0]
         
         return currently_alive, current_hps, current_target_id
     
@@ -583,7 +585,7 @@ class ShipBio(Sprite):
             
         # blit stats
         for (top_left_y, text) in zip([10,35,60,85],
-                                      ["Attacking:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
+                                      ["Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
             # render text message
             stat_surface = self._render_text(text)
             
@@ -602,7 +604,4 @@ class ShipBio(Sprite):
         # only render an updated surface if really necessary
         if self._have_stats_changed():
             self.image = self._get_ship_bio_image()
-        
-        
-        
         

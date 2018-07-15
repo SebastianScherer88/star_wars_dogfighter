@@ -16,7 +16,7 @@ import numpy as np
 
 from pygame.sprite import Group, collide_mask, groupcollide
 from basic_sprite_classes import BasicSprite
-from sprite_classes import ShipSprite, AIShipSprite
+from sprite_classes import ShipSprite, AIShipSprite, ShipBio
 from animation_classes import BasicAnimation,TrackingAnimation
 
 class Game(object):
@@ -269,6 +269,21 @@ class Game(object):
         player_ship, player_laser = level_specs['player']['ship'],level_specs['player']['laser']
         ally_ship, ally_laser = level_specs['ally']['ship'],level_specs['ally']['laser']
         hostile_ship, hostile_laser = level_specs['hostile']['ship'],level_specs['hostile']['laser']
+
+        # assign sides to player to get pilot images
+        if player_ship in ['awing','xwing','ywing']:
+            player_side = 'rebel'
+            hostile_side = 'empire'
+        else:
+            player_side = 'empire'
+            hostile_side = 'rebel'
+
+        # pilot skins
+        pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
+                        'ally': [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
+                        'hostile': [pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_side+'_pilot']['image_paths']]}
+        
+        
         
         # ship skins
         ship_images = {'player':[pg.image.load(image_path) for image_path in self.skins_meta_data[player_ship]['image_paths']],
@@ -331,7 +346,8 @@ class Game(object):
                           'piloting_cone_sine':0.1,
                           'gunning_cone_sine':0.1,
                           'ship_init_kwargs':ship_init_kwargs,
-                          'level_number':level_index+1}
+                          'level_number':level_index+1,
+                          'pilot_images':pilot_images}
         
         return level_meta_data
     
@@ -356,10 +372,14 @@ class Game(object):
         level_endings = {'pass':Group(),
                          'fail':Group()}
         
+        # add group for in-cockpit sprites
+        cockpit_group = {'any':Group()}
+        
         level_sprite_groups = {'ships':ship_groups,
                               'lasers':laser_beams_groups,
                               'non_colliders':non_collidables_group,
-                              'level_endings':level_endings}
+                              'level_endings':level_endings,
+                              'cockpit':cockpit_group}
         
         return level_sprite_groups
     
@@ -596,6 +616,7 @@ class Game(object):
         sprite_groups['lasers']['ally'].update()
         sprite_groups['lasers']['hostile'].update()
         sprite_groups['non_colliders']['any'].update()
+        sprite_groups['cockpit']['any'].update()
         #sprite_groups['level_endings']['any'].update()
         
     def draw_game_state(self,
@@ -619,6 +640,9 @@ class Game(object):
             sprite_groups['level_endings']['fail'].draw(self.screen)
             
         self.screen.blit(self.cockpit_frame,(0,0)) # paint over old cockpit frame
+        
+        # draw cockpit items
+        sprite_groups['cockpit']['any'].draw(self.screen)
                    
         # flip canvas
         pg.display.flip()
@@ -840,6 +864,36 @@ class Game(object):
                      [sprite_groups['non_colliders']['any']],
                      looping = True,
                      dynamic_angle = False)
+        
+    def _create_ship_id_card(self,
+                             side,
+                             new_ship,
+                             ship_no,
+                             level_meta_data,
+                             level_sprite_groups):
+        '''Util function that adds a ship's stats id card to the appropriate group.'''
+        
+        # get pilot images
+        pilot_images = level_meta_data['pilot_images'][side]
+        
+        # get sprite group(s)
+        ship_bio_group = level_sprite_groups['cockpit']['any']
+        
+        # create side-> center_x mapping
+        center_x = {'player':1360,
+                    'ally':1360,
+                    'hostile':100}
+        
+        # get center coordinates for ship stats id card
+        center_pos = (center_x[side],300 + ship_no * 130)
+        
+        # create the ship stats id card
+        ShipBio(pilot_images,
+                 new_ship,
+                 [ship_bio_group],
+                 center = center_pos)
+        
+        
             
     def spawn_ship(self,
                    side,
@@ -876,6 +930,15 @@ class Game(object):
         self._attach_visual_frame(new_ship,
                                   tracking_image,
                                   level_sprite_groups)
+        
+        # create ship stats "id card" in cockpit frame
+        self._create_ship_id_card(side,
+                                  new_ship,
+                                  ship_no,
+                                  level_meta_data,
+                                  level_sprite_groups)
+        
+        
         
         # if player sprite was created, return the created sprite object
         if side == 'player':

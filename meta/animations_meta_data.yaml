@@ -1,3 +1,5 @@
+empire_pilot:
+  image_paths: [./graphics/cockpit/empire_pilot1.bmp, ./graphics/cockpit/empire_pilot2.bmp]
 engine:
   image_paths: [./graphics/engine_flame/engine_flame1.bmp, ./graphics/engine_flame/engine_flame2.bmp,
     ./graphics/engine_flame/engine_flame3.bmp, ./graphics/engine_flame/engine_flame4.bmp]
@@ -15,6 +17,8 @@ green:
     ./graphics/green_muzzle_flash/green_muzzle_flash5.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash6.bmp]
   sound: ./sounds/missile.wav
   spi: 0.02
+rebel_pilot:
+  image_paths: [./graphics/cockpit/rebel_pilot1.bmp, ./graphics/cockpit/rebel_pilot2.bmp]
 red:
   image_paths: [./graphics/red_muzzle_flash/red_muzzle_flash1.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash2.bmp,
     ./graphics/red_muzzle_flash/red_muzzle_flash3.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash4.bmp,
