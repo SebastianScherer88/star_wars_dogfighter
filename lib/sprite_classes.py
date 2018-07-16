@@ -138,6 +138,7 @@ class ShipSprite(BasicSprite):
         # set laser fire meta data attributes            
         self._original_laser_fire_modes = laser_fire_modes
         self._laser_sound = laser_sound
+        #self._laser_sound = pg.mixer.Sound(file=laser_sound)
         
         # intialize and attach laser weapons
         self._laser_cannons = []

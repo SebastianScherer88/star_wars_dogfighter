@@ -9,13 +9,13 @@ explosion:
     ./graphics/explosion/explosion3.bmp, ./graphics/explosion/explosion4.bmp, ./graphics/explosion/explosion5.bmp,
     ./graphics/explosion/explosion6.bmp, ./graphics/explosion/explosion7.bmp, ./graphics/explosion/explosion8.bmp,
     ./graphics/explosion/explosion9.bmp]
-  sound: ./sounds/explosion.wav
+  sound: ./sounds/blastwave_safe.wav
   spi: 0.1
 green:
   image_paths: [./graphics/green_muzzle_flash/green_muzzle_flash1.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash2.bmp,
     ./graphics/green_muzzle_flash/green_muzzle_flash3.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash4.bmp,
     ./graphics/green_muzzle_flash/green_muzzle_flash5.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash6.bmp]
-  sound: ./sounds/missile.wav
+  sound: ./sounds/slinky_laser.wav
   spi: 0.02
 rebel_pilot:
   image_paths: [./graphics/cockpit/rebel_pilot1.bmp, ./graphics/cockpit/skull.bmp]
@@ -23,5 +23,5 @@ red:
   image_paths: [./graphics/red_muzzle_flash/red_muzzle_flash1.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash2.bmp,
     ./graphics/red_muzzle_flash/red_muzzle_flash3.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash4.bmp,
     ./graphics/red_muzzle_flash/red_muzzle_flash5.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash6.bmp]
-  sound: ./sounds/missile.wav
+  sound: ./sounds/slinky_laser.wav
   spi: 0.02

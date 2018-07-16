@@ -312,9 +312,12 @@ class Game(object):
                         'hostile':[pg.image.load(image_path) for image_path in self.skins_meta_data[hostile_laser]['image_paths']]}
         
         # laser sounds
-        laser_sounds = {'player':pg.mixer.Sound(self.animations_meta_data[player_laser]['sound']),
-                        'ally':pg.mixer.Sound(self.animations_meta_data[ally_laser]['sound']),
-                        'hostile':pg.mixer.Sound(self.animations_meta_data[hostile_laser]['sound'])}
+        laser_sounds = {'player':pg.mixer.Sound(file=self.animations_meta_data[player_laser]['sound']),
+                        'ally':pg.mixer.Sound(file=self.animations_meta_data[ally_laser]['sound']),
+                        'hostile':pg.mixer.Sound(file=self.animations_meta_data[hostile_laser]['sound'])}
+        #laser_sounds = {'player':self.animations_meta_data[player_laser]['sound'],
+        #                'ally':self.animations_meta_data[ally_laser]['sound'],
+        #                'hostile':self.animations_meta_data[hostile_laser]['sound']}
         
         # muzzle images
         muzzle_flash_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_laser]['image_paths']],
@@ -340,7 +343,7 @@ class Game(object):
                           'muzzle_flash_images':muzzle_flash_images,
                           'muzzle_flash_spi':muzzle_flash_spi,
                           'explosion_images':[pg.image.load(image_path) for image_path in self.animations_meta_data['explosion']['image_paths']],
-                          'explosion_sounds':pg.mixer.Sound(self.animations_meta_data['explosion']['sound']),
+                          'explosion_sounds':pg.mixer.Sound(file=self.animations_meta_data['explosion']['sound']),
                           'explosion_spi':self.animations_meta_data['explosion']['spi'],
                           'engine_images':[pg.image.load(image_path) for image_path in self.animations_meta_data['engine']['image_paths']],
                           'engine_spi':self.animations_meta_data['engine']['spi'],

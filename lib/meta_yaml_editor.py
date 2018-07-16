@@ -25,17 +25,20 @@ animations_meta_data = {}
 
 # create meta data for red laser muzzle flash animation
 animations_meta_data['red'] = {'image_paths':['./graphics/red_muzzle_flash/red_muzzle_flash' + str(i+1) + '.bmp' for i in range(6)],
-                                'sound':'./sounds/missile.wav',
+                                #'sound':'./sounds/missile.wav',
+                                'sound':'./sounds/slinky_laser.wav',
                                 'spi':0.02}
 
 # create meta data for green laser muzzle flash animation
 animations_meta_data['green'] = {'image_paths':['./graphics/green_muzzle_flash/green_muzzle_flash' + str(i+1) + '.bmp' for i in range(6)],
-                                'sound':'./sounds/missile.wav',
+                                #'sound':'./sounds/missile.wav',
+                                'sound':'./sounds/slinky_laser.wav',
                                 'spi':0.02}
 
 # create meta data for explosion animation
 animations_meta_data['explosion'] = {'image_paths':['./graphics/explosion/explosion' + str(i+1) + '.bmp' for i in range(9)],
-                                    'sound':'./sounds/explosion.wav',
+                                    #'sound':'./sounds/explosion.wav',
+                                    'sound':'./sounds/blastwave_safe.wav',
                                     'spi':0.1}
 
 # create meta data for engine flames
