@@ -36,7 +36,7 @@ class Game(object):
         
         # background
         #self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
-        self.background_image = pg.image.load('./graphics/misc/hoth_background.bmp')
+        self.background_image = pg.image.load('./graphics/misc/star_wars_background.bmp')
         
         # cockpit frame
         self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit2.bmp')
