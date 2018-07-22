@@ -24,7 +24,7 @@ class Game(object):
     def __init__(self,
                  screen_width=1500,
                  screen_height=700,
-                 fps=30,
+                 fps=15,
                  background_image = None):
         '''Initializes the game object and also the game'''
         
@@ -414,9 +414,6 @@ class Game(object):
         
         # render level ending messages and add to groups
         self.spawn_level_ending_messages(level_sprite_groups)
-        
-        # create background sprite
-        self.spawn_background(level_sprite_groups)
         
         return player
         
@@ -846,17 +843,22 @@ class Game(object):
         
         # load appropriate frame image and blit to tracking canvas
         ship_frame_image = pg.image.load("./graphics/misc/" + side + "_frame.bmp")
-        #tracking_canvas.blit(ship_frame_image,(10,10)) # frme is 50x50, so this should center it
+        #ship_frame_image.set_colorkey((255,255,255))
+        #tracking_canvas.blit(ship_frame_image,(10,10))
+        
+        #print("Ship ID:", ship_id)
         
         # create text surface
         #largeText = pg.font.Font('freesansbold.ttf',12)
-        #text_surface = largeText.render(ship_id, True, (250,250,250))
+        #text_surface = largeText.render(ship_id, False, (250,250,250))
         
         # superimpose ship id label on ship frame surface
-        #tracking_canvas.blit(text_surface,(0,50))
+        #tracking_canvas.blit(text_surface,(0,0))
         
-        # set color key to ensure only white parts are transparent
-        #tracking_canvas.set_colorkey((255,255,255))
+        # make white image parts transparent
+        #tracking_canvas.set_colorkey((255,255,255,0))
+        
+        #print("Tracking canvas colorkey:",tracking_canvas.get_colorkey())
         
         return ship_frame_image
         
@@ -905,8 +907,6 @@ class Game(object):
                  new_ship,
                  [ship_bio_group],
                  center = center_pos)
-        
-        
             
     def spawn_ship(self,
                    side,
@@ -992,25 +992,6 @@ class Game(object):
                                        wait_seconds=level_ending_specs[level_ending]['wait_seconds'],
                                        blit_mode=False,
                                        text_groups=[level_sprite_groups['level_endings'][level_ending]])
-            
-    def spawn_background(self,
-                         level_sprite_groups):
-        '''Util function that creates the moving backougrnd sprite.'''
-        
-        # get initial values
-        screen_w, screen_h = self.screen.get_size()
-        center_x, center_y = screen_w / 2, screen_h / 2
-        background_group = level_sprite_groups['background']['any']
-        
-        # create backgroundsprite
-        ##BasicSprite(self.fps,
-        #            self.screen,
-        #            [self.background_image],
-        #            [background_group],
-        #            center = (center_x, center_y),
-        #            angle = 180,
-        ##            speed = 80,
-         #           is_transparent = False)
         
 def main():
     # make sure directory is repo head

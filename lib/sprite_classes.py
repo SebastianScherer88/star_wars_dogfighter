@@ -135,6 +135,8 @@ class ShipSprite(BasicSprite):
         # set active state variable to communicate to tracking animations
         self._alive = True
         
+        print("Ship image colorkey:", self.image.get_colorkey())
+        
         # set laser fire meta data attributes            
         self._original_laser_fire_modes = laser_fire_modes
         self._laser_sound = laser_sound
@@ -166,7 +168,8 @@ class ShipSprite(BasicSprite):
         # attach animations group to sprite
         self._animation_group = animation_group
         
-        # set hit points attribute
+        # set hit points attributes
+        self._max_hit_points = hit_points
         self._hit_points = hit_points
         
         # set attributes for explosion animation at death
@@ -497,9 +500,17 @@ class ShipBio(Sprite):
                  pilot_images,
                  reference_ship,
                  groups,
+                 mode='text',
                  font = 'freesansbold.ttf',
                  size = 15,
                  center = np.zeros(2)):
+        
+        # add to group(s)
+        Sprite.__init__(self,
+                        *groups)
+        
+        # attch display mode
+        self.display_mode = mode
         
         # attach font
         self._font = pg.font.Font(font,size)
@@ -529,23 +540,20 @@ class ShipBio(Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = center
         
-        # add to group(s)
-        Sprite.__init__(self,
-                        *groups)
-        
     def _get_current_stats(self):
         '''Util function that gets up to date values of stats to be displayed.'''
         
         currently_alive = self._source_ship._alive # currently alive? (boolean)
         current_hps = self._source_ship._hit_points # curent hps (integer)
         current_target_id_list = [ship._ship_id for ship in self._source_ship._current_target.sprites()] # list containing target's id string; may be empty
+        current_target_image = self._source_ship.image
         
         if not current_target_id_list:
             current_target_id = ""
         else:
             current_target_id = current_target_id_list[0]
         
-        return currently_alive, current_hps, current_target_id
+        return currently_alive, current_hps, current_target_id, current_target_image
     
     def _have_stats_changed(self):
         '''Util function that checks previous ship stats against current ship stats
@@ -573,7 +581,7 @@ class ShipBio(Sprite):
         pilot_images = self._original_pilot_image
         
         # get the ship's stats
-        ship_is_alive, ship_hp, ships_target_id = self._get_current_stats()
+        ship_is_alive, ship_hp, ships_target_id, ship_image = self._get_current_stats()
         
         ship_max_hp = self._source_ship_max_hp
         ship_id = self._source_ship_id
@@ -589,16 +597,21 @@ class ShipBio(Sprite):
             id_template.blit(pilot_images[1],(10,10)) # second image in sequence shows dead pilot
             
         # blit stats
-        for (top_left_y, text) in zip([10,25,45,60,75,90],
-                                      [ship_id,"","Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
-            # render text message
-            stat_surface = self._render_text(text)
-            
-            # get top left position of text surface to be blit
-            top_left = (120,top_left_y)
-            
-            # blit stat surface
-            id_template.blit(stat_surface,top_left)
+        if self.display_mode == 'text':
+            for (top_left_y, text) in zip([10,25,45,60,75,90],
+                                          [ship_id,"","Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
+                # render text message
+                stat_surface = self._render_text(text)
+                
+                # get top left position of text surface to be blit
+                top_left = (120,top_left_y)
+                
+                # blit stat surface
+                id_template.blit(stat_surface,top_left)
+        elif self.display_mode == 'graphic':
+            ship_image_w, ship_image_h = ship_image.get_rect().size
+            left_buffer, top_buffer = 160 - int(ship_image_w/2), 40 - int(ship_image_h/2)
+            id_template.blit(ship_image, (left_buffer, top_buffer))
             
         return id_template
             
@@ -609,4 +622,3 @@ class ShipBio(Sprite):
         # only render an updated surface if really necessary
         if self._have_stats_changed():
             self.image = self._get_ship_bio_image()
-        
