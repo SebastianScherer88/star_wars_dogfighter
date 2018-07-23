@@ -284,12 +284,15 @@ class Game(object):
                         'ally': [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
                         'hostile': [pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_side+'_pilot']['image_paths']]}
         
-        
-        
         # ship skins
         ship_images = {'player':[pg.image.load(image_path) for image_path in self.skins_meta_data[player_ship]['image_paths']],
                             'ally':[pg.image.load(image_path) for image_path in self.skins_meta_data[ally_ship]['image_paths']],
                             'hostile':[pg.image.load(image_path) for image_path in self.skins_meta_data[hostile_ship]['image_paths']]}
+        
+        # ship frames
+        ship_frames = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['yellow']['image_paths']],
+                       'ally':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['green']['image_paths']],
+                       'hostile':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['red']['image_paths']]}
         
         # gun offsets
         gun_offsets = {'player':np.array(self.skins_meta_data[player_ship]['gun_offsets']).astype('float'),
@@ -315,9 +318,6 @@ class Game(object):
         laser_sounds = {'player':pg.mixer.Sound(file=self.animations_meta_data[player_laser]['sound']),
                         'ally':pg.mixer.Sound(file=self.animations_meta_data[ally_laser]['sound']),
                         'hostile':pg.mixer.Sound(file=self.animations_meta_data[hostile_laser]['sound'])}
-        #laser_sounds = {'player':self.animations_meta_data[player_laser]['sound'],
-        #                'ally':self.animations_meta_data[ally_laser]['sound'],
-        #                'hostile':self.animations_meta_data[hostile_laser]['sound']}
         
         # muzzle images
         muzzle_flash_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_laser]['image_paths']],
@@ -335,6 +335,7 @@ class Game(object):
                             'hostile':level_specs['hostile']['ship_init_kwargs']}
         
         level_meta_data = {'ship_images':ship_images,
+                           'ship_frames':ship_frames,
                           'gun_offsets':gun_offsets,
                           'engine_offsets':engine_offsets,
                           'fire_modes':fire_modes,
@@ -832,35 +833,29 @@ class Game(object):
             
     def _get_tracking_image(self,
                             side,
-                            ship_id):
+                            ship_id,
+                            level_meta_data):
         
         '''Util function that creates a surface with colored frame indicating
         ship allegiance, as well as the ship id.'''
         
         # create ground surface
-        #tracking_canvas = pg.Surface((70,70))
-        #tracking_canvas.fill((255,255,255))
+        tracking_canvas = pg.image.load("./graphics/misc/frame_canvas.bmp")
         
         # load appropriate frame image and blit to tracking canvas
-        ship_frame_image = pg.image.load("./graphics/misc/" + side + "_frame.bmp")
-        #ship_frame_image.set_colorkey((255,255,255))
-        #tracking_canvas.blit(ship_frame_image,(10,10))
+        tracking_frame = level_meta_data['ship_frames'][side][0]
         
-        #print("Ship ID:", ship_id)
+        # blit frame onto canvas
+        tracking_canvas.blit(tracking_frame,(10,10))
         
         # create text surface
-        #largeText = pg.font.Font('freesansbold.ttf',12)
-        #text_surface = largeText.render(ship_id, False, (250,250,250))
+        largeText = pg.font.Font('freesansbold.ttf',12)
+        text_surface = largeText.render(ship_id, False, (254,254,254))
         
         # superimpose ship id label on ship frame surface
-        #tracking_canvas.blit(text_surface,(0,0))
+        tracking_canvas.blit(text_surface,(10,0))
         
-        # make white image parts transparent
-        #tracking_canvas.set_colorkey((255,255,255,0))
-        
-        #print("Tracking canvas colorkey:",tracking_canvas.get_colorkey())
-        
-        return ship_frame_image
+        return tracking_canvas
         
     def _attach_visual_frame(self,
                              ship,
@@ -875,7 +870,7 @@ class Game(object):
                       [frame_image],
                       10000,
                       ship,
-                      np.array([0,0]).astype('float'),
+                      np.zeros(2).astype('float'),
                      [sprite_groups['non_colliders']['any']],
                      looping = True,
                      dynamic_angle = False)
@@ -938,7 +933,8 @@ class Game(object):
         
         # create tracking frame image
         tracking_image = self._get_tracking_image(side,
-                                                  ship_id)
+                                                  ship_id,
+                                                  level_meta_data)
         
         self._attach_visual_frame(new_ship,
                                   tracking_image,

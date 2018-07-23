@@ -35,6 +35,11 @@ animations_meta_data['green'] = {'image_paths':['./graphics/green_muzzle_flash/g
                                 'sound':'./sounds/slinky_laser.wav',
                                 'spi':0.02}
 
+# create meta data for ship frames
+animations_meta_data['ship_frame'] = {'red':{'image_paths':['./graphics/misc/hostile_frame.bmp']},
+                    'green':{'image_paths':['./graphics/misc/ally_frame.bmp']},
+                    'yellow':{'image_paths':['./graphics/misc/player_frame.bmp']}}
+
 # create meta data for explosion animation
 animations_meta_data['explosion'] = {'image_paths':['./graphics/explosion/explosion' + str(i+1) + '.bmp' for i in range(9)],
                                     #'sound':'./sounds/explosion.wav',

@@ -25,3 +25,10 @@ red:
     ./graphics/red_muzzle_flash/red_muzzle_flash5.bmp, ./graphics/red_muzzle_flash/red_muzzle_flash6.bmp]
   sound: ./sounds/slinky_laser.wav
   spi: 0.02
+ship_frame:
+  green:
+    image_paths: [./graphics/misc/ally_frame.bmp]
+  red:
+    image_paths: [./graphics/misc/hostile_frame.bmp]
+  yellow:
+    image_paths: [./graphics/misc/player_frame.bmp]
