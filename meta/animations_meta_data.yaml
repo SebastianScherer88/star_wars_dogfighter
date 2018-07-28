@@ -1,5 +1,5 @@
 empire_pilot:
-  image_paths: [./graphics/cockpit/empire_pilot12.bmp, ./graphics/cockpit/skull.bmp]
+  image_paths: [./graphics/cockpit/empire_pilot1.bmp, ./graphics/cockpit/skull.bmp]
 engine:
   image_paths: [./graphics/engine_flame/engine_flame1.bmp, ./graphics/engine_flame/engine_flame2.bmp,
     ./graphics/engine_flame/engine_flame3.bmp, ./graphics/engine_flame/engine_flame4.bmp]

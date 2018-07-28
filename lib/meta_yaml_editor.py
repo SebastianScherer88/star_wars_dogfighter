@@ -62,7 +62,7 @@ animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_
                                                         #'./graphics/cockpit/skull2.bmp']}
 
 # create meta data for empire pilot images
-animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot12.bmp',
+animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot1.bmp',
                                                         './graphics/cockpit/skull.bmp']}
                                                         #'./graphics/cockpit/skull2.bmp']}
 
