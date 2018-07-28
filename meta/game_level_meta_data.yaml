@@ -26,7 +26,7 @@
       speed: [250, 250, 250]
   player:
     laser: red
-    ship: xwing
+    ship: awing
     ship_init_kwargs:
       angle: 180
       center: [1400, 350]

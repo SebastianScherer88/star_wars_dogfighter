@@ -57,7 +57,8 @@ def main():
     # [3] left/right side titles
     
     # get a font and text color
-    title_font = pg.font.Font('freesansbold.ttf',25)
+    #title_font = pg.font.Font('freesansbold.ttf',25)
+    title_font = pg.font.Font('./graphics/firefight-bb.regular.ttf',25)
     TEXT_COLOR = (0,65,65)
     
     # render title for left cockpit side
@@ -90,7 +91,8 @@ def main():
         display_canvas.blit(ally_health_bar,kwargs['health_bar_offsets'])
         
         # get colored ally name and blit to display canvas
-        stats_name_font = pg.font.Font("freesansbold.ttf",kwargs['stats_name_font_size'])
+        #stats_name_font = pg.font.Font("freesansbold.ttf",kwargs['stats_name_font_size'])
+        stats_name_font = pg.font.Font("./graphics/firefight-bb.regular.ttf",kwargs['stats_name_font_size'])
         ally_name = stats_name_font.render(kwargs['ship_name'],
                                            False,
                                            kwargs['display_text_color'])
@@ -107,7 +109,8 @@ def main():
         ally_target_canvas.fill(kwargs['ally_target_canvas_color'])
         ally_target_canvas.blit(kwargs['target_sprite_image'],(30,30))
         ally_target_canvas.blit(hostile_frame,(25,25))
-        target_id_font = pg.font.Font("freesansbold.ttf",kwargs['ally_target_id_font_size'])
+        #target_id_font = pg.font.Font("freesansbold.ttf",kwargs['ally_target_id_font_size'])
+        target_id_font = pg.font.Font("./graphics/firefight-bb.regular.ttf",kwargs['ally_target_id_font_size'])
         target_id = target_id_font.render(kwargs['ally_target_id'],
                                           False,
                                           kwargs['ally_target_id_font_color'])

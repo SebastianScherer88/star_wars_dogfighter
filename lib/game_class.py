@@ -204,6 +204,7 @@ class Game(object):
         self.blit_message_and_wait("STAR WARS DOGFIGHTER",
                                    blackout = False,
                                    blit_mode=False,
+                                   font = './graphics/firefight-bb.regular.ttf',
                                    text_groups=[start_up_sprites])
                 
         # create "press any key to continue to game" animation
@@ -249,6 +250,7 @@ class Game(object):
         
         self.blit_message_and_wait("GAME OVER",
                                    sub_message="Thank You For Playing!",
+                                   font='./graphics/firefight-bb.regular.ttf',
                                    wait_seconds = 1.5)
             
     def _collect_meta_data_for_level(self,
@@ -432,6 +434,7 @@ class Game(object):
                 # display pause message on screen
                 self.blit_message_and_wait("PAUSED",
                                            sub_message="Press [Esc]ape to continue, [Q] to quit or [R] to retry level",
+                                           #font='./graphics/firefight-bb.regular.ttf',
                                            blackout = False)
                 
         return paused
@@ -564,6 +567,7 @@ class Game(object):
         level_title = "LEVEL " + str(level_meta_data['level_number'])
         self.blit_message_and_wait(level_title,
                                    main_size = 40,
+                                   font='./graphics/firefight-bb.regular.ttf',
                                    wait_seconds = 1.5)
         
         # add sprites to groups for this level
@@ -850,6 +854,7 @@ class Game(object):
         
         # create text surface
         largeText = pg.font.Font('freesansbold.ttf',12)
+        #largeText = pg.font.Font('./graphics/firefight-bb.regular.ttf',12)
         text_surface = largeText.render(ship_id, False, (254,254,254))
         
         # superimpose ship id label on ship frame surface
@@ -890,9 +895,12 @@ class Game(object):
         ship_bio_group = level_sprite_groups['cockpit']['any']
         
         # create side-> center_x mapping
-        side_center = {'player':(1360,550),
-                    'ally':(1360,125 + ship_no * 130),
-                    'hostile':(145,125 + ship_no * 130)}
+        side_center = {#'player':(1340,550),
+                       'player':(155,125),
+                    #'ally':(1340,125 + ship_no * 130),
+                    'ally':(155, 180 + (ship_no +1) * 130),
+                    #'hostile':(155,125 + ship_no * 130)}
+                    'hostile':(1340,180 + ship_no * 130)}
         
         # get center coordinates for ship stats id card
         center_pos = side_center[side]
@@ -900,7 +908,9 @@ class Game(object):
         # create the ship stats id card
         ShipBio(pilot_images,
                  new_ship,
+                 side,
                  [ship_bio_group],
+                 font='./graphics/firefight-bb.regular.ttf',
                  center = center_pos)
             
     def spawn_ship(self,

@@ -499,6 +499,7 @@ class ShipBio(Sprite):
     def __init__(self,
                  pilot_images,
                  reference_ship,
+                 side,
                  groups,
                  mode='text',
                  font = 'freesansbold.ttf',
@@ -511,6 +512,19 @@ class ShipBio(Sprite):
         
         # attch display mode
         self.display_mode = mode
+        
+        if side == 'hostile':
+            self.frame_color = (255,0,0) # red
+            self.opp_frame_color = (0,255,0) # green
+        elif side == 'ally':
+            self.frame_color = (0,255,0)# green
+            self.opp_frame_color = (255,0,0) # red
+        else:
+            self.frame_color = (255,255,0) # yellow
+            self.opp_frame_color = (255,0,0) # red
+            
+        self.base_text_color = (0,200,200) # light blue
+        self.base_display_color = (0,70,70) # dark blue
         
         # attach font
         self._font = pg.font.Font(font,size)
@@ -586,9 +600,12 @@ class ShipBio(Sprite):
         ship_max_hp = self._source_ship_max_hp
         ship_id = self._source_ship_id
         
-        # get blank id card canvas surface
-        id_template = pg.Surface((250,120))
-        id_template.fill((0,70,70)) # dark blue?
+        # get blank id card canvas surface with a coloured frame depending on side attribute
+        id_template = pg.Surface((280,120))
+        id_template.fill((0,70,70)) # dark blue on the inside
+        frame_thickness = 5
+        frame_rect = pg.Rect(0,0,280, 120)# coloured frame positional rectangle
+        pg.draw.rect(id_template, self.frame_color, frame_rect, frame_thickness)
         
         # blit appropriate pilot image to id_template
         if ship_is_alive:
@@ -596,12 +613,22 @@ class ShipBio(Sprite):
         elif not ship_is_alive:
             id_template.blit(pilot_images[1],(10,10)) # second image in sequence shows dead pilot
             
+        # get current hp color:
+        if 0.2 <= (ship_hp / ship_max_hp) < 0.5:
+            hp_color = (255,255,0) # yellow
+        elif ship_hp / ship_max_hp < 0.2:
+            hp_color = (255,0,0) # RED
+        else:
+            hp_color = (0,255,0) # green
+            
         # blit stats
         if self.display_mode == 'text':
-            for (top_left_y, text) in zip([10,25,45,60,75,90],
-                                          [ship_id,"","Current target:", ships_target_id, "Status report:", str(ship_hp) + " / " + str(ship_max_hp)]):          
+            for (top_left_y, text,text_color) in zip([10,35,50,75,90],
+                                          [ship_id,"Current target", ships_target_id, "Status report", str(ship_hp) + " / " + str(ship_max_hp)],
+                                          [self.frame_color,self.base_text_color,self.opp_frame_color,self.base_text_color,hp_color]):          
                 # render text message
-                stat_surface = self._render_text(text)
+                #stat_surface = self._render_text(text)
+                stat_surface = self._font.render(text,True,text_color)
                 
                 # get top left position of text surface to be blit
                 top_left = (120,top_left_y)
