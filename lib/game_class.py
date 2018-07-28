@@ -38,6 +38,10 @@ class Game(object):
         #self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
         self.background_image = pg.image.load('./graphics/misc/star_wars_background.bmp')
         
+        # main screen music
+        pg.mixer.music.load('./sounds/power_bots_loop.wav')
+        #pg.mixer.music.load('./sounds/superboy.wav')
+        
         # cockpit frame
         self.cockpit_frame = pg.image.load('./graphics/cockpit/cockpit2.bmp')
         self.cockpit_frame.set_colorkey((255,255,255))
@@ -60,6 +64,7 @@ class Game(object):
             self.level_meta_data = yaml.load(level_meta_file)
         
         # start start-up animation and welcome screen
+        pg.mixer.music.play(loops=-1)
         player_feedback = self.welcome_screen()
         
         # if player hasnt closed the pygame window, process to level 1 of game
@@ -356,7 +361,9 @@ class Game(object):
                           'gunning_cone_sine':0.1,
                           'ship_init_kwargs':ship_init_kwargs,
                           'level_number':level_index+1,
-                          'pilot_images':pilot_images}
+                          'pilot_images':pilot_images,
+                          'music_path':level_specs['music']['sound'],
+                          'music_volume':level_specs['music']['volume']}
         
         return level_meta_data
     
@@ -448,6 +455,11 @@ class Game(object):
         
         # invert sound state
         sound = not sound
+        
+        if sound:
+            pg.mixer.music.unpause()
+        elif not sound:
+            pg.mixer.music.pause()
                         
         # update sprites if needed
         for ship in level_sprite_groups['ships']['any'].sprites():
@@ -581,6 +593,11 @@ class Game(object):
         
         # initialize pause, sound and next level countdown state variables
         player_input, paused, sound, t_pass, level_status = None, False, True, False, 'ongoing'
+        
+        # load level music and start playing
+        pg.mixer.music.load(level_meta_data['music_path'])
+        pg.mixer.music.set_volume(level_meta_data['music_volume'])
+        pg.mixer.music.play(loops=-1)
         
         # start main game loop
         while True:

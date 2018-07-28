@@ -75,8 +75,6 @@ class BasicSprite(Sprite):
         # call Sprite base class init - add self to all groups specified
         Sprite.__init__(self,*groups)
         
-        #print(groups)
-        
         # set surrounding pygame variables as attributes
         self._screen = screen
         self._fps = fps

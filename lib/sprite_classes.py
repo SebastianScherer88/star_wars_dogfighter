@@ -135,8 +135,6 @@ class ShipSprite(BasicSprite):
         # set active state variable to communicate to tracking animations
         self._alive = True
         
-        print("Ship image colorkey:", self.image.get_colorkey())
-        
         # set laser fire meta data attributes            
         self._original_laser_fire_modes = laser_fire_modes
         self._laser_sound = laser_sound

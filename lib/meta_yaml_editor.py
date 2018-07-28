@@ -25,14 +25,16 @@ animations_meta_data = {}
 
 # create meta data for red laser muzzle flash animation
 animations_meta_data['red'] = {'image_paths':['./graphics/red_muzzle_flash/red_muzzle_flash' + str(i+1) + '.bmp' for i in range(6)],
-                                #'sound':'./sounds/missile.wav',
-                                'sound':'./sounds/slinky_laser.wav',
+                                'sound':'./sounds/missile.wav',
+                                #'sound':'./sounds/slinky_laser.wav',
+                                #'sound':'./sounds/diy_missile_1.wav',
                                 'spi':0.02}
 
 # create meta data for green laser muzzle flash animation
 animations_meta_data['green'] = {'image_paths':['./graphics/green_muzzle_flash/green_muzzle_flash' + str(i+1) + '.bmp' for i in range(6)],
                                 #'sound':'./sounds/missile.wav',
                                 'sound':'./sounds/slinky_laser.wav',
+                                #'sound':'./sounds/diy_missile_1.wav',
                                 'spi':0.02}
 
 # create meta data for ship frames
@@ -57,10 +59,12 @@ animations_meta_data['engine'] = {'image_paths':['./graphics/engine_flame/engine
 # create meta data for rebel pilot images
 animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_pilot1.bmp',
                                                         './graphics/cockpit/skull.bmp']}
+                                                        #'./graphics/cockpit/skull2.bmp']}
 
 # create meta data for empire pilot images
-animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot1.bmp',
+animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot12.bmp',
                                                         './graphics/cockpit/skull.bmp']}
+                                                        #'./graphics/cockpit/skull2.bmp']}
 
 with open('animations_meta_data.yaml','w') as animations_meta_data_file:
     yaml.dump(animations_meta_data,animations_meta_data_file)
@@ -174,6 +178,9 @@ with open('sprite_skins_meta_data.yaml','w') as skins_meta_data_file:
 #----------------------------------------------
     
 level_template_meta_data = {}
+
+level_template_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
     
 level_template_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
                                                           'angle':180,
