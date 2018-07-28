@@ -46,6 +46,10 @@ animations_meta_data['explosion'] = {'image_paths':['./graphics/explosion/explos
                                     'sound':'./sounds/blastwave_safe.wav',
                                     'spi':0.1}
 
+# create meta data for hit animation
+animations_meta_data['hit'] = {'sound':'./sounds/explosion.wav',
+                                'spi':0.04}
+
 # create meta data for engine flames
 animations_meta_data['engine'] = {'image_paths':['./graphics/engine_flame/engine_flame' + str(i+1) + '.bmp' for i in range(4)],
                                     'spi':0.1}

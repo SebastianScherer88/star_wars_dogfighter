@@ -33,7 +33,8 @@ class BasicAnimation(BasicSprite):
                  speed = 0,
                  looping = False,
                  is_transparent = True,
-                 transparent_color = (255,255,255)):
+                 transparent_color = (255,255,255),
+                 image_scaling = 1):
     
         '''Arguments:
             
@@ -67,7 +68,8 @@ class BasicAnimation(BasicSprite):
                              angle=angle,
                              speed=speed,
                              is_transparent=is_transparent,
-                             transparent_color=transparent_color)
+                             transparent_color=transparent_color,
+                             image_scaling=image_scaling)
         
         # if animation looping?
         self.is_looping = looping
@@ -150,6 +152,7 @@ class TrackingAnimation(BasicAnimation):
                  looping = False,
                  dynamic_angle = True,
                  is_transparent = True,
+                 image_scaling = 1,
                  transparent_color = (255,255,255)):
     
         '''Arguments:
@@ -185,7 +188,8 @@ class TrackingAnimation(BasicAnimation):
                                  groups,
                                  looping = looping,
                                  is_transparent = is_transparent,
-                                 transparent_color = transparent_color)
+                                 transparent_color = transparent_color,
+                                 image_scaling=image_scaling)
         
         # attach dynamic angle attribute
         self._dynamic_angle = dynamic_angle

@@ -17,6 +17,7 @@ green:
     ./graphics/green_muzzle_flash/green_muzzle_flash5.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash6.bmp]
   sound: ./sounds/slinky_laser.wav
   spi: 0.02
+hit: {sound: ./sounds/explosion.wav, spi: 0.04}
 rebel_pilot:
   image_paths: [./graphics/cockpit/rebel_pilot1.bmp, ./graphics/cockpit/skull.bmp]
 red:

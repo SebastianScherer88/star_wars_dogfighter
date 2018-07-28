@@ -348,6 +348,8 @@ class Game(object):
                           'explosion_images':[pg.image.load(image_path) for image_path in self.animations_meta_data['explosion']['image_paths']],
                           'explosion_sounds':pg.mixer.Sound(file=self.animations_meta_data['explosion']['sound']),
                           'explosion_spi':self.animations_meta_data['explosion']['spi'],
+                          'hit_sounds':pg.mixer.Sound(file=self.animations_meta_data['hit']['sound']),
+                          'hit_spi':self.animations_meta_data['hit']['spi'],
                           'engine_images':[pg.image.load(image_path) for image_path in self.animations_meta_data['engine']['image_paths']],
                           'engine_spi':self.animations_meta_data['engine']['spi'],
                           'piloting_cone_sine':0.1,
@@ -578,7 +580,7 @@ class Game(object):
         self._sync_player_(player)
         
         # initialize pause, sound and next level countdown state variables
-        player_input, paused, sound, t_pass, level_status = None, False, False, False, 'ongoing'
+        player_input, paused, sound, t_pass, level_status = None, False, True, False, 'ongoing'
         
         # start main game loop
         while True:
@@ -599,7 +601,9 @@ class Game(object):
                                      level_status)
                 
                 # check and handle collisions
-                self.handle_collisions(level_sprite_groups)
+                self.handle_collisions(level_meta_data,
+                                       level_sprite_groups,
+                                       sound)
             
             # check if level done based on key events; if 'quit_game', quit level,
             # return to main game and quit
@@ -663,16 +667,18 @@ class Game(object):
         pg.display.flip()
         
     def handle_collisions(self,
-                          sprite_groups):
+                          level_meta_data,
+                          sprite_groups,
+                          sound):
         '''Checks for collisions between player sprite and enemy lasers, as well
         as enemy sprites and player lasers. Terminates any sprites that were
         shot down. Records the time of the kill.'''
 
-        # check for enemy kills
+        # ---- check for allies being hit ----
         hit_allies = groupcollide(sprite_groups['ships']['ally'],
                                   sprite_groups['lasers']['hostile'],
                                       False,
-                                      True,
+                                      False,
                                       collide_mask)
         
         for hit_ally in hit_allies:
@@ -682,12 +688,34 @@ class Game(object):
             # if ship has no more hit points left, destroy and set flag
             if not hit_ally._hit_points:
                 hit_ally.kill()
+    
+        # recheck to get positions for hit explosions
+        hitting_hostile_lasers = groupcollide(sprite_groups['lasers']['hostile'],
+                                              sprite_groups['ships']['ally'],
+                                              True,
+                                              False,
+                                              collide_mask)
         
+        for hitting_hostile_laser in hitting_hostile_lasers:
+            # play hit sound if sound is toggled on
+            if sound:
+                level_meta_data['hit_sounds'].play()
+                
+            # create small explosion to show hit
+            BasicAnimation(self.fps,
+                              self.screen,
+                             level_meta_data['explosion_images'],
+                             level_meta_data['hit_spi'],
+                             [sprite_groups['non_colliders']['any']],
+                             center = hitting_hostile_laser._center,
+                             image_scaling=0.25)
+        
+        # ---- check if hostiles have been hit ----
         # check for player kills
         hit_hostiles = groupcollide(sprite_groups['ships']['hostile'],
                                   sprite_groups['lasers']['ally'],
                                       False,
-                                      True,
+                                      False,
                                       collide_mask)
         
         for hit_hostile in hit_hostiles:
@@ -697,6 +725,27 @@ class Game(object):
             # if ship has no more hit points left, destroy and flag
             if not hit_hostile._hit_points:
                 hit_hostile.kill()
+                
+        # recheck to get positions for hit explosions
+        hitting_ally_lasers = groupcollide(sprite_groups['lasers']['ally'],
+                                              sprite_groups['ships']['hostile'],
+                                              True,
+                                              False,
+                                              collide_mask)
+        
+        for hitting_ally_laser in hitting_ally_lasers:
+            # play hit sound if sound is toggled on
+            if sound:
+                level_meta_data['hit_sounds'].play()
+                
+            # create small explosion to show hit
+            BasicAnimation(self.fps,
+                              self.screen,
+                             level_meta_data['explosion_images'],
+                             level_meta_data['hit_spi'],
+                             [sprite_groups['non_colliders']['any']],
+                             center = hitting_ally_laser._center,
+                             image_scaling=0.25)
                 
     def _get_level_status(self,
                           sprite_group):

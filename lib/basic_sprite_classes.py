@@ -47,7 +47,8 @@ class BasicSprite(Sprite):
                  angle = 0,
                  speed = 0,
                  is_transparent = True,
-                 transparent_color = (255,255,255)):
+                 transparent_color = (255,255,255),
+                 image_scaling = 1):
         
         '''Arguments:
             
@@ -101,10 +102,10 @@ class BasicSprite(Sprite):
         self._image_index = 0 # always start with first image in original_images
 
         # initialize image surface object
-        self._size_factor = 1
+        self._image_scaling = image_scaling
         self.image = pg.transform.rotozoom(self._original_images[self._image_index],
                                            self._angle,
-                                           self._size_factor)
+                                           self._image_scaling)
         
         # update object type attribute: mask
         self.mask = pg.mask.from_surface(self.image)
@@ -187,7 +188,7 @@ class BasicSprite(Sprite):
         # update object type attributes: surface
         self.image = pg.transform.rotozoom(self._original_images[self._image_index],
                                            self._angle,
-                                           self._size_factor)
+                                           self._image_scaling)
 
         # update object type attribute: mask
         self.mask = pg.mask.from_surface(self.image)

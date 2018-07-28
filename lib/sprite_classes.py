@@ -115,7 +115,7 @@ class ShipSprite(BasicSprite):
                     Allows for dictionary style argument plumbing further upstream.'''
                     
         # set sound toggle variable to default False
-        self._sound = False
+        self._sound = True
         
         # set ships id
         self._ship_id = ship_id
@@ -145,7 +145,7 @@ class ShipSprite(BasicSprite):
         # intialize and attach laser weapons
         self._laser_cannons = []
         
-        for laser_cannon_offset in laser_cannon_offsets * self._size_factor:
+        for laser_cannon_offset in laser_cannon_offsets * self._image_scaling:
             # for each weapon offset in the ship skin's meta data, we create and 
             # attach a LaserCannon object
             self._laser_cannons.append(LaserCannon(ship_sprite=self,
@@ -220,7 +220,7 @@ class ShipSprite(BasicSprite):
                                                              self._original_engine_flame_images,
                                                              self._engine_flame_seconds_per_image,
                                                              self,
-                                                             engine_flame_offset * self._size_factor,
+                                                             engine_flame_offset * self._image_scaling,
                                                              [self._animation_group],
                                                              looping = True))
         
