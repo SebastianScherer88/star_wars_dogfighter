@@ -488,6 +488,13 @@ class AIShipSprite(ShipSprite):
         if not self._current_target:
             return
         
+        # if ship was in last 0.5 seconds, it cant maneuver
+        if self._time_of_hit != None:
+            time_since_last_hit = (pg.time.get_ticks() - self._time_of_hit) / 1000
+            if time_since_last_hit < 0.5:
+                self._d_angle = 0
+                return
+        
         # have a look at the radar to see where target is
         projection_on_ortnorm = self.use_radar()
 
@@ -506,9 +513,16 @@ class AIShipSprite(ShipSprite):
     def set_gunner_commands(self):
         '''See parent FighterSprite class doc for this method.'''
         
-                # only make piloting decisions if there is a current target
+        # only make gunning decisions if there is a current target
         if not self._current_target:
             return
+        
+        # if ship was hit in last 0.5 seconds, it cant shoot
+        if self._time_of_hit != None:
+            time_since_last_hit = (pg.time.get_ticks() - self._time_of_hit) / 1000
+            if time_since_last_hit < 0.5:
+                self._command_to_fire = False
+                return
         
         # have a look at the radar to see where player sprite is
         projection_on_ortnorm = self.use_radar()
