@@ -3,7 +3,7 @@ empire_pilot:
 engine:
   image_paths: [./graphics/engine_flame/engine_flame1.bmp, ./graphics/engine_flame/engine_flame2.bmp,
     ./graphics/engine_flame/engine_flame3.bmp, ./graphics/engine_flame/engine_flame4.bmp]
-  spi: 0.1
+  spi: 0.3
 explosion:
   image_paths: [./graphics/explosion/explosion1.bmp, ./graphics/explosion/explosion2.bmp,
     ./graphics/explosion/explosion3.bmp, ./graphics/explosion/explosion4.bmp, ./graphics/explosion/explosion5.bmp,

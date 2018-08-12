@@ -54,7 +54,7 @@ animations_meta_data['hit'] = {'sound':'./sounds/explosion.wav',
 
 # create meta data for engine flames
 animations_meta_data['engine'] = {'image_paths':['./graphics/engine_flame/engine_flame' + str(i+1) + '.bmp' for i in range(4)],
-                                    'spi':0.1}
+                                    'spi':0.3}
 
 # create meta data for rebel pilot images
 animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_pilot1.bmp',
@@ -76,7 +76,8 @@ with open('animations_meta_data.yaml','w') as animations_meta_data_file:
 skins_meta_data = {}
 
 # create meta data for snowspeeder skin
-skins_meta_data['snowspeeder'] = {'image_paths':['./graphics/sprite_skins/snowspeeder.bmp'],
+skins_meta_data['snowspeeder'] = {'image_paths':['./graphics/sprite_skins/snowspeeder1.bmp',
+                                                 './graphics/sprite_skins/snowspeeder2.bmp'],
                'gun_offsets':[[22,-11],
                               [22,11]],
                'engine_offsets':[[-22,-5],
@@ -86,7 +87,8 @@ skins_meta_data['snowspeeder'] = {'image_paths':['./graphics/sprite_skins/snowsp
                                [1]]]}
 
 # create meta data for awing skin
-skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing.bmp'],
+skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing1.bmp',
+                                           './graphics/sprite_skins/awing2.bmp'],
                'gun_offsets':[[9,-15],
                               [9,15]],
                'engine_offsets':[[-20,-7],
@@ -96,7 +98,8 @@ skins_meta_data['awing'] = {'image_paths':['./graphics/sprite_skins/awing.bmp'],
                                [1]]]}
 
 # create meta data for xwing skin
-skins_meta_data['xwing'] = {'image_paths':['./graphics/sprite_skins/xwing.bmp'],
+skins_meta_data['xwing'] = {'image_paths':['./graphics/sprite_skins/xwing1.bmp',
+                                           './graphics/sprite_skins/xwing2.bmp'],
                'gun_offsets':[[13,-18],
                               [13,18],
                               [14,-16],
@@ -112,7 +115,8 @@ skins_meta_data['xwing'] = {'image_paths':['./graphics/sprite_skins/xwing.bmp'],
                                [3]]]}
 
 # create meta data for tie fighter skin
-skins_meta_data['tiefighter'] = {'image_paths':['./graphics/sprite_skins/tiefighter.bmp'],
+skins_meta_data['tiefighter'] = {'image_paths':['./graphics/sprite_skins/tiefighter1.bmp',
+                                               './graphics/sprite_skins/tiefighter2.bmp'],
                'gun_offsets':[[9,-2],
                               [9,3]],
                'engine_offsets':[[-11,0]],
@@ -121,7 +125,8 @@ skins_meta_data['tiefighter'] = {'image_paths':['./graphics/sprite_skins/tiefigh
                                [1]]]}
 
 # create meta data for the tie interceptor skin                
-skins_meta_data['tieinterceptor'] = {'image_paths':['./graphics/sprite_skins/tieinterceptor.bmp'],
+skins_meta_data['tieinterceptor'] = {'image_paths':['./graphics/sprite_skins/tieinterceptor1.bmp',
+                                                   './graphics/sprite_skins/tieinterceptor2.bmp'],
                'gun_offsets':[[20,-17],
                               [20,17],
                               [20,-13],
@@ -136,7 +141,8 @@ skins_meta_data['tieinterceptor'] = {'image_paths':['./graphics/sprite_skins/tie
                                [3]]]}
 
 # create meta data for vader's tie fighter
-skins_meta_data['tievader'] = {'image_paths':['./graphics/sprite_skins/tievader.bmp'],
+skins_meta_data['tievader'] = {'image_paths':['./graphics/sprite_skins/tievader1.bmp',
+                                               './graphics/sprite_skins/tievader2.bmp'],
                'gun_offsets':[[18,-9],
                               [18,9]],
                'engine_offsets':[[-18,-3],
@@ -146,7 +152,8 @@ skins_meta_data['tievader'] = {'image_paths':['./graphics/sprite_skins/tievader.
                                [1]]]}
 
 # create meta data for hornet skin
-skins_meta_data['hornet'] = {'image_paths':['./graphics/sprite_skins/hornet.bmp'],
+skins_meta_data['hornet'] = {'image_paths':['./graphics/sprite_skins/hornet.bmp',
+                                           './graphics/sprite_skins/hornet.bmp'],
                'gun_offsets':[[6,-2],
                               [6,3]],
                'engine_offsets':[[-20,0]],
@@ -155,7 +162,8 @@ skins_meta_data['hornet'] = {'image_paths':['./graphics/sprite_skins/hornet.bmp'
                                [1]]]}
 
 # create meta data for f35 skin
-skins_meta_data['f35'] = {'image_paths':['./graphics/sprite_skins/f35.bmp'],
+skins_meta_data['f35'] = {'image_paths':['./graphics/sprite_skins/f35.bmp',
+                                         './graphics/sprite_skins/f35.bmp'],
                'gun_offsets':[[6,-2],
                               [6,3]],
                'engine_offsets':[[-17,0]],
@@ -203,7 +211,7 @@ level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                                      20],
                                                         'max_speed_pixel_per_second':[250,
                                                                                      250]},
-                                    'ship':'awing',
+                                    'ship':'xwing',
                                     'laser':'red'}
 
 level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
@@ -224,7 +232,7 @@ level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                             'max_speed_pixel_per_second':[250,
                                                                                            250,
                                                                                            250]},
-                                        'ship':'tiefighter',
+                                        'ship':'tieinterceptor',
                                         'laser':'green'}
 
 game_level_meta_data = [level_template_meta_data ] * 5
