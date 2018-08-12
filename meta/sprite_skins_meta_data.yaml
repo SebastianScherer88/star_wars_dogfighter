@@ -9,7 +9,7 @@ awing:
   gun_offsets:
   - [9, -15]
   - [9, 15]
-  image_paths: [./graphics/sprite_skins/awing.bmp]
+  image_paths: [./graphics/sprite_skins/awing1.bmp, ./graphics/sprite_skins/awing2.bmp]
 f35:
   engine_offsets:
   - [-17, 0]
@@ -20,7 +20,7 @@ f35:
   gun_offsets:
   - [6, -2]
   - [6, 3]
-  image_paths: [./graphics/sprite_skins/f35.bmp]
+  image_paths: [./graphics/sprite_skins/f35.bmp, ./graphics/sprite_skins/f35.bmp]
 green:
   image_paths: [./graphics/sprite_skins/greenlaser.bmp]
 hornet:
@@ -33,7 +33,7 @@ hornet:
   gun_offsets:
   - [6, -2]
   - [6, 3]
-  image_paths: [./graphics/sprite_skins/hornet.bmp]
+  image_paths: [./graphics/sprite_skins/hornet.bmp, ./graphics/sprite_skins/hornet.bmp]
 red:
   image_paths: [./graphics/sprite_skins/redlaser.bmp]
 snowspeeder:
@@ -47,7 +47,7 @@ snowspeeder:
   gun_offsets:
   - [22, -11]
   - [22, 11]
-  image_paths: [./graphics/sprite_skins/snowspeeder.bmp]
+  image_paths: [./graphics/sprite_skins/snowspeeder1.bmp, ./graphics/sprite_skins/snowspeeder2.bmp]
 tiefighter:
   engine_offsets:
   - [-11, 0]
@@ -58,7 +58,7 @@ tiefighter:
   gun_offsets:
   - [9, -2]
   - [9, 3]
-  image_paths: [./graphics/sprite_skins/tiefighter.bmp]
+  image_paths: [./graphics/sprite_skins/tiefighter1.bmp, ./graphics/sprite_skins/tiefighter2.bmp]
 tieinterceptor:
   engine_offsets:
   - [-18, 0]
@@ -75,7 +75,7 @@ tieinterceptor:
   - [20, 17]
   - [20, -13]
   - [20, 13]
-  image_paths: [./graphics/sprite_skins/tieinterceptor.bmp]
+  image_paths: [./graphics/sprite_skins/tieinterceptor1.bmp, ./graphics/sprite_skins/tieinterceptor2.bmp]
 tievader:
   engine_offsets:
   - [-18, -3]
@@ -87,7 +87,7 @@ tievader:
   gun_offsets:
   - [18, -9]
   - [18, 9]
-  image_paths: [./graphics/sprite_skins/tievader.bmp]
+  image_paths: [./graphics/sprite_skins/tievader1.bmp, ./graphics/sprite_skins/tievader2.bmp]
 xwing:
   engine_offsets:
   - [-25, -6]
@@ -105,4 +105,4 @@ xwing:
   - [13, 18]
   - [14, -16]
   - [14, 16]
-  image_paths: [./graphics/sprite_skins/xwing.bmp]
+  image_paths: [./graphics/sprite_skins/xwing1.bmp, ./graphics/sprite_skins/xwing2.bmp]

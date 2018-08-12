@@ -37,6 +37,7 @@ class Game(object):
         # background
         #self.background_image = pg.image.load('./graphics/misc/star_wars_background_24bit.bmp')
         self.background_image = pg.image.load('./graphics/misc/star_wars_background.bmp')
+        #self.background_image = pg.image.load('./graphics/misc/mountains_background.bmp')
         
         # main screen music
         pg.mixer.music.load('./sounds/power_bots_loop.wav')
@@ -700,6 +701,7 @@ class Game(object):
         
         for hit_ally in hit_allies:
             # update hit ship's hit points attribute
+            hit_ally.was_hit()
             hit_ally._hit_points -= 1
             
             # if ship has no more hit points left, destroy and set flag
@@ -737,6 +739,7 @@ class Game(object):
         
         for hit_hostile in hit_hostiles:
             # update hit ship's hit points attribute
+            hit_hostile.was_hit()
             hit_hostile._hit_points -= 1
             
             # if ship has no more hit points left, destroy and flag

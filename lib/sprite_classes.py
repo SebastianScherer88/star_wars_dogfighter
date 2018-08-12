@@ -135,6 +135,9 @@ class ShipSprite(BasicSprite):
         # set active state variable to communicate to tracking animations
         self._alive = True
         
+        # set was_hit attribute to None
+        self._time_of_hit = None
+        
         # set laser fire meta data attributes            
         self._original_laser_fire_modes = laser_fire_modes
         self._laser_sound = laser_sound
@@ -286,6 +289,9 @@ class ShipSprite(BasicSprite):
     def update(self):
         '''Base class update plus additional ShipSprite specific updates.'''
         
+        # update image index
+        self.update_image_index()
+        
         # if no target has been aquired, get it
         if not self._current_target:
             self._acquire_target()
@@ -323,6 +329,28 @@ class ShipSprite(BasicSprite):
                       center = self._center,
                       angle = self._angle,
                       speed = self._speed * self._fps) # animation expects pixel/second speed unit
+        
+    def was_hit(self):
+        '''Called from game class when sprite is hit by hostile missiles/laser.'''
+        self._time_of_hit = pg.time.get_ticks()
+        
+    def update_image_index(self):
+        '''Updates image index depending on wether sprite was recently hit by
+        hostile laser/issile.'''
+        
+        # check if hit
+        if self._time_of_hit == None:
+            return
+        
+        # get time since last hit
+        time_since_last_hit = (pg.time.get_ticks() - self._time_of_hit) / 1000
+        
+        # if time window has passed, set back to normal image and reset hit flag
+        if time_since_last_hit > 0.5:
+            self._time_of_hit = None
+            self._image_index = 0
+        else:
+            self._image_index = int((time_since_last_hit // 0.1) % 2)
         
 class AIShipSprite(ShipSprite):
     '''Based on ShipSprite class. Represents an enemy ship during game.'''
@@ -460,6 +488,13 @@ class AIShipSprite(ShipSprite):
         if not self._current_target:
             return
         
+        # if ship was in last 0.5 seconds, it cant maneuver
+        if self._time_of_hit != None:
+            time_since_last_hit = (pg.time.get_ticks() - self._time_of_hit) / 1000
+            if time_since_last_hit < 0.5:
+                self._d_angle = 0
+                return
+        
         # have a look at the radar to see where target is
         projection_on_ortnorm = self.use_radar()
 
@@ -478,9 +513,16 @@ class AIShipSprite(ShipSprite):
     def set_gunner_commands(self):
         '''See parent FighterSprite class doc for this method.'''
         
-                # only make piloting decisions if there is a current target
+        # only make gunning decisions if there is a current target
         if not self._current_target:
             return
+        
+        # if ship was hit in last 0.5 seconds, it cant shoot
+        if self._time_of_hit != None:
+            time_since_last_hit = (pg.time.get_ticks() - self._time_of_hit) / 1000
+            if time_since_last_hit < 0.5:
+                self._command_to_fire = False
+                return
         
         # have a look at the radar to see where player sprite is
         projection_on_ortnorm = self.use_radar()
