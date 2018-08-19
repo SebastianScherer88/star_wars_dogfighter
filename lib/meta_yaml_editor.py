@@ -184,22 +184,161 @@ with open('sprite_skins_meta_data.yaml','w') as skins_meta_data_file:
 #----------------------------------------------
 # [3] Create and save the per-level meta data
 #----------------------------------------------
-    
-level_template_meta_data = {}
 
-level_template_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+# --- level one meta data
+level_1_meta_data = {}
+
+#   music
+level_1_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
                                     'volume':1}
-    
-level_template_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
+
+level_1_meta_data['player'] = {'ship_init_kwargs':{'center':[200,350],
+                                                          'angle':0,
+                                                          'speed':200,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250,
+                                                          'hit_points':10},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+level_1_meta_data['hostile'] = {'ship_init_kwargs':{'center':[(1200,350)],
+                                                            'angle':[180],
+                                                            'speed':[250],
+                                                            'd_angle_degrees_per_second':[100],
+                                                            'd_speed_pixel_per_second':[20],
+                                                            'max_speed_pixel_per_second':[250],
+                                                            'hit_points':[10]},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+                                        
+# --- level two meta data
+level_2_meta_data = {}
+
+#   music
+level_2_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
+
+level_2_meta_data['player'] = {'ship_init_kwargs':{'center':[200,350],
+                                                          'angle':0,
+                                                          'speed':200,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250,
+                                                          'hit_points':15},
+                                        'ship':{'empire':'tieinterceptor',
+                                                'rebel':'xwing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+level_2_meta_data['hostile'] = {'ship_init_kwargs':{'center':[(1200,150),
+                                                             (1200,450)],
+                                                            'angle':[180,
+                                                                     180],
+                                                            'speed':[230,
+                                                                     230],
+                                                            'd_angle_degrees_per_second':[120,
+                                                                                          120],
+                                                            'd_speed_pixel_per_second':[20,
+                                                                                        20],
+                                                            'max_speed_pixel_per_second':[250,
+                                                                                          250],
+                                                            'hit_points':[15,
+                                                                          15]},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+                                        
+# --- level twhree meta data
+level_3_meta_data = {}
+
+#   music
+level_3_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
+
+level_3_meta_data['player'] = {'ship_init_kwargs':{'center':[500,700],
+                                                          'angle':80,
+                                                          'speed':210,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250,
+                                                          'hit_points':15},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+level_3_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1000,700)],
+                                                            'angle':[100],
+                                                            'speed':[220],
+                                                            'd_angle_degrees_per_second':[140],
+                                                            'd_speed_pixel_per_second':[20],
+                                                            'max_speed_pixel_per_second':[250],
+                                                            'hit_points':[15]},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+level_3_meta_data['hostile'] = {'ship_init_kwargs':{'center':[(350,50),
+                                                             (750,50),
+                                                             (1100,50)],
+                                                            'angle':[-70,
+                                                                     -90,
+                                                                     -80],
+                                                            'speed':[200,
+                                                                     200,
+                                                                     200],
+                                                            'd_angle_degrees_per_second':[110,
+                                                                                          110,
+                                                                                          110],
+                                                            'd_speed_pixel_per_second':[20,
+                                                                                        20,
+                                                                                        20],
+                                                            'max_speed_pixel_per_second':[250,
+                                                                                          250,
+                                                                                          250],
+                                                            'hit_points':[15,
+                                                                          15,
+                                                                          15]},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+                                        
+# --- level four meta data
+level_4_meta_data = {}
+
+#   music
+level_4_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
+#    player
+level_4_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
                                                           'angle':180,
                                                           'speed':200,
                                                           'd_angle_degrees_per_second':150,
                                                           'd_speed_pixel_per_second':20,
                                                           'max_speed_pixel_per_second':250},
-                                        'ship':'awing',
-                                        'laser':'red'}
+                                        'ship':{'empire':'tieinterceptor',
+                                                'rebel':'xwing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
 
-level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
+# ally
+level_4_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                     (1400,700)],
                                                         'angle':[180,
                                                                 180],
@@ -211,10 +350,14 @@ level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                                      20],
                                                         'max_speed_pixel_per_second':[250,
                                                                                      250]},
-                                    'ship':'xwing',
-                                    'laser':'red'}
+                                    'ship':{'empire':'tieinterceptor',
+                                            'rebel':'xwing'},
+                                    'laser':{'empire':'green',
+                                             'rebel':'red'}
+                                        }
 
-level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
+# hostile
+level_4_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                                        (50,350),
                                                                        (50,700)),
                                                             'angle':[0,
@@ -232,10 +375,186 @@ level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                             'max_speed_pixel_per_second':[250,
                                                                                            250,
                                                                                            250]},
-                                        'ship':'tieinterceptor',
-                                        'laser':'green'}
+                                        'ship':{'empire':'tieinterceptor',
+                                                'rebel':'xwing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
 
-game_level_meta_data = [level_template_meta_data ] * 5
+# --- level five meta data
+
+level_5_meta_data = {}
+
+#   music
+level_5_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
+#    player
+level_5_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
+                                                          'angle':180,
+                                                          'speed':200,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250},
+                                        'ship':{'empire':'tieinterceptor',
+                                                'rebel':'xwing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+# ally
+level_5_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
+                                                                    (1400,700)],
+                                                        'angle':[180,
+                                                                180],
+                                                        'speed':[250,
+                                                                250],
+                                                        'd_angle_degrees_per_second':[110,
+                                                                                       110],
+                                                        'd_speed_pixel_per_second':[20,
+                                                                                     20],
+                                                        'max_speed_pixel_per_second':[250,
+                                                                                     250]},
+                                    'ship':{'empire':'tieinterceptor',
+                                            'rebel':'xwing'},
+                                    'laser':{'empire':'green',
+                                             'rebel':'red'}
+                                        }
+
+# hostile
+level_5_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
+                                                                       (50,300),
+                                                                       (50,500),
+                                                                       (50,700)),
+                                                            'angle':[0,
+                                                                      0,
+                                                                      0,
+                                                                      0],
+                                                            'speed':[250,
+                                                                      250,
+                                                                      250,
+                                                                      250],
+                                                            'd_angle_degrees_per_second':[120,
+                                                                                           120,
+                                                                                           120,
+                                                                                           120],
+                                                            'd_speed_pixel_per_second':[15,
+                                                                                         15,
+                                                                                         15,
+                                                                                         15],
+                                                            'max_speed_pixel_per_second':[250,
+                                                                                           250,
+                                                                                           250,
+                                                                                           250]},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+                                        
+                                        # --- level five meta data
+
+level_6_meta_data = {}
+
+#   music
+level_6_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
+#    player
+level_6_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,550],
+                                                          'angle':0,
+                                                          'speed':200,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+# ally
+level_6_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
+                                                                    (1400,200),
+                                                                    (1400,300)],
+                                                        'angle':[-90,
+                                                                -90,
+                                                                -90],
+                                                        'speed':[240,
+                                                                240,
+                                                                240],
+                                                        'd_angle_degrees_per_second':[110,
+                                                                                       110,
+                                                                                       110],
+                                                        'd_speed_pixel_per_second':[20,
+                                                                                     20,
+                                                                                     20],
+                                                        'max_speed_pixel_per_second':[250,
+                                                                                     250,
+                                                                                     250]},
+                                    'ship':{'empire':'tiefighter',
+                                            'rebel':'awing'},
+                                    'laser':{'empire':'green',
+                                             'rebel':'red'}
+                                        }
+
+# hostile
+level_6_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,150),
+                                                                       (50,250),
+                                                                       (50,350),
+                                                                       (50,450),
+                                                                       (50,550)),
+                                                            'angle':[90,
+                                                                      90,
+                                                                      90,
+                                                                      90,
+                                                                      90],
+                                                            'speed':[240,
+                                                                      240,
+                                                                      240,
+                                                                      240,
+                                                                      240],
+                                                            'd_angle_degrees_per_second':[120,
+                                                                                           120,
+                                                                                           120,
+                                                                                           120,
+                                                                                           120],
+                                                            'd_speed_pixel_per_second':[20,
+                                                                                         20,
+                                                                                         20,
+                                                                                         20,
+                                                                                         20],
+                                                            'max_speed_pixel_per_second':[250,
+                                                                                           250,
+                                                                                           250,
+                                                                                           250,
+                                                                                           250]},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+game_level_meta_data = [level_1_meta_data,
+                        level_2_meta_data,
+                        level_3_meta_data,
+                        level_4_meta_data,
+                        level_5_meta_data,
+                        level_6_meta_data]
 
 with open('game_level_meta_data.yaml','w') as game_level_data_file:
     yaml.dump(game_level_meta_data,game_level_data_file)
+
+#----------------------------------------------
+# [4] Create game level meta data
+#----------------------------------------------
+    
+game_meta_data = {}
+
+# load both versions of the empire logo
+game_meta_data['empire'] = {'image_paths': ['./graphics/misc/empire_logo' + str(i+1) + '.bmp' for i in range(2)]}
+
+# load both versions of the alliance logo
+game_meta_data['rebel'] = {'image_paths': ['./graphics/misc/alliance_logo' + str(i+1) + '.bmp' for i in range(2)]}
+
+with open('game_meta_data.yaml','w') as game_data_file:
+    yaml.dump(game_meta_data,game_data_file)
+    

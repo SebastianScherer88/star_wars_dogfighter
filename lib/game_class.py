@@ -63,10 +63,17 @@ class Game(object):
             
         with open ('./meta/game_level_meta_data.yaml','r') as level_meta_file:
             self.level_meta_data = yaml.load(level_meta_file)
+            
+        with open('./meta/game_meta_data.yaml','r') as game_meta_file:
+            self.game_meta_data = yaml.load(game_meta_file)
         
         # start start-up animation and welcome screen
         pg.mixer.music.play(loops=-1)
         player_feedback = self.welcome_screen()
+        
+        # if player hasnt closed the pygame window, proceed to choosing sides
+        if player_feedback == 'pass':
+            player_feedback, (player_side,hostile_side) = self.choose_sides_screen()
         
         # if player hasnt closed the pygame window, process to level 1 of game
         if player_feedback == 'pass':
@@ -79,7 +86,9 @@ class Game(object):
                 level_specs = self.level_meta_data[level_index]
                 
                 # get meta data for i-th level
-                level_meta_data = self._collect_meta_data_for_level(level_index,
+                level_meta_data = self._collect_meta_data_for_level(player_side,
+                                                                    hostile_side,
+                                                                    level_index,
                                                                     level_specs)
                 
                 # start level and receive level outcome
@@ -94,8 +103,9 @@ class Game(object):
                     # increase level index by one
                     level_index += 1
             
-        # display game over message
-        self.goodbye_screen()
+        if player_feedback != 'quit_game':
+            # display game over message
+            self.goodbye_screen()
         
         # quit (py)game
         pg.quit()
@@ -120,6 +130,33 @@ class Game(object):
                 
         return player_input
     
+    def handle_sides_events_queue(self,
+                                 player_input):
+        '''Util function for handling events during the choose sides phase of game.'''
+        
+        events = pg.event.get()
+        
+        switch_sides = False
+        
+        player_input = 'stay'
+        
+        for event in events:
+            # if player wants to quit, record that feedback
+            if event.type == pg.QUIT:                    
+                # quit this level
+                player_input = 'quit_game'
+            # if player wants to skip/continue to game, record that feedback
+            if event.type == pg.KEYDOWN:
+                # switch sides
+                if event.key in [pg.K_LEFT,pg.K_RIGHT]:
+                    switch_sides = True
+                
+                # process to next stage
+                if event.key == pg.K_RETURN:
+                    player_input = 'pass'
+                
+        return player_input, switch_sides
+    
     def _get_surface_from_text(self,
                                message = '',
                                font = 'freesansbold.ttf',
@@ -143,13 +180,15 @@ class Game(object):
                              sub_message=None,
                              main_size = 40,
                              sub_size = 20,
-                             font = 'freesansbold.ttf',
+                             font = './graphics/firefight-bb.regular.ttf',
                              text_color = (255, 0, 0),
                              background_color = None,
                              blackout = True,
                              wait_seconds = 0,
                              blit_mode=True,
-                             text_groups=None):
+                             text_groups=None,
+                             x = None,
+                             y = None):
         '''Util message that can be used to blit a message with smaller submessage
         to the center of the main screen, and wait a bit. If blit_mode is set to True,
         messages will be blitted straight to the screen. Otherwise, a pair of BasicSprites
@@ -176,6 +215,17 @@ class Game(object):
                                                            background_color)
                 text_rect = text_surface.get_rect()
                 text_rect.center = pos
+                
+                # reposition if required
+                if x != None:
+                    temp_pos = list(text_rect.center)
+                    temp_pos[0] = x
+                    pos = text_rect.center = temp_pos
+                if y != None:
+                    temp_pos = list(text_rect.center)
+                    temp_pos[1] = y
+                    pos = text_rect.center = temp_pos
+                    
                 if blit_mode:
                     self.screen.blit(text_surface,text_rect)
                 else:
@@ -250,6 +300,142 @@ class Game(object):
             
         return player_input
     
+    def choose_sides_screen(self):
+        '''Util function that displays the screen in which player chooses sides.'''
+        
+        # initialize player choice
+        player_input = ''
+        
+        # get an empty sprit group
+        choose_sides = Group()
+        
+        # get clock
+        clock = pg.time.Clock()
+        
+        # add text sprite to group/main screen
+        self.blit_message_and_wait("Choose a side",
+                                   blackout = False,
+                                   blit_mode=False,
+                                   font = './graphics/firefight-bb.regular.ttf',
+                                   text_groups=[choose_sides],
+                                   y = 200)
+        
+        # get logos for both sides from game meta data
+        side_logos = {}
+        side_logos['empire'] = [pg.image.load(image_path) for image_path in self.game_meta_data['empire']['image_paths']]
+        side_logos['rebel'] = [pg.image.load(image_path) for image_path in self.game_meta_data['rebel']['image_paths']]
+        
+        # create sprites with logos
+        empire_logo = BasicSprite(self.fps,
+                     self.screen,
+                     side_logos['empire'],
+                     [choose_sides],
+                     center = np.array((300,300)))
+        alliance_logo = BasicSprite(self.fps,
+                     self.screen,
+                     side_logos['rebel'],
+                     [choose_sides],
+                     center = np.array((1200,300)))
+        
+        # initialize sides
+        player_sides = ['empire','rebel']
+        player_sides_verbose = ['The glorious empire','The mighty alliance']
+        
+        # initialize side indices; default is alliance
+        player_side_index = alliance_logo._image_index = 1
+        player_side = player_sides[player_side_index]
+        player_side_verbose = player_sides_verbose[player_side_index]
+        
+        # add side caption text sprites
+        self.blit_message_and_wait(player_sides_verbose[0],
+                           blackout = False,
+                           blit_mode=False,
+                           font = './graphics/firefight-bb.regular.ttf',
+                           text_groups=[choose_sides],
+                           x = 300,
+                           y = 550)
+        self.blit_message_and_wait(player_sides_verbose[1],
+                           blackout = False,
+                           blit_mode=False,
+                           font = './graphics/firefight-bb.regular.ttf',
+                           text_groups=[choose_sides],
+                           x = 1200,
+                           y = 550)
+        
+        while True:
+            # handle player pressing any key
+            player_input, switch_sides = self.handle_sides_events_queue(player_input)
+            
+            # stop this segment if player wants to skip ahead to game
+            if player_input in  ['pass','quit_game']:
+                # empty sprite group
+                choose_sides.empty()
+                # set hostile side
+                if player_side == 'rebel':
+                    hostile_side = 'empire'
+                elif player_side == 'empire':
+                    hostile_side = 'rebel'
+                break
+            
+            # update side status
+            if switch_sides:
+                # update sprite image indices
+                empire_logo._image_index = (empire_logo._image_index + 1) % 2
+                alliance_logo._image_index = (alliance_logo._image_index + 1) % 2
+                player_side_index = (player_side_index + 1) % 2
+                
+                # update player side return and description using up-to-date image indices
+                player_side = player_sides[player_side_index]
+                player_side_verbose = player_sides_verbose[player_side_index]
+            
+            # update message sprites
+            choose_sides.update()
+            
+            # draw messae sprites
+            self.screen.fill((0,0,0))
+            choose_sides.draw(self.screen)
+            pg.display.flip()
+            
+            # control speed up frame updates
+            clock.tick(self.fps)
+            
+        if player_input == 'pass':
+            # --- display choice in center
+            #   add text sprite to group/main screen
+            self.blit_message_and_wait("You chose to live and die for",
+                                       blackout = False,
+                                       blit_mode=False,
+                                       font = './graphics/firefight-bb.regular.ttf',
+                                       text_groups=[choose_sides],
+                                       y = 100)
+            
+            #   add chosen side's logo
+            BasicSprite(self.fps,
+                         self.screen,
+                         side_logos[player_side],
+                         [choose_sides],
+                         center = np.array((700,300)))
+            
+            # add chosen side's caption
+            self.blit_message_and_wait(player_side_verbose,
+                               blackout = False,
+                               blit_mode=False,
+                               font = './graphics/firefight-bb.regular.ttf',
+                               text_groups=[choose_sides],
+                               x = 700,
+                               y = 550)
+            
+            #   update & display
+            self.screen.fill((0,0,0))
+            choose_sides.draw(self.screen)
+            pg.display.flip()
+            
+            # wait for one second
+            pg.time.wait(int(3 * 1000))
+
+          
+        return player_input, (player_side,hostile_side)
+    
     def goodbye_screen(self):
         '''Util function that blits some game over type of message to screen,
         waits a bit and returns.'''
@@ -260,6 +446,8 @@ class Game(object):
                                    wait_seconds = 1.5)
             
     def _collect_meta_data_for_level(self,
+                                     player_side,
+                                     hostile_side,
                                      level_index,
                                      level_specs):
         '''Util function that collects all the sprite related meta data for player,
@@ -274,73 +462,80 @@ class Game(object):
         initializers in via the sub keys 'ship', 'laser' and 'ship_init_kwargs',
         respectively.'''
         
-        # get ship and laser specs for player, allies and hostiles for this level
-        player_ship, player_laser = level_specs['player']['ship'],level_specs['player']['laser']
-        ally_ship, ally_laser = level_specs['ally']['ship'],level_specs['ally']['laser']
-        hostile_ship, hostile_laser = level_specs['hostile']['ship'],level_specs['hostile']['laser']
+        # --- get ship and laser specs for player, allies and hostiles for this level
+        #   player
+        player_ship = level_specs['player']['ship'][player_side]
+        player_laser = level_specs['player']['laser'][player_side]
+        
+        #   ally - optional
+        if 'ally' in level_specs.keys():
+            ally_ship = level_specs['ally']['ship'][player_side]
+            ally_laser = level_specs['ally']['laser'][player_side]
+        
+        #   hostile
+        hostile_ship = level_specs['hostile']['ship'][hostile_side]
+        hostile_laser = level_specs['hostile']['laser'][hostile_side]
 
-        # assign sides to player to get pilot images
-        if player_ship in ['awing','xwing','ywing','snowspeeder']:
-            player_side = 'rebel'
-            hostile_side = 'empire'
-        else:
-            player_side = 'empire'
-            hostile_side = 'rebel'
-
-        # pilot skins
+        # --- get meta data for player, ally and hostile sides
+        #   pilot skins
         pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
-                        'ally': [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
                         'hostile': [pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_side+'_pilot']['image_paths']]}
         
         # ship skins
         ship_images = {'player':[pg.image.load(image_path) for image_path in self.skins_meta_data[player_ship]['image_paths']],
-                            'ally':[pg.image.load(image_path) for image_path in self.skins_meta_data[ally_ship]['image_paths']],
                             'hostile':[pg.image.load(image_path) for image_path in self.skins_meta_data[hostile_ship]['image_paths']]}
         
         # ship frames
         ship_frames = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['yellow']['image_paths']],
-                       'ally':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['green']['image_paths']],
                        'hostile':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['red']['image_paths']]}
         
         # gun offsets
         gun_offsets = {'player':np.array(self.skins_meta_data[player_ship]['gun_offsets']).astype('float'),
-                       'ally':np.array(self.skins_meta_data[ally_ship]['gun_offsets']).astype('float'),
                        'hostile':np.array(self.skins_meta_data[hostile_ship]['gun_offsets']).astype('float')}
         
         # engine offsets
         engine_offsets = {'player':np.array(self.skins_meta_data[player_ship]['engine_offsets']).astype('float'),
-                          'ally':np.array(self.skins_meta_data[ally_ship]['engine_offsets']).astype('float'),
                           'hostile':np.array(self.skins_meta_data[hostile_ship]['engine_offsets']).astype('float')}
         
         # fire modes
         fire_modes = {'player':self.skins_meta_data[player_ship]['fire_modes'],
-                      'ally':self.skins_meta_data[ally_ship]['fire_modes'],
                       'hostile':self.skins_meta_data[hostile_ship]['fire_modes']}
         
         # laser images
         laser_images = {'player':[pg.image.load(image_path) for image_path in self.skins_meta_data[player_laser]['image_paths']],
-                        'ally':[pg.image.load(image_path) for image_path in self.skins_meta_data[ally_laser]['image_paths']],
                         'hostile':[pg.image.load(image_path) for image_path in self.skins_meta_data[hostile_laser]['image_paths']]}
         
         # laser sounds
         laser_sounds = {'player':pg.mixer.Sound(file=self.animations_meta_data[player_laser]['sound']),
-                        'ally':pg.mixer.Sound(file=self.animations_meta_data[ally_laser]['sound']),
                         'hostile':pg.mixer.Sound(file=self.animations_meta_data[hostile_laser]['sound'])}
         
         # muzzle images
         muzzle_flash_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_laser]['image_paths']],
-                                'ally':[pg.image.load(image_path) for image_path in self.animations_meta_data[ally_laser]['image_paths']],
                                 'hostile':[pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_laser]['image_paths']]}
         
         # muzzle seconds per image
         muzzle_flash_spi = {'player':self.animations_meta_data[player_laser]['spi'],
-                             'ally':self.animations_meta_data[ally_laser]['spi'],
                              'hostile':self.animations_meta_data[hostile_laser]['spi']}
         
         # ship sprites' intial values
         ship_init_kwargs = {'player':level_specs['player']['ship_init_kwargs'],
-                            'ally':level_specs['ally']['ship_init_kwargs'],
                             'hostile':level_specs['hostile']['ship_init_kwargs']}
+        
+        # ally meta data - depends on level
+        if 'ally' in level_specs.keys():
+            pilot_images['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']]
+            ship_images['ally'] = [pg.image.load(image_path) for image_path in self.skins_meta_data[ally_ship]['image_paths']]
+            ship_frames['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['green']['image_paths']]
+            gun_offsets['ally'] = np.array(self.skins_meta_data[ally_ship]['gun_offsets']).astype('float')
+            engine_offsets['ally'] = np.array(self.skins_meta_data[ally_ship]['engine_offsets']).astype('float')
+            fire_modes['ally'] = self.skins_meta_data[ally_ship]['fire_modes']
+            laser_images['ally'] = [pg.image.load(image_path) for image_path in self.skins_meta_data[ally_laser]['image_paths']]
+            laser_sounds['ally'] = pg.mixer.Sound(file=self.animations_meta_data[ally_laser]['sound'])
+            muzzle_flash_images['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data[ally_laser]['image_paths']]
+            muzzle_flash_spi['ally'] = self.animations_meta_data[ally_laser]['spi']
+            ship_init_kwargs['ally'] = level_specs['ally']['ship_init_kwargs']
+            
+            
         
         level_meta_data = {'ship_images':ship_images,
                            'ship_frames':ship_frames,
@@ -415,10 +610,11 @@ class Game(object):
                                  level_meta_data,
                                  level_sprite_groups)
         
-        # create allies for this level and add to groups
-        self.spawn_squadron('ally',
-                            level_meta_data,
-                            level_sprite_groups)
+        # if needed, create allies for this level and add to groups
+        if 'ally' in level_meta_data['ship_images'].keys():
+            self.spawn_squadron('ally',
+                                level_meta_data,
+                                level_sprite_groups)
         
         # create hostiles for this level and add to groups
         self.spawn_squadron('hostile',
@@ -969,7 +1165,7 @@ class Game(object):
                     #'ally':(1340,125 + ship_no * 130),
                     'ally':(155, 180 + (ship_no +1) * 130),
                     #'hostile':(155,125 + ship_no * 130)}
-                    'hostile':(1340,180 + ship_no * 130)}
+                    'hostile':(1340,100 + ship_no * 130)}
         
         # get center coordinates for ship stats id card
         center_pos = side_center[side]
