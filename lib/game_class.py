@@ -330,12 +330,12 @@ class Game(object):
                      self.screen,
                      side_logos['empire'],
                      [choose_sides],
-                     center = np.array((300,400)))
+                     center = np.array((300,300)))
         alliance_logo = BasicSprite(self.fps,
                      self.screen,
                      side_logos['rebel'],
                      [choose_sides],
-                     center = np.array((1200,400)))
+                     center = np.array((1200,300)))
         
         # initialize sides
         player_sides = ['empire','rebel']
@@ -353,14 +353,14 @@ class Game(object):
                            font = './graphics/firefight-bb.regular.ttf',
                            text_groups=[choose_sides],
                            x = 300,
-                           y = 650)
+                           y = 550)
         self.blit_message_and_wait(player_sides_verbose[1],
                            blackout = False,
                            blit_mode=False,
                            font = './graphics/firefight-bb.regular.ttf',
                            text_groups=[choose_sides],
                            x = 1200,
-                           y = 650)
+                           y = 550)
         
         while True:
             # handle player pressing any key
@@ -399,38 +399,39 @@ class Game(object):
             # control speed up frame updates
             clock.tick(self.fps)
             
-        # --- display choice in center
-        #   add text sprite to group/main screen
-        self.blit_message_and_wait("You chose to live and die for",
-                                   blackout = False,
-                                   blit_mode=False,
-                                   font = './graphics/firefight-bb.regular.ttf',
-                                   text_groups=[choose_sides],
-                                   y = 200)
-        
-        #   add chosen side's logo
-        BasicSprite(self.fps,
-                     self.screen,
-                     side_logos[player_side],
-                     [choose_sides],
-                     center = np.array((700,400)))
-        
-        # add chosen side's caption
-        self.blit_message_and_wait(player_side_verbose,
-                           blackout = False,
-                           blit_mode=False,
-                           font = './graphics/firefight-bb.regular.ttf',
-                           text_groups=[choose_sides],
-                           x = 700,
-                           y = 650)
-        
-        #   update & display
-        self.screen.fill((0,0,0))
-        choose_sides.draw(self.screen)
-        pg.display.flip()
-        
-        # wait for one second
-        pg.time.wait(int(3 * 1000))
+        if player_input == 'pass':
+            # --- display choice in center
+            #   add text sprite to group/main screen
+            self.blit_message_and_wait("You chose to live and die for",
+                                       blackout = False,
+                                       blit_mode=False,
+                                       font = './graphics/firefight-bb.regular.ttf',
+                                       text_groups=[choose_sides],
+                                       y = 100)
+            
+            #   add chosen side's logo
+            BasicSprite(self.fps,
+                         self.screen,
+                         side_logos[player_side],
+                         [choose_sides],
+                         center = np.array((700,300)))
+            
+            # add chosen side's caption
+            self.blit_message_and_wait(player_side_verbose,
+                               blackout = False,
+                               blit_mode=False,
+                               font = './graphics/firefight-bb.regular.ttf',
+                               text_groups=[choose_sides],
+                               x = 700,
+                               y = 550)
+            
+            #   update & display
+            self.screen.fill((0,0,0))
+            choose_sides.draw(self.screen)
+            pg.display.flip()
+            
+            # wait for one second
+            pg.time.wait(int(3 * 1000))
 
           
         return player_input, (player_side,hostile_side)
