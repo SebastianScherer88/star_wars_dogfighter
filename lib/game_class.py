@@ -81,7 +81,7 @@ class Game(object):
             # start levels
             level_index = 0
             
-            while level_index < 5:
+            while level_index < 6:
                 # get level specs for i-th level
                 level_specs = self.level_meta_data[level_index]
                 
@@ -791,10 +791,11 @@ class Game(object):
         # initialize pause, sound and next level countdown state variables
         player_input, paused, sound, t_pass, level_status = None, False, True, False, 'ongoing'
         
-        # load level music and start playing
-        pg.mixer.music.load(level_meta_data['music_path'])
-        pg.mixer.music.set_volume(level_meta_data['music_volume'])
-        pg.mixer.music.play(loops=-1)
+        # for the first level, load level music and start playing
+        if level_meta_data['level_number'] == 1:
+            pg.mixer.music.load(level_meta_data['music_path'])
+            pg.mixer.music.set_volume(level_meta_data['music_volume'])
+            pg.mixer.music.play(loops=-1)
         
         # start main game loop
         while True:
