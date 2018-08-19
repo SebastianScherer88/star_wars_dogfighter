@@ -196,8 +196,11 @@ level_template_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,350],
                                                           'd_angle_degrees_per_second':150,
                                                           'd_speed_pixel_per_second':20,
                                                           'max_speed_pixel_per_second':250},
-                                        'ship':'awing',
-                                        'laser':'red'}
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
 
 level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                     (1400,700)],
@@ -211,8 +214,11 @@ level_template_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
                                                                                      20],
                                                         'max_speed_pixel_per_second':[250,
                                                                                      250]},
-                                    'ship':'xwing',
-                                    'laser':'red'}
+                                    'ship':{'empire':'tieinterceptor',
+                                            'rebel':'xwing'},
+                                    'laser':{'empire':'green',
+                                             'rebel':'red'}
+                                        }
 
 level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                                        (50,350),
@@ -232,10 +238,29 @@ level_template_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,100),
                                                             'max_speed_pixel_per_second':[250,
                                                                                            250,
                                                                                            250]},
-                                        'ship':'tieinterceptor',
-                                        'laser':'green'}
+                                        'ship':{'empire':'tieinterceptor',
+                                                'rebel':'xwing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
 
 game_level_meta_data = [level_template_meta_data ] * 5
 
 with open('game_level_meta_data.yaml','w') as game_level_data_file:
     yaml.dump(game_level_meta_data,game_level_data_file)
+
+#----------------------------------------------
+# [4] Create game level meta data
+#----------------------------------------------
+    
+game_meta_data = {}
+
+# load both versions of the empire logo
+game_meta_data['empire'] = {'image_paths': ['./graphics/misc/empire_logo' + str(i+1) + '.bmp' for i in range(2)]}
+
+# load both versions of the alliance logo
+game_meta_data['rebel'] = {'image_paths': ['./graphics/misc/alliance_logo' + str(i+1) + '.bmp' for i in range(2)]}
+
+with open('game_meta_data.yaml','w') as game_data_file:
+    yaml.dump(game_meta_data,game_data_file)
+    

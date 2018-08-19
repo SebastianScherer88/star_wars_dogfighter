@@ -1,7 +1,7 @@
 - &id001
   ally:
-    laser: red
-    ship: xwing
+    laser: {empire: green, rebel: red}
+    ship: {empire: tieinterceptor, rebel: xwing}
     ship_init_kwargs:
       angle: [180, 180]
       center:
@@ -12,8 +12,8 @@
       max_speed_pixel_per_second: [250, 250]
       speed: [250, 250]
   hostile:
-    laser: green
-    ship: tieinterceptor
+    laser: {empire: green, rebel: red}
+    ship: {empire: tieinterceptor, rebel: xwing}
     ship_init_kwargs:
       angle: [0, 0, 0]
       center: !!python/tuple
@@ -26,8 +26,8 @@
       speed: [250, 250, 250]
   music: {sound: ./sounds/platformer2.wav, volume: 1}
   player:
-    laser: red
-    ship: awing
+    laser: {empire: green, rebel: red}
+    ship: {empire: tiefighter, rebel: awing}
     ship_init_kwargs:
       angle: 180
       center: [1400, 350]
