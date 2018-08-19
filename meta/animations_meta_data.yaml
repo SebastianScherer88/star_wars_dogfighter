@@ -9,7 +9,7 @@ explosion:
     ./graphics/explosion/explosion3.bmp, ./graphics/explosion/explosion4.bmp, ./graphics/explosion/explosion5.bmp,
     ./graphics/explosion/explosion6.bmp, ./graphics/explosion/explosion7.bmp, ./graphics/explosion/explosion8.bmp,
     ./graphics/explosion/explosion9.bmp]
-  sound: ./sounds/blastwave_safe.wav
+  sound: ./sounds/pt_blast.wav
   spi: 0.1
 green:
   image_paths: [./graphics/green_muzzle_flash/green_muzzle_flash1.bmp, ./graphics/green_muzzle_flash/green_muzzle_flash2.bmp,
