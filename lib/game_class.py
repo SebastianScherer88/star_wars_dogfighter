@@ -180,7 +180,7 @@ class Game(object):
                              sub_message=None,
                              main_size = 40,
                              sub_size = 20,
-                             font = 'freesansbold.ttf',
+                             font = './graphics/firefight-bb.regular.ttf',
                              text_color = (255, 0, 0),
                              background_color = None,
                              blackout = True,
@@ -463,69 +463,79 @@ class Game(object):
         respectively.'''
         
         # --- get ship and laser specs for player, allies and hostiles for this level
+        #   player
         player_ship = level_specs['player']['ship'][player_side]
         player_laser = level_specs['player']['laser'][player_side]
         
-        ally_ship = level_specs['ally']['ship'][player_side]
-        ally_laser = level_specs['ally']['laser'][player_side]
+        #   ally - optional
+        if 'ally' in level_specs.keys():
+            ally_ship = level_specs['ally']['ship'][player_side]
+            ally_laser = level_specs['ally']['laser'][player_side]
         
+        #   hostile
         hostile_ship = level_specs['hostile']['ship'][hostile_side]
         hostile_laser = level_specs['hostile']['laser'][hostile_side]
 
-        # pilot skins
+        # --- get meta data for player, ally and hostile sides
+        #   pilot skins
         pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
-                        'ally': [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
                         'hostile': [pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_side+'_pilot']['image_paths']]}
         
         # ship skins
         ship_images = {'player':[pg.image.load(image_path) for image_path in self.skins_meta_data[player_ship]['image_paths']],
-                            'ally':[pg.image.load(image_path) for image_path in self.skins_meta_data[ally_ship]['image_paths']],
                             'hostile':[pg.image.load(image_path) for image_path in self.skins_meta_data[hostile_ship]['image_paths']]}
         
         # ship frames
         ship_frames = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['yellow']['image_paths']],
-                       'ally':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['green']['image_paths']],
                        'hostile':[pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['red']['image_paths']]}
         
         # gun offsets
         gun_offsets = {'player':np.array(self.skins_meta_data[player_ship]['gun_offsets']).astype('float'),
-                       'ally':np.array(self.skins_meta_data[ally_ship]['gun_offsets']).astype('float'),
                        'hostile':np.array(self.skins_meta_data[hostile_ship]['gun_offsets']).astype('float')}
         
         # engine offsets
         engine_offsets = {'player':np.array(self.skins_meta_data[player_ship]['engine_offsets']).astype('float'),
-                          'ally':np.array(self.skins_meta_data[ally_ship]['engine_offsets']).astype('float'),
                           'hostile':np.array(self.skins_meta_data[hostile_ship]['engine_offsets']).astype('float')}
         
         # fire modes
         fire_modes = {'player':self.skins_meta_data[player_ship]['fire_modes'],
-                      'ally':self.skins_meta_data[ally_ship]['fire_modes'],
                       'hostile':self.skins_meta_data[hostile_ship]['fire_modes']}
         
         # laser images
         laser_images = {'player':[pg.image.load(image_path) for image_path in self.skins_meta_data[player_laser]['image_paths']],
-                        'ally':[pg.image.load(image_path) for image_path in self.skins_meta_data[ally_laser]['image_paths']],
                         'hostile':[pg.image.load(image_path) for image_path in self.skins_meta_data[hostile_laser]['image_paths']]}
         
         # laser sounds
         laser_sounds = {'player':pg.mixer.Sound(file=self.animations_meta_data[player_laser]['sound']),
-                        'ally':pg.mixer.Sound(file=self.animations_meta_data[ally_laser]['sound']),
                         'hostile':pg.mixer.Sound(file=self.animations_meta_data[hostile_laser]['sound'])}
         
         # muzzle images
         muzzle_flash_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_laser]['image_paths']],
-                                'ally':[pg.image.load(image_path) for image_path in self.animations_meta_data[ally_laser]['image_paths']],
                                 'hostile':[pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_laser]['image_paths']]}
         
         # muzzle seconds per image
         muzzle_flash_spi = {'player':self.animations_meta_data[player_laser]['spi'],
-                             'ally':self.animations_meta_data[ally_laser]['spi'],
                              'hostile':self.animations_meta_data[hostile_laser]['spi']}
         
         # ship sprites' intial values
         ship_init_kwargs = {'player':level_specs['player']['ship_init_kwargs'],
-                            'ally':level_specs['ally']['ship_init_kwargs'],
                             'hostile':level_specs['hostile']['ship_init_kwargs']}
+        
+        # ally meta data - depends on level
+        if 'ally' in level_specs.keys():
+            pilot_images['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']]
+            ship_images['ally'] = [pg.image.load(image_path) for image_path in self.skins_meta_data[ally_ship]['image_paths']]
+            ship_frames['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['green']['image_paths']]
+            gun_offsets['ally'] = np.array(self.skins_meta_data[ally_ship]['gun_offsets']).astype('float')
+            engine_offsets['ally'] = np.array(self.skins_meta_data[ally_ship]['engine_offsets']).astype('float')
+            fire_modes['ally'] = self.skins_meta_data[ally_ship]['fire_modes']
+            laser_images['ally'] = [pg.image.load(image_path) for image_path in self.skins_meta_data[ally_laser]['image_paths']]
+            laser_sounds['ally'] = pg.mixer.Sound(file=self.animations_meta_data[ally_laser]['sound'])
+            muzzle_flash_images['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data[ally_laser]['image_paths']]
+            muzzle_flash_spi['ally'] = self.animations_meta_data[ally_laser]['spi']
+            ship_init_kwargs['ally'] = level_specs['ally']['ship_init_kwargs']
+            
+            
         
         level_meta_data = {'ship_images':ship_images,
                            'ship_frames':ship_frames,
@@ -600,10 +610,11 @@ class Game(object):
                                  level_meta_data,
                                  level_sprite_groups)
         
-        # create allies for this level and add to groups
-        self.spawn_squadron('ally',
-                            level_meta_data,
-                            level_sprite_groups)
+        # if needed, create allies for this level and add to groups
+        if 'ally' in level_meta_data['ship_images'].keys():
+            self.spawn_squadron('ally',
+                                level_meta_data,
+                                level_sprite_groups)
         
         # create hostiles for this level and add to groups
         self.spawn_squadron('hostile',
@@ -1154,7 +1165,7 @@ class Game(object):
                     #'ally':(1340,125 + ship_no * 130),
                     'ally':(155, 180 + (ship_no +1) * 130),
                     #'hostile':(155,125 + ship_no * 130)}
-                    'hostile':(1340,180 + ship_no * 130)}
+                    'hostile':(1340,100 + ship_no * 130)}
         
         # get center coordinates for ship stats id card
         center_pos = side_center[side]
