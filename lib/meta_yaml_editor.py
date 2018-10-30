@@ -535,7 +535,8 @@ level_6_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,150),
                                                  'rebel':'red'}
                                         }
 
-game_level_meta_data = [level_1_meta_data,
+game_level_meta_data = [level_6_meta_data,
+                        level_1_meta_data,
                         level_2_meta_data,
                         level_3_meta_data,
                         level_4_meta_data,
