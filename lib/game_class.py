@@ -31,6 +31,10 @@ class Game(object):
         # initialize pygame (handles pretty much eveything)
         pg.init()
         
+        print(os.getcwd())
+        os.chdir(os.path.join(os.getcwd(),'exe.win-amd64-3.6'))
+        print(os.getcwd())
+        
         # create clock    
         self.clock = pg.time.Clock()
         
