@@ -643,17 +643,17 @@ class ShipBio(Sprite):
         ship_id = self._source_ship_id
         
         # get blank id card canvas surface with a coloured frame depending on side attribute
-        id_template = pg.Surface((280,120))
+        id_template = pg.Surface((280,100))
         id_template.fill((0,70,70)) # dark blue on the inside
         frame_thickness = 5
-        frame_rect = pg.Rect(0,0,280, 120)# coloured frame positional rectangle
+        frame_rect = pg.Rect(0,0,280, 100)# coloured frame positional rectangle
         pg.draw.rect(id_template, self.frame_color, frame_rect, frame_thickness)
         
         # blit appropriate pilot image to id_template
         if ship_is_alive:
-            id_template.blit(pilot_images[0],(10,10)) # first image in sequence shows alive pilot
+            id_template.blit(pilot_images[0],(10,0)) # first image in sequence shows alive pilot
         elif not ship_is_alive:
-            id_template.blit(pilot_images[1],(10,10)) # second image in sequence shows dead pilot
+            id_template.blit(pilot_images[1],(10,0)) # second image in sequence shows dead pilot
             
         # get current hp color:
         if 0.2 <= (ship_hp / ship_max_hp) < 0.5:
@@ -665,7 +665,7 @@ class ShipBio(Sprite):
             
         # blit stats
         if self.display_mode == 'text':
-            for (top_left_y, text,text_color) in zip([10,35,50,75,90],
+            for (top_left_y, text,text_color) in zip([10,25,40,65,80],
                                           [ship_id,"Current target", ships_target_id, "Status report", str(ship_hp) + " / " + str(ship_max_hp)],
                                           [self.frame_color,self.base_text_color,self.opp_frame_color,self.base_text_color,hp_color]):          
                 # render text message
@@ -679,7 +679,7 @@ class ShipBio(Sprite):
                 id_template.blit(stat_surface,top_left)
         elif self.display_mode == 'graphic':
             ship_image_w, ship_image_h = ship_image.get_rect().size
-            left_buffer, top_buffer = 160 - int(ship_image_w/2), 40 - int(ship_image_h/2)
+            left_buffer, top_buffer = 160 - int(ship_image_w/2), -int(ship_image_h/2)
             id_template.blit(ship_image, (left_buffer, top_buffer))
             
         return id_template

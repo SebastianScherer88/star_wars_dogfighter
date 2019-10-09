@@ -61,12 +61,22 @@ animations_meta_data['engine'] = {'image_paths':['./graphics/engine_flame/engine
 # create meta data for rebel pilot images
 animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_pilot1.bmp',
                                                         './graphics/cockpit/skull.bmp']}
-                                                        #'./graphics/cockpit/skull2.bmp']}
 
 # create meta data for empire pilot images
 animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empire_pilot1.bmp',
                                                         './graphics/cockpit/skull.bmp']}
-                                                        #'./graphics/cockpit/skull2.bmp']}
+
+# create meta data for bridget#s pilot image
+animations_meta_data['bridget_pilot'] = {'image_paths':['./graphics/cockpit/bridget.bmp',
+                                                        './graphics/cockpit/skull.bmp']}
+
+# create meta data for data science pilot images
+animations_meta_data['data_science_copilots'] = {'image_paths':[['./graphics/cockpit/tom.bmp','./graphics/cockpit/skull.bmp'],
+['./graphics/cockpit/alistair.bmp','./graphics/cockpit/skull.bmp'],
+['./graphics/cockpit/joe.bmp','./graphics/cockpit/skull.bmp'],
+['./graphics/cockpit/seb.bmp','./graphics/cockpit/skull.bmp'],
+['./graphics/cockpit/charles.bmp','./graphics/cockpit/skull.bmp']]}
+
 
 with open('animations_meta_data.yaml','w') as animations_meta_data_file:
     yaml.dump(animations_meta_data,animations_meta_data_file)
@@ -534,13 +544,112 @@ level_6_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,150),
                                         'laser':{'empire':'green',
                                                  'rebel':'red'}
                                         }
+                                        
+level_7_meta_data = {}
+
+#   music
+level_7_meta_data['music'] = {'sound':'./sounds/platformer2.wav',
+                                    'volume':1}
+#    player
+level_7_meta_data['player'] = {'ship_init_kwargs':{'center':[1400,550],
+                                                          'angle':0,
+                                                          'speed':200,
+                                                          'd_angle_degrees_per_second':150,
+                                                          'd_speed_pixel_per_second':20,
+                                                          'max_speed_pixel_per_second':250},
+                                        'ship':{'empire':'tiefighter',
+                                                'rebel':'awing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
+
+# ally
+level_7_meta_data['ally'] = {'ship_init_kwargs':{'center':[(1400,100),
+                                                                    (1400,200),
+                                                                    (1400,300),
+                                        (1400,200),
+                                                                    (1400,300)],
+                                                        'angle':[-90,
+                                                                -90,
+                                                                -90,
+                                                                -90,
+                                                                -90],
+                                                        'speed':[240,
+                                                                240,
+                                                                240,
+                                                                240,
+                                                                240],
+                                                        'd_angle_degrees_per_second':[110,
+                                                                                       110,
+                                                                                       110,
+                                                                                       110,
+                                                                                       110],
+                                                        'd_speed_pixel_per_second':[20,
+                                                                                     20,
+                                                                                     20,
+                                                                                     20,
+                                                                                     20],
+                                                        'max_speed_pixel_per_second':[250,
+                                                                                     250,
+                                                                                     250,
+                                                                                     250,
+                                                                                     250]},
+                                    'ship':{'empire':'tiefighter',
+                                            'rebel':'awing'},
+                                    'laser':{'empire':'green',
+                                             'rebel':'red'}
+                                        }
+
+# hostile
+level_7_meta_data['hostile'] = {'ship_init_kwargs':{'center':((50,150),
+                                                                       (50,250),
+                                                                       (50,350),
+                                                                       (50,450),
+                                                                       (50,550),
+                                    (50,650)),
+                                                            'angle':[90,
+                                                                      90,
+                                                                      90,
+                                                                      90,
+                                                                      90,
+                                                                      90],
+                                                            'speed':[240,
+                                                                      240,
+                                                                      240,
+                                                                      240,
+                                                                      240,
+                                                                      240],
+                                                            'd_angle_degrees_per_second':[120,
+                                                                                           120,
+                                                                                           120,
+                                                                                           120,
+                                                                                           120,
+                                                                                           120],
+                                                            'd_speed_pixel_per_second':[20,
+                                                                                         20,
+                                                                                         20,
+                                                                                         20,
+                                                                                         20,
+                                                                                         20],
+                                                            'max_speed_pixel_per_second':[250,
+                                                                                          250,
+                                                                                           250,
+                                                                                           250,
+                                                                                           250,
+                                                                                           250]},
+                                        'ship':{'empire':'tieinterceptor',
+                                                'rebel':'xwing'},
+                                        'laser':{'empire':'green',
+                                                 'rebel':'red'}
+                                        }
 
 game_level_meta_data = [level_1_meta_data,
                         level_2_meta_data,
                         level_3_meta_data,
                         level_4_meta_data,
                         level_5_meta_data,
-                        level_6_meta_data]
+                        level_6_meta_data,
+                        level_7_meta_data]
 
 with open('game_level_meta_data.yaml','w') as game_level_data_file:
     yaml.dump(game_level_meta_data,game_level_data_file)

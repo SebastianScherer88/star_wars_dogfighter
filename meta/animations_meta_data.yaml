@@ -1,3 +1,12 @@
+bridget_pilot:
+  image_paths: [./graphics/cockpit/bridget.bmp, ./graphics/cockpit/skull.bmp]
+data_science_copilots:
+  image_paths:
+  - [./graphics/cockpit/tom.bmp, ./graphics/cockpit/skull.bmp]
+  - [./graphics/cockpit/alistair.bmp, ./graphics/cockpit/skull.bmp]
+  - [./graphics/cockpit/joe.bmp, ./graphics/cockpit/skull.bmp]
+  - [./graphics/cockpit/seb.bmp, ./graphics/cockpit/skull.bmp]
+  - [./graphics/cockpit/charles.bmp, ./graphics/cockpit/skull.bmp]
 empire_pilot:
   image_paths: [./graphics/cockpit/empire_pilot1.bmp, ./graphics/cockpit/skull.bmp]
 engine:

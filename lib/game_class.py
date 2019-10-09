@@ -52,7 +52,7 @@ class Game(object):
         # initialize main screen
         size = screen_width, screen_height # set screen size
         self.screen = pg.display.set_mode(size)
-        pg.display.set_caption("STAR WARS DOGFIGHTER")
+        pg.display.set_caption("STAR WARS DOGFIGHTER | End Of Pleasantries Edition ")
         
         # load meta data
         with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
@@ -257,7 +257,7 @@ class Game(object):
         clock = pg.time.Clock()
         
         # add STAR WARS DOGFIGHTER text sprite to group/main screen
-        self.blit_message_and_wait("STAR WARS DOGFIGHTER",
+        self.blit_message_and_wait("STAR WARS DOGFIGHTER: End Of Pleasantries",
                                    blackout = False,
                                    blit_mode=False,
                                    font = './graphics/firefight-bb.regular.ttf',
@@ -441,7 +441,7 @@ class Game(object):
         waits a bit and returns.'''
         
         self.blit_message_and_wait("GAME OVER",
-                                   sub_message="Thank You For Playing!",
+                                   sub_message="Thank You For Playing, and all the best! :)",
                                    font='./graphics/firefight-bb.regular.ttf',
                                    wait_seconds = 1.5)
             
@@ -478,7 +478,7 @@ class Game(object):
 
         # --- get meta data for player, ally and hostile sides
         #   pilot skins
-        pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']],
+        pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data['bridget_pilot']['image_paths']],
                         'hostile': [pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_side+'_pilot']['image_paths']]}
         
         # ship skins
@@ -522,8 +522,16 @@ class Game(object):
                             'hostile':level_specs['hostile']['ship_init_kwargs']}
         
         # ally meta data - depends on level
+        #print(self.animations_meta_data['data_science_copilots'])
+        
         if 'ally' in level_specs.keys():
-            pilot_images['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data[player_side+'_pilot']['image_paths']]
+            
+            pilot_images['ally'] = []
+            
+            for image_paths in self.animations_meta_data['data_science_copilots']['image_paths']:
+                
+                pilot_images['ally'].append([pg.image.load(image_path) for image_path in image_paths])
+                    
             ship_images['ally'] = [pg.image.load(image_path) for image_path in self.skins_meta_data[ally_ship]['image_paths']]
             ship_frames['ally'] = [pg.image.load(image_path) for image_path in self.animations_meta_data['ship_frame']['green']['image_paths']]
             gun_offsets['ally'] = np.array(self.skins_meta_data[ally_ship]['gun_offsets']).astype('float')
@@ -1155,18 +1163,21 @@ class Game(object):
         '''Util function that adds a ship's stats id card to the appropriate group.'''
         
         # get pilot images
-        pilot_images = level_meta_data['pilot_images'][side]
+        if side in ('player','hostile'):
+            pilot_images = level_meta_data['pilot_images'][side]
+        elif side == 'ally':
+            pilot_images = level_meta_data['pilot_images'][side][ship_no]
         
         # get sprite group(s)
         ship_bio_group = level_sprite_groups['cockpit']['any']
         
         # create side-> center_x mapping
         side_center = {#'player':(1340,550),
-                       'player':(155,125),
+                       'player':(155,80),
                     #'ally':(1340,125 + ship_no * 130),
-                    'ally':(155, 180 + (ship_no +1) * 130),
+                    'ally':(155, 80 + (ship_no +1) * 110),
                     #'hostile':(155,125 + ship_no * 130)}
-                    'hostile':(1340,100 + ship_no * 130)}
+                    'hostile':(1340,80 + ship_no * 110)}
         
         # get center coordinates for ship stats id card
         center_pos = side_center[side]
