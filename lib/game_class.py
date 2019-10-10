@@ -81,7 +81,7 @@ class Game(object):
             # start levels
             level_index = 0
             
-            while level_index < 6:
+            while level_index < 7:
                 # get level specs for i-th level
                 level_specs = self.level_meta_data[level_index]
                 
@@ -443,7 +443,7 @@ class Game(object):
         self.blit_message_and_wait("GAME OVER",
                                    sub_message="Thank You For Playing, and all the best! :)",
                                    font='./graphics/firefight-bb.regular.ttf',
-                                   wait_seconds = 1.5)
+                                   wait_seconds = 4.5)
             
     def _collect_meta_data_for_level(self,
                                      player_side,
