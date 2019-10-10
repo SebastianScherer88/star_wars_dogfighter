@@ -29,7 +29,7 @@ class Game(object):
         '''Initializes the game object and also the game'''
         
         # chane into executable file directory
-        os.chdir(os.path.join(os.getcwd(),'exe.win-amd64-3.6'))
+        os.chdir(os.path.join(os.getcwd(),'star_wars_dogfighter_build'))
         
         # initialize pygame (handles pretty much eveything)
         pg.init()
