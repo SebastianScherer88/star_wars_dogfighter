@@ -7,7 +7,6 @@ Created on Sun Jul  1 20:15:48 2018
 
 import cx_Freeze
 import os
-import re
 
 os.environ['TCL_LIBRARY'] = r'C:\Users\bettmensch\Anaconda3\envs\game_env\tcl\tcl8.6'
 os.environ['TK_LIBRARY'] = r'C:\Users\bettmensch\Anaconda3\envs\game_env\tcl\tk8.6'

@@ -55,7 +55,7 @@ class Game(object):
         # initialize main screen
         size = screen_width, screen_height # set screen size
         self.screen = pg.display.set_mode(size)
-        pg.display.set_caption("STAR WARS DOGFIGHTER | Hard shores of the force")
+        pg.display.set_caption("STAR WARS DOGFIGHTER | Hard shores of the force Edition ")
         
         # load meta data
         with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
@@ -260,7 +260,7 @@ class Game(object):
         clock = pg.time.Clock()
         
         # add STAR WARS DOGFIGHTER text sprite to group/main screen
-        self.blit_message_and_wait("STAR WARS DOGFIGHTER: Hard shores of the force Edition",
+        self.blit_message_and_wait("STAR WARS DOGFIGHTER: Hard shores of the force",
                                    blackout = False,
                                    blit_mode=False,
                                    font = './graphics/firefight-bb.regular.ttf',
