@@ -1,10 +1,8 @@
-bridget_pilot:
-  image_paths: [./graphics/cockpit/bridget.bmp, ./graphics/cockpit/skull.bmp]
 data_science_copilots:
   image_paths:
   - [./graphics/cockpit/tom.bmp, ./graphics/cockpit/skull.bmp]
   - [./graphics/cockpit/alistair.bmp, ./graphics/cockpit/skull.bmp]
-  - [./graphics/cockpit/joe.bmp, ./graphics/cockpit/skull.bmp]
+  - [./graphics/cockpit/bridget.bmp, ./graphics/cockpit/skull.bmp]
   - [./graphics/cockpit/seb.bmp, ./graphics/cockpit/skull.bmp]
   - [./graphics/cockpit/charles.bmp, ./graphics/cockpit/skull.bmp]
 empire_pilot:
@@ -27,6 +25,8 @@ green:
   sound: ./sounds/slinky_laser.wav
   spi: 0.02
 hit: {sound: ./sounds/explosion.wav, spi: 0.04}
+joe_pilot:
+  image_paths: [./graphics/cockpit/joe.bmp, ./graphics/cockpit/skull.bmp]
 rebel_pilot:
   image_paths: [./graphics/cockpit/rebel_pilot1.bmp, ./graphics/cockpit/skull.bmp]
 red:
