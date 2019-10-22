@@ -25,15 +25,19 @@ You will need:
 The untested "./setup" section is still experimental and relies on the player having a working conda installation. I suggest
 installing the above dependencies manually.
 
-## Running the demo version
+## Running the game
 
-To run the demo version, simply open the "./lib/game_classes.py" in an editor of your choosing and run the script. It should
+To run the game, simply open the "./lib/game_class.py" in an editor of your choosing and run the script. It should
 create a pygame window and immediately start the game.
 
-Alternativly, you could run the "./lib/game_classes.py" script from the command line. If you do this, just make sure you are in the
+Alternativly, you could run "python ./lib/game_class.py" from the windows console - just make sure you are in the
 repo's parent directory.
 
-## Playing the demo
+## Running the special editions
+
+If your name is Bridget or Joe, check out your respective branch and run the executable file located at './build/star_wars_dogfighter/sar_wars_dogfighter.exe' either by calling it from the windows console or by double-clicking it.
+
+## Playing the game
 
 The player's ship is starting out on the right side, marked a yellow frame around it. The
 aim is to shoot down all hostile ships (marked with red frames), with the support of your
