@@ -67,13 +67,13 @@ animations_meta_data['empire_pilot'] = {'image_paths':['./graphics/cockpit/empir
                                                         './graphics/cockpit/skull.bmp']}
 
 # create meta data for bridget#s pilot image
-animations_meta_data['bridget_pilot'] = {'image_paths':['./graphics/cockpit/bridget.bmp',
+animations_meta_data['joe_pilot'] = {'image_paths':['./graphics/cockpit/joe.bmp',
                                                         './graphics/cockpit/skull.bmp']}
 
 # create meta data for data science pilot images
 animations_meta_data['data_science_copilots'] = {'image_paths':[['./graphics/cockpit/tom.bmp','./graphics/cockpit/skull.bmp'],
 ['./graphics/cockpit/alistair.bmp','./graphics/cockpit/skull.bmp'],
-['./graphics/cockpit/joe.bmp','./graphics/cockpit/skull.bmp'],
+['./graphics/cockpit/bridget.bmp','./graphics/cockpit/skull.bmp'],
 ['./graphics/cockpit/seb.bmp','./graphics/cockpit/skull.bmp'],
 ['./graphics/cockpit/charles.bmp','./graphics/cockpit/skull.bmp']]}
 
