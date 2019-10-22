@@ -260,7 +260,7 @@ class Game(object):
         clock = pg.time.Clock()
         
         # add STAR WARS DOGFIGHTER text sprite to group/main screen
-        self.blit_message_and_wait("STAR WARS DOGFIGHTER: End Of Pleasantries",
+        self.blit_message_and_wait("STAR WARS DOGFIGHTER: Hard shores of the force",
                                    blackout = False,
                                    blit_mode=False,
                                    font = './graphics/firefight-bb.regular.ttf',
