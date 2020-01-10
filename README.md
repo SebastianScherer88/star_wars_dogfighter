@@ -1,3 +1,6 @@
+
+!["Your standard rebel scum"](./graphics/cockpit/rebel_pilot1.bmp)
+
 # Star Wars Dogfighter
 
 Welcome to S"tar Wars Dogfighter"! Please read below for a short game description, how to run the demo version and player controls.
@@ -37,6 +40,8 @@ repo's parent directory.
 
 If your name is Bridget or Joe, check out your respective branch and run the executable file located at './build/star_wars_dogfighter/sar_wars_dogfighter.exe' either by calling it from the windows console or by double-clicking it.
 
+!["Another empire stooge"](./graphics/cockpit/empire_pilot1.bmp)
+
 ## Playing the game
 
 The player's ship is starting out on the right side, marked a yellow frame around it. The
@@ -49,6 +54,8 @@ To pause/unpause the game, press the "Escape" key.
 
 To end the game, click on the "x" in the top right corner of the pygame window.
 
+![Intercept!](./graphics/sprite_skins/tieinterceptor1.bmp)
+
 ### Player controls
 
 To accelerate/deccelarate, press the "ARROW UP"/"ARROW DOWN" keys.
@@ -58,3 +65,5 @@ To turn left/right, press the "ARROW LEFT"/"ARROW RIGHT" keys.
 To fire laser cannons, press the SPACEBAR.
 
 To toggle between single/dual/all laser fire modes, press the "F" key.
+
+![Game Over](.graphics/cockpit/skull.bmp)
