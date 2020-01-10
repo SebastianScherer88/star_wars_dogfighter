@@ -1,5 +1,5 @@
 
-!["Your standard rebel scum"](./graphics/cockpit/rebel_pilot1.bmp)
+![Your standard rebel scum](./graphics/cockpit/rebel_pilot1.bmp)
 
 # Star Wars Dogfighter
 
@@ -40,7 +40,7 @@ repo's parent directory.
 
 If your name is Bridget or Joe, check out your respective branch and run the executable file located at './build/star_wars_dogfighter/sar_wars_dogfighter.exe' either by calling it from the windows console or by double-clicking it.
 
-!["Another empire stooge"](./graphics/cockpit/empire_pilot1.bmp)
+![Another empire stooge](./graphics/cockpit/empire_pilot1.bmp)
 
 ## Playing the game
 
@@ -66,4 +66,4 @@ To fire laser cannons, press the SPACEBAR.
 
 To toggle between single/dual/all laser fire modes, press the "F" key.
 
-![Game Over](.graphics/cockpit/skull.bmp)
+![Game Over](./graphics/cockpit/skull.bmp)
