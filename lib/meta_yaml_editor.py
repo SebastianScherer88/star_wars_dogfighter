@@ -58,6 +58,10 @@ animations_meta_data['hit'] = {'sound':'./sounds/explosion.wav',
 animations_meta_data['engine'] = {'image_paths':['./graphics/engine_flame/engine_flame' + str(i+1) + '.bmp' for i in range(4)],
                                     'spi':0.3}
 
+# create meta data for engine flames
+animations_meta_data['engine_trail'] = {'image_paths':['./graphics/engine_trail/engine_trail' + str(i+1) + '.bmp' for i in range(4)],
+                                    'spi':0.15}
+
 # create meta data for rebel pilot images
 animations_meta_data['rebel_pilot'] = {'image_paths':['./graphics/cockpit/rebel_pilot1.bmp',
                                                         './graphics/cockpit/skull.bmp']}

@@ -50,6 +50,8 @@ class ShipSprite(BasicSprite):
                  engine_flame_offsets,
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
+                 original_engine_trail_images,
+                 engine_trail_seconds_per_image,
                  animation_group,
                  groups,
                  hostile_ships_group = None,
@@ -179,9 +181,15 @@ class ShipSprite(BasicSprite):
         self._explosion_seconds_per_image = explosion_seconds_per_image
         
         # set attributes for engine animation when moving
+        
+        # flames
         self._engine_flame_offsets = engine_flame_offsets
         self._original_engine_flame_images = original_engine_flame_images
         self._engine_flame_seconds_per_image = engine_flame_seconds_per_image
+        
+        # vapour trails
+        self._original_engine_trail_images = original_engine_trail_images
+        self._engine_trail_seconds_per_image = engine_trail_seconds_per_image
         
         # set motion control attributes
         self._d_angle_degrees_per_frame = d_angle_degrees_per_second / self._fps
@@ -216,6 +224,7 @@ class ShipSprite(BasicSprite):
         '''Util method to create engine animations.'''
         
         for engine_flame_offset in self._engine_flame_offsets:
+            # engine flame for curent engine
             self._engine_animations.append(TrackingAnimation(self._fps,
                                                              self._screen,
                                                              self._original_engine_flame_images,
@@ -286,6 +295,22 @@ class ShipSprite(BasicSprite):
         group to the current_target group, if feasible. Dummy method at ShipSprite
         level, to be used for AIShipSprite class.'''
         
+    def create_engine_trail(self):
+        
+        for engine_flame_animation in self._engine_animations:
+            # get position and angle of engine trail via the dynamically updated position of corresponding engine flame animation
+            engine_trail_center = engine_flame_animation._center
+            engine_trail_angle = engine_flame_animation._angle
+            
+            # create basic animation with those specs
+            BasicAnimation(self._fps,
+                           self._screen,
+                           self._original_engine_trail_images,
+                           self._engine_trail_seconds_per_image,
+                           [self._animation_group],
+                           center = engine_trail_center,
+                           angle = engine_trail_angle)
+        
     def update(self):
         '''Base class update plus additional ShipSprite specific updates.'''
         
@@ -298,6 +323,8 @@ class ShipSprite(BasicSprite):
         
         # call base class update method
         BasicSprite.update(self)
+        
+        self.create_engine_trail()
         
         # get command to fire from custom method
         self.set_gunner_commands()
@@ -375,6 +402,8 @@ class AIShipSprite(ShipSprite):
                  engine_flame_offsets,
                  original_engine_flame_images,
                  engine_flame_seconds_per_image,
+                 original_engine_trail_images,
+                 engine_trail_seconds_per_image,
                  animation_group,
                  piloting_cone_sine,
                  gunning_cone_sine,
@@ -424,6 +453,8 @@ class AIShipSprite(ShipSprite):
                             engine_flame_offsets,
                             original_engine_flame_images,
                             engine_flame_seconds_per_image,
+                            original_engine_trail_images,
+                            engine_trail_seconds_per_image,
                             animation_group,
                              groups,
                              hostile_ships_group = hostile_ships_group,

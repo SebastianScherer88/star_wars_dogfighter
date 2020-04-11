@@ -1,4 +1,8 @@
 empire:
-  image_paths: [./graphics/misc/empire_logo1.bmp, ./graphics/misc/empire_logo2.bmp]
+  image_paths:
+  - ./graphics/misc/empire_logo1.bmp
+  - ./graphics/misc/empire_logo2.bmp
 rebel:
-  image_paths: [./graphics/misc/alliance_logo1.bmp, ./graphics/misc/alliance_logo2.bmp]
+  image_paths:
+  - ./graphics/misc/alliance_logo1.bmp
+  - ./graphics/misc/alliance_logo2.bmp
