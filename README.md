@@ -1,3 +1,6 @@
+
+![Your standard rebel scum](./graphics/cockpit/rebel_pilot1.bmp)
+
 # Star Wars Dogfighter
 
 ![Better luck next time!](./graphics/readme_pics/game_screenshot.png)
