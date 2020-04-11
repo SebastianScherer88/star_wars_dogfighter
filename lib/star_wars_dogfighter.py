@@ -24,12 +24,13 @@ class Game(object):
     def __init__(self,
                  screen_width=1500,
                  screen_height=700,
-                 fps=15,
+                 #fps=15,
+                 fps=20,
                  background_image = None):
         '''Initializes the game object and also the game'''
         
         # chane into executable file directory
-        os.chdir(os.path.join(os.getcwd(),'exe.win-amd64-3.6'))
+        #os.chdir(os.path.join(os.getcwd(),'exe.win-amd64-3.6'))
         
         # initialize pygame (handles pretty much eveything)
         pg.init()
@@ -556,6 +557,8 @@ class Game(object):
                           'hit_spi':self.animations_meta_data['hit']['spi'],
                           'engine_images':[pg.image.load(image_path) for image_path in self.animations_meta_data['engine']['image_paths']],
                           'engine_spi':self.animations_meta_data['engine']['spi'],
+                          'engine_trail_images':[pg.image.load(image_path) for image_path in self.animations_meta_data['engine_trail']['image_paths']],
+                          'engine_trail_spi':self.animations_meta_data['engine_trail']['spi'],
                           'piloting_cone_sine':0.1,
                           'gunning_cone_sine':0.1,
                           'ship_init_kwargs':ship_init_kwargs,
@@ -1074,6 +1077,8 @@ class Game(object):
                           data['engine_offsets'][side],#self.allied_engine_offsets,
                           data['engine_images'],#self.engine_images,
                           data['engine_spi'],#self.engine_spi,
+                          data['engine_trail_images'],
+                          data['engine_trail_spi'],
                           groups['non_colliders']['any'],#self.animations,
                           data['piloting_cone_sine'], # only neede for AIShipSPrite
                           data['gunning_cone_sine'], # only neede for AIShipSPrite
@@ -1082,7 +1087,7 @@ class Game(object):
         # get initial values for ship sprite initializers from level meta data
         if side == 'player':
             # adjsut args for player
-            ship_init_args = ship_init_args[:20] + ship_init_args[22:]
+            ship_init_args = ship_init_args[:22] + ship_init_args[24:]
             
             # get kwargs for player
             ship_init_kwargs = level_meta_data['ship_init_kwargs'][side]

@@ -1,198 +1,475 @@
 - hostile:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [180]
+      angle:
+      - 180
       center:
-      - !!python/tuple [1200, 350]
-      d_angle_degrees_per_second: [100]
-      d_speed_pixel_per_second: [20]
-      hit_points: [10]
-      max_speed_pixel_per_second: [250]
-      speed: [250]
-  music: {sound: ./sounds/platformer2.wav, volume: 1}
+      - !!python/tuple
+        - 1200
+        - 350
+      d_angle_degrees_per_second:
+      - 100
+      d_speed_pixel_per_second:
+      - 20
+      hit_points:
+      - 10
+      max_speed_pixel_per_second:
+      - 250
+      speed:
+      - 250
+  music:
+    sound: ./sounds/platformer2.wav
+    volume: 1
   player:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
       angle: 0
-      center: [200, 350]
+      center:
+      - 200
+      - 350
       d_angle_degrees_per_second: 150
       d_speed_pixel_per_second: 20
       hit_points: 10
       max_speed_pixel_per_second: 250
       speed: 200
 - hostile:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [180, 180]
+      angle:
+      - 180
+      - 180
       center:
-      - !!python/tuple [1200, 150]
-      - !!python/tuple [1200, 450]
-      d_angle_degrees_per_second: [120, 120]
-      d_speed_pixel_per_second: [20, 20]
-      hit_points: [15, 15]
-      max_speed_pixel_per_second: [250, 250]
-      speed: [230, 230]
-  music: {sound: ./sounds/platformer2.wav, volume: 1}
+      - !!python/tuple
+        - 1200
+        - 150
+      - !!python/tuple
+        - 1200
+        - 450
+      d_angle_degrees_per_second:
+      - 120
+      - 120
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      hit_points:
+      - 15
+      - 15
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      speed:
+      - 230
+      - 230
+  music:
+    sound: ./sounds/platformer2.wav
+    volume: 1
   player:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tieinterceptor, rebel: xwing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tieinterceptor
+      rebel: xwing
     ship_init_kwargs:
       angle: 0
-      center: [200, 350]
+      center:
+      - 200
+      - 350
       d_angle_degrees_per_second: 150
       d_speed_pixel_per_second: 20
       hit_points: 15
       max_speed_pixel_per_second: 250
       speed: 200
 - ally:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [100]
+      angle:
+      - 100
       center:
-      - !!python/tuple [1000, 700]
-      d_angle_degrees_per_second: [140]
-      d_speed_pixel_per_second: [20]
-      hit_points: [15]
-      max_speed_pixel_per_second: [250]
-      speed: [220]
+      - !!python/tuple
+        - 1000
+        - 700
+      d_angle_degrees_per_second:
+      - 140
+      d_speed_pixel_per_second:
+      - 20
+      hit_points:
+      - 15
+      max_speed_pixel_per_second:
+      - 250
+      speed:
+      - 220
   hostile:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [-70, -90, -80]
+      angle:
+      - -70
+      - -90
+      - -80
       center:
-      - !!python/tuple [350, 50]
-      - !!python/tuple [750, 50]
-      - !!python/tuple [1100, 50]
-      d_angle_degrees_per_second: [110, 110, 110]
-      d_speed_pixel_per_second: [20, 20, 20]
-      hit_points: [15, 15, 15]
-      max_speed_pixel_per_second: [250, 250, 250]
-      speed: [200, 200, 200]
-  music: {sound: ./sounds/platformer2.wav, volume: 1}
+      - !!python/tuple
+        - 350
+        - 50
+      - !!python/tuple
+        - 750
+        - 50
+      - !!python/tuple
+        - 1100
+        - 50
+      d_angle_degrees_per_second:
+      - 110
+      - 110
+      - 110
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      - 20
+      hit_points:
+      - 15
+      - 15
+      - 15
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      - 250
+      speed:
+      - 200
+      - 200
+      - 200
+  music:
+    sound: ./sounds/platformer2.wav
+    volume: 1
   player:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
       angle: 80
-      center: [500, 700]
+      center:
+      - 500
+      - 700
       d_angle_degrees_per_second: 150
       d_speed_pixel_per_second: 20
       hit_points: 15
       max_speed_pixel_per_second: 250
       speed: 210
 - ally:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tieinterceptor, rebel: xwing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tieinterceptor
+      rebel: xwing
     ship_init_kwargs:
-      angle: [180, 180]
+      angle:
+      - 180
+      - 180
       center:
-      - !!python/tuple [1400, 100]
-      - !!python/tuple [1400, 700]
-      d_angle_degrees_per_second: [100, 100]
-      d_speed_pixel_per_second: [20, 20]
-      max_speed_pixel_per_second: [250, 250]
-      speed: [250, 250]
+      - !!python/tuple
+        - 1400
+        - 100
+      - !!python/tuple
+        - 1400
+        - 700
+      d_angle_degrees_per_second:
+      - 100
+      - 100
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      speed:
+      - 250
+      - 250
   hostile:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tieinterceptor, rebel: xwing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tieinterceptor
+      rebel: xwing
     ship_init_kwargs:
-      angle: [0, 0, 0]
+      angle:
+      - 0
+      - 0
+      - 0
       center: !!python/tuple
-      - !!python/tuple [50, 100]
-      - !!python/tuple [50, 350]
-      - !!python/tuple [50, 700]
-      d_angle_degrees_per_second: [100, 100, 100]
-      d_speed_pixel_per_second: [20, 20, 20]
-      max_speed_pixel_per_second: [250, 250, 250]
-      speed: [250, 250, 250]
-  music: {sound: ./sounds/platformer2.wav, volume: 1}
+      - !!python/tuple
+        - 50
+        - 100
+      - !!python/tuple
+        - 50
+        - 350
+      - !!python/tuple
+        - 50
+        - 700
+      d_angle_degrees_per_second:
+      - 100
+      - 100
+      - 100
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      - 20
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      - 250
+      speed:
+      - 250
+      - 250
+      - 250
+  music:
+    sound: ./sounds/platformer2.wav
+    volume: 1
   player:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tieinterceptor, rebel: xwing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tieinterceptor
+      rebel: xwing
     ship_init_kwargs:
       angle: 180
-      center: [1400, 350]
+      center:
+      - 1400
+      - 350
       d_angle_degrees_per_second: 150
       d_speed_pixel_per_second: 20
       max_speed_pixel_per_second: 250
       speed: 200
 - ally:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tieinterceptor, rebel: xwing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tieinterceptor
+      rebel: xwing
     ship_init_kwargs:
-      angle: [180, 180]
+      angle:
+      - 180
+      - 180
       center:
-      - !!python/tuple [1400, 100]
-      - !!python/tuple [1400, 700]
-      d_angle_degrees_per_second: [110, 110]
-      d_speed_pixel_per_second: [20, 20]
-      max_speed_pixel_per_second: [250, 250]
-      speed: [250, 250]
+      - !!python/tuple
+        - 1400
+        - 100
+      - !!python/tuple
+        - 1400
+        - 700
+      d_angle_degrees_per_second:
+      - 110
+      - 110
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      speed:
+      - 250
+      - 250
   hostile:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [0, 0, 0, 0]
+      angle:
+      - 0
+      - 0
+      - 0
+      - 0
       center: !!python/tuple
-      - !!python/tuple [50, 100]
-      - !!python/tuple [50, 300]
-      - !!python/tuple [50, 500]
-      - !!python/tuple [50, 700]
-      d_angle_degrees_per_second: [120, 120, 120, 120]
-      d_speed_pixel_per_second: [15, 15, 15, 15]
-      max_speed_pixel_per_second: [250, 250, 250, 250]
-      speed: [250, 250, 250, 250]
-  music: {sound: ./sounds/platformer2.wav, volume: 1}
+      - !!python/tuple
+        - 50
+        - 100
+      - !!python/tuple
+        - 50
+        - 300
+      - !!python/tuple
+        - 50
+        - 500
+      - !!python/tuple
+        - 50
+        - 700
+      d_angle_degrees_per_second:
+      - 120
+      - 120
+      - 120
+      - 120
+      d_speed_pixel_per_second:
+      - 15
+      - 15
+      - 15
+      - 15
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      - 250
+      - 250
+      speed:
+      - 250
+      - 250
+      - 250
+      - 250
+  music:
+    sound: ./sounds/platformer2.wav
+    volume: 1
   player:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tieinterceptor, rebel: xwing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tieinterceptor
+      rebel: xwing
     ship_init_kwargs:
       angle: 180
-      center: [1400, 350]
+      center:
+      - 1400
+      - 350
       d_angle_degrees_per_second: 150
       d_speed_pixel_per_second: 20
       max_speed_pixel_per_second: 250
       speed: 200
 - ally:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [-90, -90, -90]
+      angle:
+      - -90
+      - -90
+      - -90
       center:
-      - !!python/tuple [1400, 100]
-      - !!python/tuple [1400, 200]
-      - !!python/tuple [1400, 300]
-      d_angle_degrees_per_second: [110, 110, 110]
-      d_speed_pixel_per_second: [20, 20, 20]
-      max_speed_pixel_per_second: [250, 250, 250]
-      speed: [240, 240, 240]
+      - !!python/tuple
+        - 1400
+        - 100
+      - !!python/tuple
+        - 1400
+        - 200
+      - !!python/tuple
+        - 1400
+        - 300
+      d_angle_degrees_per_second:
+      - 110
+      - 110
+      - 110
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      - 20
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      - 250
+      speed:
+      - 240
+      - 240
+      - 240
   hostile:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
-      angle: [90, 90, 90, 90, 90]
+      angle:
+      - 90
+      - 90
+      - 90
+      - 90
+      - 90
       center: !!python/tuple
-      - !!python/tuple [50, 150]
-      - !!python/tuple [50, 250]
-      - !!python/tuple [50, 350]
-      - !!python/tuple [50, 450]
-      - !!python/tuple [50, 550]
-      d_angle_degrees_per_second: [120, 120, 120, 120, 120]
-      d_speed_pixel_per_second: [20, 20, 20, 20, 20]
-      max_speed_pixel_per_second: [250, 250, 250, 250, 250]
-      speed: [240, 240, 240, 240, 240]
-  music: {sound: ./sounds/platformer2.wav, volume: 1}
+      - !!python/tuple
+        - 50
+        - 150
+      - !!python/tuple
+        - 50
+        - 250
+      - !!python/tuple
+        - 50
+        - 350
+      - !!python/tuple
+        - 50
+        - 450
+      - !!python/tuple
+        - 50
+        - 550
+      d_angle_degrees_per_second:
+      - 120
+      - 120
+      - 120
+      - 120
+      - 120
+      d_speed_pixel_per_second:
+      - 20
+      - 20
+      - 20
+      - 20
+      - 20
+      max_speed_pixel_per_second:
+      - 250
+      - 250
+      - 250
+      - 250
+      - 250
+      speed:
+      - 240
+      - 240
+      - 240
+      - 240
+      - 240
+  music:
+    sound: ./sounds/platformer2.wav
+    volume: 1
   player:
-    laser: {empire: green, rebel: red}
-    ship: {empire: tiefighter, rebel: awing}
+    laser:
+      empire: green
+      rebel: red
+    ship:
+      empire: tiefighter
+      rebel: awing
     ship_init_kwargs:
       angle: 0
-      center: [1400, 550]
+      center:
+      - 1400
+      - 550
       d_angle_degrees_per_second: 150
       d_speed_pixel_per_second: 20
       max_speed_pixel_per_second: 250
