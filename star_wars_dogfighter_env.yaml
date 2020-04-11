@@ -1,0 +1,27 @@
+name: star_wars_dogfighter_env
+channels:
+  - anaconda-fusion
+  - conda-forge
+  - bioconda
+  - r
+  - defaults
+dependencies:
+  - certifi=2019.11.28=py36_0
+  - cx_freeze=6.0=py36hfa6e2cd_0
+  - libblas=3.8.0=14_mkl
+  - libcblas=3.8.0=14_mkl
+  - liblapack=3.8.0=14_mkl
+  - numpy=1.17.3=py36hc71023c_0
+  - pip=9.0.1=py36_1
+  - python=3.6.2=0
+  - vc=14=0
+  - vs2015_runtime=14.0.25420=0
+  - wheel=0.29.0=py36_0
+  - wincertstore=0.2=py36_0
+  - intel-openmp=2019.4=245
+  - mkl=2019.4=245
+  - setuptools=36.4.0=py36_1
+  - pip:
+    - pygame==1.9.3
+prefix: C:\Users\bettmensch\Anaconda3\envs\star_wars_dogfighter_env
+

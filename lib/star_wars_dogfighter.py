@@ -55,7 +55,7 @@ class Game(object):
         # initialize main screen
         size = screen_width, screen_height # set screen size
         self.screen = pg.display.set_mode(size)
-        pg.display.set_caption("STAR WARS DOGFIGHTER | Hard shores of the force Edition ")
+        pg.display.set_caption("STAR WARS DOGFIGHTER | Jarred malaise of the republic")
         
         # load meta data
         with open('./meta/sprite_skins_meta_data.yaml','r') as skins_meta_file:
@@ -260,7 +260,7 @@ class Game(object):
         clock = pg.time.Clock()
         
         # add STAR WARS DOGFIGHTER text sprite to group/main screen
-        self.blit_message_and_wait("STAR WARS DOGFIGHTER: Hard shores of the force",
+        self.blit_message_and_wait("STAR WARS DOGFIGHTER: Jarred malaise of the republic",
                                    blackout = False,
                                    blit_mode=False,
                                    font = './graphics/firefight-bb.regular.ttf',
@@ -481,7 +481,7 @@ class Game(object):
 
         # --- get meta data for player, ally and hostile sides
         #   pilot skins
-        pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data['joe_pilot']['image_paths']],
+        pilot_images = {'player':[pg.image.load(image_path) for image_path in self.animations_meta_data['charl_pilot']['image_paths']],
                         'hostile': [pg.image.load(image_path) for image_path in self.animations_meta_data[hostile_side+'_pilot']['image_paths']]}
         
         # ship skins
