@@ -2,7 +2,9 @@
 
 # Star Wars Dogfighter
 
-Welcome to S"tar Wars Dogfighter"! Please read below for a short game description, how to run the demo version and player controls.
+Welcome to `Star Wars Dogfighter`! 
+
+Please read below for a short game description, how to run the demo version and player controls.
 
 ## Summary
 
