@@ -1,3 +1,5 @@
+![Better luck next time!](./graphics/readme_pics/game_screenshot.png)
+
 # Star Wars Dogfighter
 
 Welcome to S"tar Wars Dogfighter"! Please read below for a short game description, how to run the demo version and player controls.
@@ -8,49 +10,47 @@ This is a game I wanted to do for some time. It's a classic 2D, top-down shooter
 supported by ally ships. The version in both master and dev_star_wars branches are demo versions that are not the finished game,
 but should let you see what its all about. I'm having a lot of fun working on this game, but it still is very much a work in progress!
 
+![Your standard rebel scum](./graphics/cockpit/rebel_pilot1.bmp)
+
 Please feel free to try it out on your computer, and contact me at below email to leave some feedback!
 
 scherersebastian@yahoo.de
 
 I hope you have as much fun playing (the eventual finished version of) this game as I am having creating it.
 
-## Dependencies
+![Another empire stooge](./graphics/cockpit/empire_pilot1.bmp)
 
-You will need:
+## Playing the game
 
-- python 3.x
-- numpy
-- pygame
+Download the game files by selectig the 'Download ZIP files' option on the game's github page:
 
-The untested "./setup" section is still experimental and relies on the player having a working conda installation. I suggest
-installing the above dependencies manually.
+![Download the game](./graphics/readme_pics/github_download.PNG)
 
-## Running the demo version
+After extracting the files, run the game by double clicking the file `./build/exe.win-amd64-3.6/star_wars_dogfighter.exe`.
 
-To run the demo version, simply open the "./lib/game_classes.py" in an editor of your choosing and run the script. It should
-create a pygame window and immediately start the game.
+### Game settings
 
-Alternativly, you could run the "./lib/game_classes.py" script from the command line. If you do this, just make sure you are in the
-repo's parent directory.
+To toggle sound on/off, press the `S` key.
 
-## Playing the demo
+To pause/unpause the game, press the `Esc` key.
 
-The player's ship is starting out on the right side, marked a yellow frame around it. The
-aim is to shoot down all hostile ships (marked with red frames), with the support of your
-wing-men (marked by green frames).
+To end the game, either
 
-To toggle sound on/off, press the "S" key.
+  - click on the "x" in the top right corner of the pygame window.
+  - Pressing the `Esc` key, then pressing the Q` key
 
-To pause/unpause the game, press the "Escape" key.
-
-To end the game, click on the "x" in the top right corner of the pygame window.
+![Game Over](./graphics/cockpit/skull.bmp)
 
 ### Player controls
 
-To accelerate/deccelarate, press the "ARROW UP"/"ARROW DOWN" keys.
+To accelerate/deccelarate, press the `ARROW UP`/`ARROW DOWN` keys.
 
-To turn left/right, press the "ARROW LEFT"/"ARROW RIGHT" keys.
+To turn left/right, press the `ARROW LEFT`/`ARROW RIGHT` keys.
 
-To fire laser cannons, press the SPACEBAR.
+To fire laser cannons, press the `SPACEBAR`.
 
-To toggle between single/dual/all laser fire modes, press the "F" key.
+To toggle between single/dual/all laser fire modes, press the `F` key.
+
+# May the force be with you!
+
+![Intercept!](./graphics/sprite_skins/tieinterceptor1.bmp)
