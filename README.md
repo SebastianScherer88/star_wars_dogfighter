@@ -1,6 +1,6 @@
-![Better luck next time!](./graphics/readme_pics/game_screenshot.png)
-
 # Star Wars Dogfighter
+
+![Better luck next time!](./graphics/readme_pics/game_screenshot.png)
 
 Welcome to `Star Wars Dogfighter`! 
 
