@@ -25,7 +25,7 @@ Download the game files by selectig the 'Download ZIP files' option on the game'
 
 ![Download the game](./graphics/readme_pics/github_download.PNG)
 
-After extracting the files, run the game by double clicking the file `./build/exe.win-amd64-3.6/star_wars_dogfighter.exe`.
+After extracting the files, run the game by double clicking the file `./build/exe.win-amd64-3.6/Star Wars Dogfighter.exe`.
 
 ### Game settings
 
