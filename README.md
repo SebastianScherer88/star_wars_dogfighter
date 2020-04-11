@@ -9,16 +9,13 @@ Please read below for a short game description, how to run the demo version and 
 ## Summary
 
 This is a game I wanted to do for some time. It's a classic 2D, top-down shooter with where the player shoots down enemy ships while being
-supported by ally ships. The version in both master and dev_star_wars branches are demo versions that are not the finished game,
-but should let you see what its all about. I'm having a lot of fun working on this game, but it still is very much a work in progress!
+supported by ally ships. I had a lot of fun working on this game, and hope you enjoy playing it as much as I enjoyed making it!
 
 ![Your standard rebel scum](./graphics/cockpit/rebel_pilot1.bmp)
 
 Please feel free to try it out on your computer, and contact me at below email to leave some feedback!
 
 scherersebastian@yahoo.de
-
-I hope you have as much fun playing (the eventual finished version of) this game as I am having creating it.
 
 ![Another empire stooge](./graphics/cockpit/empire_pilot1.bmp)
 
