@@ -18,7 +18,7 @@ mkl_files_to_include = [dll_file_name for dll_file_name in mkl_dll_files if dll_
 mkl_files_to_incldue = [dll_file_name for dll_file_name in mkl_files_to_include if dll_file_name.endswith('.dll')]
 
 
-executables = [cx_Freeze.Executable(script = "./lib/star_wars_dogfighter.py")]
+executables = [cx_Freeze.Executable(script = "./lib/star_wars_dogfighter.py",targetName = 'Star Wars Dogfighter')]
 
 cx_Freeze.setup(
     name="Star Wars Dogfighter",
