@@ -52,4 +52,4 @@ To toggle between single/dual/all laser fire modes, press the `F` key.
 
 # May the force be with you!
 
-![Intercept!](./graphics/sprite_skins/tieinterceptor1.bmp)
+![Intercept!](./graphics/readme_pics/tieinterceptor_vs_xwing.bmp)
