@@ -21,11 +21,15 @@ scherersebastian@yahoo.de
 
 ## Playing the game
 
-Download the game files by selectig the 'Download ZIP files' option on the game's github page:
+Download the game files by selectig by downloading the .zip file from the [release section](https://github.com/SebastianScherer88/star_wars_dogfighter/releases/tag/v1.0) of the repo:
 
-![Download the game](./graphics/readme_pics/github_download.PNG)
+![Navigate to the release section from the main page](./graphics/readme_pics/github_release_1.PNG)
+![Select the game release files](./graphics/readme_pics/github_release_2.PNG)
+![Download the game](./graphics/readme_pics/github_release_3.PNG)
 
-After extracting the files, run the game by double clicking the file `./build/exe.win-amd64-3.6/Star Wars Dogfighter.exe`.
+After extracting the files, run the game by double clicking the executable file like below. 
+
+![Time to play](./graphics/readme_pics/github_release_4.PNG)
 
 ### Game settings
 
